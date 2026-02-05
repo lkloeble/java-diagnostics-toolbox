@@ -1,27 +1,38 @@
 import re
+from typing import List, Dict
 
-def validate_log_format(lines: list[str]) -> None:
+OLD_REGIONS_PATTERN = re.compile(
+    r'\[([^\]]+)\]'                     # timestamp
+    r'\[([\d.]+)s\]'                    # uptime
+    r'\[info\]\[gc,heap[^]]*\]'         # [gc,heap     ] ou n'importe quoi entre crochets
+    r'\s*GC\(\d+\)'                     # GC(10)
+    r'.*Old\s+regions:\s*(\d+)\s*->\s*(\d+)'  # Old regions: 214 -> 227 (espaces partout)
+)
+
+def validate_log_format(lines: List[str]) -> None:
     if not lines:
-        raise ValueError("Empty log file")
-    if "Using G1" not in lines[0]:
-        raise ValueError("Invalid log format: Must be Java 9+ unified logging with G1")
-    # Check first event line pattern.
-    pattern = re.compile(r'\[\d{4}-\d{2}-\d{2}T.*\]\[\d+\.\d+s\]\[info\]\[gc.*\]')
-    if not pattern.match(lines[1]):
-        raise ValueError("Invalid log format: Does not match expected unified pattern")
+        raise ValueError("Log file is empty")
+    # Vérification minimale : présence d'au moins un GC event + G1 mentionné quelque part
+    has_g1 = any("G1" in line for line in lines[:10])
+    has_heap_event = any("gc,heap" in line for line in lines)
+    if not (has_g1 and has_heap_event):
+        raise ValueError("Invalid format: expected G1 unified logging with gc,heap events")
 
-def parse_log(lines: list[str]) -> list[dict]:
+
+def parse_log(lines: List[str]) -> List[Dict]:
     validate_log_format(lines)
-    events = []
-    for i, line in enumerate(lines[1:], start=1):  # Skip first "Using G1".
-        if '[gc,heap]' not in line:
-            continue
-        # Mock parse: [ts][up][info][gc,heap] GC#N Heap: before->after (max) Old: before->after
-        parts = re.search(r'\[(\d+\.\d+)s\].*Old: (\d+)M->(\d+)M', line)
-        if parts:
+    events: List[Dict] = []
+
+    for line_num, line in enumerate(lines, start=1):
+        match = OLD_REGIONS_PATTERN.search(line)
+        if match:
+            timestamp, uptime_str, before_str, after_str = match.groups()
             events.append({
-                'line_num': i + 1,  # 1-indexed.
-                'uptime': float(parts.group(1)),
-                'old_after': int(parts.group(3))
+                'line_num': line_num,
+                'timestamp': timestamp,
+                'uptime_sec': float(uptime_str),
+                'old_before_regions': int(before_str),
+                'old_after_regions': int(after_str),
             })
+
     return events
