@@ -2,14 +2,6 @@ from pathlib import Path
 import pytest
 from gc_diagnostic.parser import parse_log, validate_log_format, OLD_REGIONS_PATTERN
 
-@pytest.fixture(scope="session")
-def gc_fast_log_lines():
-    repo_root = Path(__file__).resolve().parents[3]
-    path = repo_root / "samples" / "gc-fast.log"
-    if not path.is_file():
-        pytest.skip(f"Sample file not found: {path}\nAdd it to /samples/ and commit.")
-    return path.read_text(encoding="utf-8").splitlines()
-
 def test_parses_real_fast_leak_log(gc_fast_log_lines):
     events = parse_log(gc_fast_log_lines)
     assert len(events) >= 5, f"Seulement {len(events)} events GC old regions détectés"
