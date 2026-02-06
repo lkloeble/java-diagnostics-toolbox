@@ -11,7 +11,7 @@ from gc_diagnostic.reporter import generate_report
 def main():
     parser = argparse.ArgumentParser(
         description="GC Flu Test: quick triage of G1 GC logs for common issues",
-        epilog="Example: python get-gc-diagnostic.py samples/gc-fast.log --tail-window 2 --format md"
+        epilog="Example: python get-gc-diagnostic.py samples/gc-memoryleak-fast.log --tail-window 2 --format md"
     )
     parser.add_argument("log_file", type=str, help="Path to the GC log file")
     parser.add_argument("--tail-window", type=int, default=None, help="Analyze only last N minutes")
