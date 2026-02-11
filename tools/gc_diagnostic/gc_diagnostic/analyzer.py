@@ -273,6 +273,113 @@ def detect_long_stw_pauses(
     }
 
 
+def detect_allocation_pressure(
+        filtered_events: List[Dict],
+        evac_failure_threshold: int = 5
+) -> Dict:
+    """
+    Détection de l'allocation pressure via Evacuation Failure count.
+
+    Evacuation Failure = le GC n'a pas pu déplacer les objets car pas assez de place.
+    C'est le signal le plus direct d'allocation pressure en G1GC.
+
+    Seuil par défaut: > 5 evacuation failures → allocation pressure détectée.
+    """
+    if not filtered_events:
+        return {
+            "type": "allocation_pressure",
+            "detected": False,
+            "confidence": "low",
+            "reason": "no events",
+            "evac_failure_count": 0,
+            "evidence": [],
+            "next_steps": [],
+            "business_note": ""
+        }
+
+    # Compter les Evacuation Failures
+    evac_failures = [e for e in filtered_events if e.get('evacuation_failure', False)]
+    evac_failure_count = len(evac_failures)
+
+    # Calcul durée pour contexte
+    first = filtered_events[0]
+    last = filtered_events[-1]
+    duration_min = (last['uptime_sec'] - first['uptime_sec']) / 60
+
+    # Détection
+    detected = evac_failure_count > evac_failure_threshold
+
+    # Confidence basée sur le nombre d'échecs
+    if detected:
+        if evac_failure_count > 50:
+            confidence = "high"
+        elif evac_failure_count > 20:
+            confidence = "medium"
+        else:
+            confidence = "low"
+    else:
+        confidence = "low"
+
+    # Evidence
+    evidence = []
+    if evac_failure_count > 0:
+        evidence.append(f"Evacuation Failures: {evac_failure_count} (threshold: {evac_failure_threshold})")
+        evidence.append(f"Analysis window: {duration_min:.1f} min, {len(filtered_events)} GC events")
+
+        # Montrer quelques exemples
+        samples = evac_failures[:5]
+        for e in samples:
+            old = e.get('old_after_regions', '?')
+            t = e['uptime_sec'] / 60
+            evidence.append(f"  GC({e['gc_number']}) at {t:.1f}min: Old={old} regions")
+        if len(evac_failures) > 5:
+            evidence.append(f"  ... and {len(evac_failures) - 5} more")
+    else:
+        evidence.append("No Evacuation Failures detected")
+
+    # Next steps
+    next_steps = []
+    if detected:
+        next_steps = [
+            "Increase heap size (-Xmx) if possible",
+            "JFR recording to identify allocation hotspots",
+            "Review object allocation patterns (large arrays, frequent allocations)",
+            "Consider tuning G1 parameters: -XX:G1HeapRegionSize, -XX:G1ReservePercent"
+        ]
+
+    # Business note
+    if detected:
+        if evac_failure_count > 50:
+            business_note = (
+                "SEVERE ALLOCATION PRESSURE: {} Evacuation Failures detected. "
+                "The application is allocating objects faster than G1 can evacuate them. "
+                "This causes promotion failures and degrades performance significantly. "
+                "Immediate action: increase heap or reduce allocation rate."
+            ).format(evac_failure_count)
+        else:
+            business_note = (
+                "ALLOCATION PRESSURE detected: {} Evacuation Failures. "
+                "G1 is struggling to keep up with object allocation rate. "
+                "This can lead to longer GC pauses and degraded throughput. "
+                "Consider increasing heap size or optimizing allocation patterns."
+            ).format(evac_failure_count)
+    else:
+        business_note = ""
+
+    return {
+        "type": "allocation_pressure",
+        "detected": detected,
+        "confidence": confidence,
+        "evac_failure_count": evac_failure_count,
+        "evac_failure_threshold": evac_failure_threshold,
+        "duration_min": round(duration_min, 1),
+        "events_count": len(filtered_events),
+        "evidence": evidence,
+        "next_steps": next_steps,
+        "business_note": business_note
+    }
+
+
 def analyze_events(
         events: List[Dict],
         tail_minutes: Optional[int] = None,
@@ -293,14 +400,14 @@ def analyze_events(
             "suspects": []
         }
 
-    # Liste des fonctions de détection (ajoute-en 6 autres ici plus tard)
+    # Liste des fonctions de détection
     detections = [
         detect_retention_growth(filtered_events,
                                 old_trend_threshold,
-                                max_heap_mb=max_heap_mb,           # ← on les passe ici
-                                region_size_mb=region_size_mb),      # ← on les passe ici),
+                                max_heap_mb=max_heap_mb,
+                                region_size_mb=region_size_mb),
+        detect_allocation_pressure(filtered_events),
         detect_long_stw_pauses(filtered_events, stw_threshold_ms),
-        # Ajoute ici detect_allocation_pressure, detect_humongous, etc.
     ]
 
     # Filtre seulement les detected/suspected

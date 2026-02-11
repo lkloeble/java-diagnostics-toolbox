@@ -4,6 +4,7 @@ from gc_diagnostic.parser import parse_log
 from gc_diagnostic.analyzer import analyze_events
 from gc_diagnostic.analyzer import detect_long_stw_pauses
 from gc_diagnostic.analyzer import detect_retention_growth
+from gc_diagnostic.analyzer import detect_allocation_pressure
 
 @pytest.fixture
 def sample_events():
@@ -144,16 +145,20 @@ def test_detect_long_stw_pauses_with_long_pause():
 def test_analyze_events_orchestrates_multiple_suspects(sample_events):
     result = analyze_events(sample_events, tail_minutes=None, old_trend_threshold=40.0)
     assert "suspects" in result
-    assert len(result["suspects"]) == 2, "Doit analyser retention_growth + long_stw_pauses"
+    assert len(result["suspects"]) == 3, "Doit analyser retention_growth + allocation_pressure + long_stw_pauses"
 
-    # Vérifie que les deux types sont présents
+    # Vérifie que les trois types sont présents
     types = {s["type"] for s in result["suspects"]}
     assert "retention_growth" in types
+    assert "allocation_pressure" in types
     assert "long_stw_pauses" in types
 
-    # Vérifie que retention est détecté, STW non
+    # Vérifie que retention est détecté, les autres non
     retention = next(s for s in result["suspects"] if s["type"] == "retention_growth")
     assert retention["detected"] is True
+
+    alloc = next(s for s in result["suspects"] if s["type"] == "allocation_pressure")
+    assert alloc["detected"] is False  # sample_events n'a pas d'evacuation_failure
 
     stw = next(s for s in result["suspects"] if s["type"] == "long_stw_pauses")
     assert stw["detected"] is False
@@ -193,3 +198,51 @@ def test_detect_retention_growth_ignores_last_oom_crash():
     assert result["duration_min"] == pytest.approx(3.0, abs=0.1)  # 240 - 60 = 180 s = 3 min
     assert result["delta_regions"] == 800 - 100, "Delta sur events stables"
     assert result["events_count"] == 5, "events_count reste le total filtré"
+
+
+# === Tests for allocation pressure ===
+
+def test_detect_allocation_pressure_no_failures():
+    """No allocation pressure when no evacuation failures."""
+    events = [
+        {'uptime_sec': 60.0, 'old_after_regions': 100, 'evacuation_failure': False},
+        {'uptime_sec': 120.0, 'old_after_regions': 150, 'evacuation_failure': False},
+        {'uptime_sec': 180.0, 'old_after_regions': 200, 'evacuation_failure': False},
+    ]
+    result = detect_allocation_pressure(events, evac_failure_threshold=5)
+    assert result["detected"] is False
+    assert result["evac_failure_count"] == 0
+    assert result["confidence"] == "low"
+
+
+def test_detect_allocation_pressure_with_failures():
+    """Allocation pressure detected with multiple evacuation failures."""
+    events = [
+        {'uptime_sec': 60.0, 'old_after_regions': 100, 'evacuation_failure': False, 'gc_number': 1},
+        {'uptime_sec': 120.0, 'old_after_regions': 500, 'evacuation_failure': True, 'gc_number': 2},
+        {'uptime_sec': 180.0, 'old_after_regions': 600, 'evacuation_failure': True, 'gc_number': 3},
+        {'uptime_sec': 240.0, 'old_after_regions': 700, 'evacuation_failure': True, 'gc_number': 4},
+        {'uptime_sec': 300.0, 'old_after_regions': 800, 'evacuation_failure': True, 'gc_number': 5},
+        {'uptime_sec': 360.0, 'old_after_regions': 850, 'evacuation_failure': True, 'gc_number': 6},
+        {'uptime_sec': 420.0, 'old_after_regions': 900, 'evacuation_failure': True, 'gc_number': 7},
+    ]
+    result = detect_allocation_pressure(events, evac_failure_threshold=5)
+    assert result["detected"] is True
+    assert result["evac_failure_count"] == 6
+    assert result["confidence"] == "low"  # 6 failures, threshold for medium is 20
+    assert len(result["evidence"]) > 0
+    assert len(result["next_steps"]) > 0
+
+
+def test_detect_allocation_pressure_high_confidence():
+    """High confidence with many evacuation failures."""
+    # 60 evacuation failures
+    events = [
+        {'uptime_sec': i * 10.0, 'old_after_regions': 900, 'evacuation_failure': True, 'gc_number': i}
+        for i in range(60)
+    ]
+    result = detect_allocation_pressure(events, evac_failure_threshold=5)
+    assert result["detected"] is True
+    assert result["evac_failure_count"] == 60
+    assert result["confidence"] == "high"
+    assert "SEVERE" in result["business_note"]
