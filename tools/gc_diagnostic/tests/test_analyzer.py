@@ -5,6 +5,7 @@ from gc_diagnostic.analyzer import analyze_events
 from gc_diagnostic.analyzer import detect_long_stw_pauses
 from gc_diagnostic.analyzer import detect_retention_growth
 from gc_diagnostic.analyzer import detect_allocation_pressure
+from gc_diagnostic.analyzer import detect_humongous_pressure
 
 @pytest.fixture
 def sample_events():
@@ -145,13 +146,14 @@ def test_detect_long_stw_pauses_with_long_pause():
 def test_analyze_events_orchestrates_multiple_suspects(sample_events):
     result = analyze_events(sample_events, tail_minutes=None, old_trend_threshold=40.0)
     assert "suspects" in result
-    assert len(result["suspects"]) == 3, "Doit analyser retention_growth + allocation_pressure + long_stw_pauses"
+    assert len(result["suspects"]) == 4, "Doit analyser retention_growth + allocation_pressure + long_stw_pauses + humongous_pressure"
 
-    # Vérifie que les trois types sont présents
+    # Vérifie que les quatre types sont présents
     types = {s["type"] for s in result["suspects"]}
     assert "retention_growth" in types
     assert "allocation_pressure" in types
     assert "long_stw_pauses" in types
+    assert "humongous_pressure" in types
 
     # Vérifie que retention est détecté, les autres non
     retention = next(s for s in result["suspects"] if s["type"] == "retention_growth")
@@ -162,6 +164,9 @@ def test_analyze_events_orchestrates_multiple_suspects(sample_events):
 
     stw = next(s for s in result["suspects"] if s["type"] == "long_stw_pauses")
     assert stw["detected"] is False
+
+    humongous = next(s for s in result["suspects"] if s["type"] == "humongous_pressure")
+    assert humongous["detected"] is False  # sample_events n'a pas d'humongous
 
 
 def test_detect_retention_growth_ignores_last_oom_crash():
@@ -246,3 +251,69 @@ def test_detect_allocation_pressure_high_confidence():
     assert result["evac_failure_count"] == 60
     assert result["confidence"] == "high"
     assert "SEVERE" in result["business_note"]
+
+
+# === Tests for humongous pressure ===
+
+def test_detect_humongous_pressure_no_humongous():
+    """No humongous pressure when no humongous regions."""
+    events = [
+        {'uptime_sec': 60.0, 'old_after_regions': 100, 'humongous_before': 0, 'humongous_after': 0, 'gc_number': 0},
+        {'uptime_sec': 120.0, 'old_after_regions': 150, 'humongous_before': 0, 'humongous_after': 0, 'gc_number': 1},
+        {'uptime_sec': 180.0, 'old_after_regions': 200, 'humongous_before': 0, 'humongous_after': 0, 'gc_number': 2},
+    ]
+    result = detect_humongous_pressure(events)
+    assert result["detected"] is False
+    assert result["frequency_pct"] == 0.0
+    assert result["peak_humongous"] == 0
+    assert result["confidence"] == "low"
+
+
+def test_detect_humongous_pressure_low_frequency():
+    """No detection when humongous frequency is below threshold."""
+    # Only 1 out of 10 GCs has humongous = 10% (below 20% threshold)
+    events = [
+        {'uptime_sec': i * 60.0, 'old_after_regions': 100, 'humongous_before': 0, 'humongous_after': 0, 'gc_number': i}
+        for i in range(10)
+    ]
+    events[5]['humongous_before'] = 15  # Only one with humongous
+    events[5]['humongous_after'] = 0
+
+    result = detect_humongous_pressure(events, frequency_threshold_pct=20.0, peak_threshold_regions=30)
+    assert result["detected"] is False
+    assert result["frequency_pct"] == 10.0
+    assert result["peak_humongous"] == 15
+
+
+def test_detect_humongous_pressure_high_frequency():
+    """Detect humongous pressure with high frequency."""
+    # 6 out of 10 GCs have humongous = 60%
+    events = [
+        {'uptime_sec': i * 60.0, 'old_after_regions': 100, 'humongous_before': 35 if i >= 4 else 0, 'humongous_after': 0, 'gc_number': i}
+        for i in range(10)
+    ]
+
+    result = detect_humongous_pressure(events, frequency_threshold_pct=20.0, peak_threshold_regions=30)
+    assert result["detected"] is True
+    assert result["frequency_pct"] == 60.0
+    assert result["detected_by_frequency"] is True
+    assert result["confidence"] == "high"  # >50% frequency
+    assert "SIGNIFICANT HUMONGOUS PRESSURE" in result["business_note"]
+
+
+def test_detect_humongous_pressure_high_peak():
+    """Detect humongous pressure with high peak (large allocations)."""
+    # Low frequency but high peak
+    events = [
+        {'uptime_sec': i * 60.0, 'old_after_regions': 100, 'humongous_before': 0, 'humongous_after': 0, 'gc_number': i}
+        for i in range(10)
+    ]
+    events[5]['humongous_before'] = 50  # One large humongous allocation
+    events[5]['humongous_after'] = 0
+
+    result = detect_humongous_pressure(events, frequency_threshold_pct=20.0, peak_threshold_regions=30)
+    assert result["detected"] is True
+    assert result["peak_humongous"] == 50
+    assert result["detected_by_peak"] is True
+    assert result["detected_by_frequency"] is False
+    assert result["confidence"] == "low"  # Only peak, not frequency

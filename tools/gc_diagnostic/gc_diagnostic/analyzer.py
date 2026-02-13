@@ -416,6 +416,160 @@ def detect_allocation_pressure(
     }
 
 
+def detect_humongous_pressure(
+        filtered_events: List[Dict],
+        frequency_threshold_pct: float = 20.0,
+        peak_threshold_regions: int = 30,
+        max_heap_regions: Optional[int] = None
+) -> Dict:
+    """
+    Détection de pression humongous (objets > 50% d'une région G1).
+
+    Les humongous objects causent:
+    - Fragmentation du heap (ne peuvent pas être déplacés)
+    - Concurrent cycles plus fréquents
+    - Potentiellement des Full GC
+
+    Signaux:
+    1. Fréquence: % de GCs avec humongous > 0 (pression constante)
+    2. Peak: Max humongous regions (taille des allocations)
+    """
+    if not filtered_events:
+        return {
+            "type": "humongous_pressure",
+            "detected": False,
+            "confidence": "low",
+            "reason": "no events",
+            "evidence": [],
+            "next_steps": [],
+            "business_note": ""
+        }
+
+    # Calcul durée pour contexte
+    first = filtered_events[0]
+    last = filtered_events[-1]
+    duration_min = (last['uptime_sec'] - first['uptime_sec']) / 60
+
+    # Récupérer les events avec humongous_before
+    events_with_humongous = [
+        e for e in filtered_events
+        if e.get('humongous_before') is not None and e['humongous_before'] > 0
+    ]
+
+    total_gc_count = len(filtered_events)
+    humongous_gc_count = len(events_with_humongous)
+
+    # Fréquence des GCs avec humongous
+    frequency_pct = (humongous_gc_count / total_gc_count * 100) if total_gc_count > 0 else 0
+
+    # Peak et average humongous
+    if events_with_humongous:
+        peak_humongous = max(e['humongous_before'] for e in events_with_humongous)
+        avg_humongous = sum(e['humongous_before'] for e in events_with_humongous) / len(events_with_humongous)
+    else:
+        peak_humongous = 0
+        avg_humongous = 0
+
+    # Ratio par rapport au heap total si disponible
+    heap_ratio_pct = None
+    if max_heap_regions and max_heap_regions > 0 and peak_humongous > 0:
+        heap_ratio_pct = (peak_humongous / max_heap_regions) * 100
+
+    # === LOGIQUE DE DÉTECTION ===
+    # Signal 1: Fréquence élevée (beaucoup de GCs ont des humongous)
+    detected_by_frequency = frequency_pct >= frequency_threshold_pct
+
+    # Signal 2: Peak élevé (grosses allocations humongous)
+    detected_by_peak = peak_humongous >= peak_threshold_regions
+
+    # Détection finale
+    detected = detected_by_frequency or detected_by_peak
+
+    # === CONFIDENCE ===
+    if detected:
+        if detected_by_frequency and detected_by_peak and frequency_pct >= 50:
+            confidence = "high"
+        elif detected_by_frequency and frequency_pct >= 50:
+            confidence = "high"
+        elif detected_by_frequency and detected_by_peak:
+            confidence = "medium"
+        else:
+            confidence = "low"
+    else:
+        confidence = "low"
+
+    # === EVIDENCE ===
+    evidence = []
+    evidence.append(f"GCs with humongous: {humongous_gc_count}/{total_gc_count} ({frequency_pct:.1f}%)")
+    if peak_humongous > 0:
+        evidence.append(f"Peak humongous regions: {peak_humongous} (avg: {avg_humongous:.1f})")
+    if heap_ratio_pct is not None:
+        evidence.append(f"Peak humongous vs heap: {heap_ratio_pct:.1f}%")
+    evidence.append(f"Analysis window: {duration_min:.1f} min")
+
+    # Montrer quelques exemples si détecté
+    if detected and events_with_humongous:
+        # Top 3 par humongous_before
+        top_events = sorted(events_with_humongous, key=lambda e: e['humongous_before'], reverse=True)[:3]
+        for e in top_events:
+            h_before = e['humongous_before']
+            h_after = e.get('humongous_after', '?')
+            t = e['uptime_sec'] / 60
+            evidence.append(f"  GC({e['gc_number']}) at {t:.1f}min: Humongous {h_before}->{h_after}")
+
+    # === NEXT STEPS ===
+    next_steps = []
+    if detected:
+        next_steps = [
+            "Identify humongous allocations: -Xlog:gc+humongous=debug",
+            "JFR recording to find allocation sites of large objects",
+            "Review code for large arrays, collections, or buffers (> region_size/2)",
+            "Consider increasing G1HeapRegionSize to reduce humongous threshold"
+        ]
+
+    # === BUSINESS NOTE ===
+    if detected:
+        if confidence == "high":
+            business_note = (
+                "SIGNIFICANT HUMONGOUS PRESSURE: {:.0f}% of GCs involve humongous objects. "
+                "These are objects larger than half a G1 region (typically > 512KB). "
+                "Humongous objects cause heap fragmentation and cannot be evacuated during young GC. "
+                "This leads to more frequent concurrent cycles and potential Full GCs."
+            ).format(frequency_pct)
+        elif detected_by_peak:
+            business_note = (
+                "LARGE HUMONGOUS ALLOCATIONS detected (peak: {} regions). "
+                "Very large objects are being allocated, consuming significant heap space. "
+                "Identify and optimize these allocations to reduce GC pressure."
+            ).format(peak_humongous)
+        else:
+            business_note = (
+                "HUMONGOUS ALLOCATIONS detected in {:.0f}% of GCs. "
+                "Large objects are being allocated regularly. "
+                "Monitor for impact on GC pause times and heap fragmentation."
+            ).format(frequency_pct)
+    else:
+        business_note = ""
+
+    return {
+        "type": "humongous_pressure",
+        "detected": detected,
+        "confidence": confidence,
+        "frequency_pct": round(frequency_pct, 1),
+        "humongous_gc_count": humongous_gc_count,
+        "total_gc_count": total_gc_count,
+        "peak_humongous": peak_humongous,
+        "avg_humongous": round(avg_humongous, 1),
+        "heap_ratio_pct": round(heap_ratio_pct, 1) if heap_ratio_pct else None,
+        "detected_by_frequency": detected_by_frequency,
+        "detected_by_peak": detected_by_peak,
+        "duration_min": round(duration_min, 1),
+        "evidence": evidence,
+        "next_steps": next_steps,
+        "business_note": business_note
+    }
+
+
 def analyze_events(
         events: List[Dict],
         tail_minutes: Optional[int] = None,
@@ -436,6 +590,11 @@ def analyze_events(
             "suspects": []
         }
 
+    # Calcul max_heap_regions pour humongous detection
+    max_heap_regions = None
+    if max_heap_mb and region_size_mb and region_size_mb > 0:
+        max_heap_regions = int(max_heap_mb / region_size_mb)
+
     # Liste des fonctions de détection
     detections = [
         detect_retention_growth(filtered_events,
@@ -444,6 +603,7 @@ def analyze_events(
                                 region_size_mb=region_size_mb),
         detect_allocation_pressure(filtered_events),
         detect_long_stw_pauses(filtered_events, stw_threshold_ms),
+        detect_humongous_pressure(filtered_events, max_heap_regions=max_heap_regions),
     ]
 
     # Filtre seulement les detected/suspected
