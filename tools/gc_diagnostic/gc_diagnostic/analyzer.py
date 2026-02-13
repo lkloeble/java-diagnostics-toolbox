@@ -228,48 +228,84 @@ def detect_retention_growth(
 
 def detect_long_stw_pauses(
         filtered_events: List[Dict],
-        threshold_ms: int = 1000
+        threshold_ms: int = 500
 ) -> Dict:
     """
-    Détection spécifique aux pauses STW longues.
-    (À affiner avec parsing réel de pause_ms dans parser.py)
-    """
-    # Assume que 'pause_ms' est extrait dans parser.py (à implémenter)
-    pauses = [e.get('pause_ms', 0) for e in filtered_events if 'pause_ms' in e]
+    Détection des pauses Stop-The-World longues.
 
-    if not pauses:
+    Seuil par défaut: 500ms (déjà problématique pour la plupart des applications).
+    """
+    # Récupérer les events avec pause_ms
+    events_with_pause = [e for e in filtered_events if e.get('pause_ms') is not None]
+
+    if not events_with_pause:
         return {
             "type": "long_stw_pauses",
             "detected": False,
             "confidence": "low",
             "reason": "no pause data found",
             "evidence": [],
-            "next_steps": []
+            "next_steps": [],
+            "business_note": ""
         }
 
-    long_pauses = [p for p in pauses if p >= threshold_ms]
-    detected = len(long_pauses) >= 1
+    # Filtrer les longues pauses
+    long_pause_events = [e for e in events_with_pause if e['pause_ms'] >= threshold_ms]
+    detected = len(long_pause_events) >= 1
 
     confidence = (
-        "high" if len(long_pauses) >= 3
+        "high" if len(long_pause_events) >= 3
         else "medium" if detected
         else "low"
     )
 
-    evidence = [f"Pause of {p} ms" for p in long_pauses]
+    # Evidence avec cause (gc_type) et durée
+    evidence = []
+    for e in long_pause_events:
+        pause_ms = e['pause_ms']
+        gc_type = e.get('gc_type', 'Unknown')
+        gc_num = e.get('gc_number', '?')
+        time_min = e['uptime_sec'] / 60
+        evidence.append(f"GC({gc_num}) at {time_min:.1f}min: {pause_ms:.0f}ms - {gc_type}")
+
+    # Stats summary si plusieurs longues pauses
+    if len(long_pause_events) > 1:
+        max_pause = max(e['pause_ms'] for e in long_pause_events)
+        avg_pause = sum(e['pause_ms'] for e in long_pause_events) / len(long_pause_events)
+        evidence.insert(0, f"Found {len(long_pause_events)} pauses >= {threshold_ms}ms (max: {max_pause:.0f}ms, avg: {avg_pause:.0f}ms)")
 
     next_steps = [
         "JFR recording (GC + safepoint + pause phases)",
         "Increase logging: -Xlog:gc*,safepoint*",
-        "Thread dump during long pause if reproducible"
+        "Check for Full GC triggers (heap too small, System.gc() calls, metadata pressure)"
     ] if detected else []
+
+    # Business note
+    if detected:
+        if len(long_pause_events) >= 3:
+            business_note = (
+                "FREQUENT LONG PAUSES: Multiple STW pauses exceeding {}ms detected. "
+                "This severely impacts application responsiveness and throughput. "
+                "Investigate GC configuration and heap sizing."
+            ).format(threshold_ms)
+        else:
+            business_note = (
+                "LONG STW PAUSE detected (>{}ms). "
+                "This can cause application latency spikes and timeouts. "
+                "Check if caused by Full GC, heap pressure, or explicit System.gc() calls."
+            ).format(threshold_ms)
+    else:
+        business_note = ""
 
     return {
         "type": "long_stw_pauses",
         "detected": detected,
         "confidence": confidence,
+        "long_pause_count": len(long_pause_events),
+        "threshold_ms": threshold_ms,
         "evidence": evidence,
-        "next_steps": next_steps
+        "next_steps": next_steps,
+        "business_note": business_note
     }
 
 
@@ -384,7 +420,7 @@ def analyze_events(
         events: List[Dict],
         tail_minutes: Optional[int] = None,
         old_trend_threshold: float = 30.0,
-        stw_threshold_ms: int = 1000,
+        stw_threshold_ms: int = 500,
         max_heap_mb: Optional[float] = None,
         region_size_mb: Optional[float] = None
 ) -> Dict:
