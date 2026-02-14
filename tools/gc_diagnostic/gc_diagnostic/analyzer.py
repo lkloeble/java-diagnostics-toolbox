@@ -570,6 +570,184 @@ def detect_humongous_pressure(
     }
 
 
+def detect_gc_starvation(
+        filtered_events: List[Dict],
+        gap_threshold_sec: float = 30.0,
+        max_heap_mb: Optional[float] = None,
+        region_size_mb: Optional[float] = None
+) -> Dict:
+    """
+    Détection de GC starvation / finalizer backlog.
+
+    Symptôme typique des finalizers bloquants ou code legacy avec finalize() :
+    - L'application est bloquée par le Finalizer thread
+    - Peu de GCs malgré une heap sous pression
+    - Longs gaps entre GCs consécutifs
+
+    Ce pattern est différent d'une app idle : la heap est haute mais les GCs sont rares.
+
+    Signaux:
+    1. Long inter-GC gaps (>30s par défaut)
+    2. Heap élevée pendant ces gaps
+    3. Très peu de GCs par rapport à la durée totale
+    """
+    if len(filtered_events) < 3:
+        return {
+            "type": "gc_starvation",
+            "detected": False,
+            "confidence": "low",
+            "reason": f"only {len(filtered_events)} events",
+            "evidence": [],
+            "next_steps": [],
+            "business_note": ""
+        }
+
+    # Calcul durée totale
+    first = filtered_events[0]
+    last = filtered_events[-1]
+    duration_sec = last['uptime_sec'] - first['uptime_sec']
+    duration_min = duration_sec / 60
+
+    if duration_min < 1:
+        return {
+            "type": "gc_starvation",
+            "detected": False,
+            "confidence": "low",
+            "reason": "log duration too short",
+            "evidence": [],
+            "next_steps": [],
+            "business_note": ""
+        }
+
+    # Calculer les gaps entre GCs consécutifs
+    gaps = []
+    for i in range(1, len(filtered_events)):
+        gap_sec = filtered_events[i]['uptime_sec'] - filtered_events[i-1]['uptime_sec']
+        prev_heap = filtered_events[i-1].get('old_after_regions', 0)
+        gaps.append({
+            'gap_sec': gap_sec,
+            'from_gc': filtered_events[i-1].get('gc_number', i-1),
+            'to_gc': filtered_events[i].get('gc_number', i),
+            'heap_before_gap': prev_heap,
+            'from_uptime': filtered_events[i-1]['uptime_sec'],
+            'to_uptime': filtered_events[i]['uptime_sec']
+        })
+
+    # Trouver les longs gaps
+    long_gaps = [g for g in gaps if g['gap_sec'] >= gap_threshold_sec]
+    max_gap_sec = max(g['gap_sec'] for g in gaps) if gaps else 0
+
+    # Calculer le GC rate (GCs par minute)
+    gc_count = len(filtered_events)
+    gc_rate_per_min = gc_count / duration_min if duration_min > 0 else 0
+
+    # Calculer l'occupation heap moyenne pendant les longs gaps
+    avg_heap_during_gaps = None
+    if long_gaps and max_heap_mb and region_size_mb:
+        max_heap_regions = max_heap_mb / region_size_mb
+        heap_pcts = [(g['heap_before_gap'] / max_heap_regions * 100) for g in long_gaps if max_heap_regions > 0]
+        if heap_pcts:
+            avg_heap_during_gaps = sum(heap_pcts) / len(heap_pcts)
+
+    # Calculer si la heap croît pendant la fenêtre d'analyse
+    # Finalizer starvation = accumulation, Plateau = stable
+    heap_growing = False
+    heap_growth_rate = 0.0
+    if len(filtered_events) >= 3:
+        first_heap = filtered_events[0].get('old_after_regions', 0)
+        last_heap = filtered_events[-1].get('old_after_regions', 0)
+        heap_delta = last_heap - first_heap
+        heap_growth_rate = heap_delta / duration_min if duration_min > 0 else 0
+        # Considérer comme "croissant" si > 10 regions/min (significatif)
+        heap_growing = heap_growth_rate > 10
+
+    # === LOGIQUE DE DÉTECTION ===
+    # Signal 1: Au moins un gap très long (>30s par défaut)
+    has_long_gaps = len(long_gaps) >= 1
+
+    # Signal 2: Heap élevée pendant les gaps (>50%)
+    heap_high_during_gaps = avg_heap_during_gaps is not None and avg_heap_during_gaps > 50
+
+    # Signal 3: Heap en croissance (pas un plateau stable)
+    # C'est la différence clé : finalizer = accumulation, idle = stable
+    # Un plateau avec gaps longs mais heap stable n'est PAS du starvation
+
+    # Détection: gaps longs + heap haute + (heap croissante OU très haute >75%)
+    # Si heap > 75%, même sans croissance c'est critique
+    heap_critical = avg_heap_during_gaps is not None and avg_heap_during_gaps > 75
+    detected = has_long_gaps and heap_high_during_gaps and (heap_growing or heap_critical)
+
+    # === CONFIDENCE ===
+    if detected:
+        if len(long_gaps) >= 3 and heap_high_during_gaps:
+            confidence = "high"
+        elif len(long_gaps) >= 2 or (has_long_gaps and heap_high_during_gaps):
+            confidence = "medium"
+        else:
+            confidence = "low"
+    else:
+        confidence = "low"
+
+    # === EVIDENCE ===
+    evidence = []
+    evidence.append(f"Max inter-GC gap: {max_gap_sec:.1f}s (threshold: {gap_threshold_sec}s)")
+    evidence.append(f"Long gaps (>{gap_threshold_sec}s): {len(long_gaps)}")
+    evidence.append(f"GC frequency: {gc_rate_per_min:.1f} GCs/min over {duration_min:.1f} min")
+    if avg_heap_during_gaps is not None:
+        evidence.append(f"Avg heap during long gaps: {avg_heap_during_gaps:.0f}%")
+    evidence.append(f"Heap growth rate: {heap_growth_rate:.1f} regions/min ({'growing' if heap_growing else 'stable'})")
+
+    # Montrer les top 3 plus longs gaps
+    if long_gaps:
+        sorted_gaps = sorted(long_gaps, key=lambda g: g['gap_sec'], reverse=True)[:3]
+        for g in sorted_gaps:
+            evidence.append(f"  GC({g['from_gc']}) → GC({g['to_gc']}): {g['gap_sec']:.0f}s gap")
+
+    # === NEXT STEPS ===
+    next_steps = []
+    if detected:
+        next_steps = [
+            "Check for finalize() methods: grep -r 'void finalize' src/",
+            "Enable finalizer logging: -Xlog:gc+ref=debug",
+            "JFR recording focusing on 'Java Blocking' events",
+            "Review legacy code for finalize() → refactor to try-with-resources or Cleaner API",
+            "Monitor Finalizer thread CPU usage"
+        ]
+
+    # === BUSINESS NOTE ===
+    if detected:
+        if confidence == "high":
+            business_note = (
+                "SEVERE GC STARVATION: Very long gaps ({:.0f}s max) between GCs despite high heap usage. "
+                "This is a classic symptom of FINALIZER BACKLOG - the Finalizer thread is blocking "
+                "the application. finalize() methods with I/O or slow operations create queues that "
+                "prevent objects from being collected. Immediate code review required."
+            ).format(max_gap_sec)
+        else:
+            business_note = (
+                "GC STARVATION detected: Long gaps ({:.0f}s) between GCs suggest the application "
+                "may be blocked by finalizers or other reference processing. Check for finalize() "
+                "methods in legacy code. This can cause indirect OOM and severe performance degradation."
+            ).format(max_gap_sec)
+    else:
+        business_note = ""
+
+    return {
+        "type": "gc_starvation",
+        "detected": detected,
+        "confidence": confidence,
+        "max_gap_sec": round(max_gap_sec, 1),
+        "long_gap_count": len(long_gaps),
+        "gc_rate_per_min": round(gc_rate_per_min, 1),
+        "gc_count": gc_count,
+        "duration_min": round(duration_min, 1),
+        "avg_heap_during_gaps_pct": round(avg_heap_during_gaps, 1) if avg_heap_during_gaps else None,
+        "evidence": evidence,
+        "next_steps": next_steps,
+        "business_note": business_note
+    }
+
+
 def analyze_events(
         events: List[Dict],
         tail_minutes: Optional[int] = None,
@@ -604,6 +782,7 @@ def analyze_events(
         detect_allocation_pressure(filtered_events),
         detect_long_stw_pauses(filtered_events, stw_threshold_ms),
         detect_humongous_pressure(filtered_events, max_heap_regions=max_heap_regions),
+        detect_gc_starvation(filtered_events, max_heap_mb=max_heap_mb, region_size_mb=region_size_mb),
     ]
 
     # Filtre seulement les detected/suspected

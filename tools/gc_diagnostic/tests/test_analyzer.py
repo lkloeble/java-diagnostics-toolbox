@@ -6,6 +6,7 @@ from gc_diagnostic.analyzer import detect_long_stw_pauses
 from gc_diagnostic.analyzer import detect_retention_growth
 from gc_diagnostic.analyzer import detect_allocation_pressure
 from gc_diagnostic.analyzer import detect_humongous_pressure
+from gc_diagnostic.analyzer import detect_gc_starvation
 
 @pytest.fixture
 def sample_events():
@@ -146,14 +147,15 @@ def test_detect_long_stw_pauses_with_long_pause():
 def test_analyze_events_orchestrates_multiple_suspects(sample_events):
     result = analyze_events(sample_events, tail_minutes=None, old_trend_threshold=40.0)
     assert "suspects" in result
-    assert len(result["suspects"]) == 4, "Doit analyser retention_growth + allocation_pressure + long_stw_pauses + humongous_pressure"
+    assert len(result["suspects"]) == 5, "Doit analyser retention_growth + allocation_pressure + long_stw_pauses + humongous_pressure + gc_starvation"
 
-    # Vérifie que les quatre types sont présents
+    # Vérifie que les cinq types sont présents
     types = {s["type"] for s in result["suspects"]}
     assert "retention_growth" in types
     assert "allocation_pressure" in types
     assert "long_stw_pauses" in types
     assert "humongous_pressure" in types
+    assert "gc_starvation" in types
 
     # Vérifie que retention est détecté, les autres non
     retention = next(s for s in result["suspects"] if s["type"] == "retention_growth")
@@ -167,6 +169,9 @@ def test_analyze_events_orchestrates_multiple_suspects(sample_events):
 
     humongous = next(s for s in result["suspects"] if s["type"] == "humongous_pressure")
     assert humongous["detected"] is False  # sample_events n'a pas d'humongous
+
+    starvation = next(s for s in result["suspects"] if s["type"] == "gc_starvation")
+    assert starvation["detected"] is False  # sample_events n'a pas de long gaps
 
 
 def test_detect_retention_growth_ignores_last_oom_crash():
@@ -317,3 +322,61 @@ def test_detect_humongous_pressure_high_peak():
     assert result["detected_by_peak"] is True
     assert result["detected_by_frequency"] is False
     assert result["confidence"] == "low"  # Only peak, not frequency
+
+
+# === Tests for GC Starvation / Finalizer backlog ===
+
+def test_detect_gc_starvation_no_long_gaps():
+    """No starvation when GCs happen frequently."""
+    # GCs every 10 seconds, no long gaps
+    events = [
+        {'uptime_sec': i * 10.0, 'old_after_regions': 100 + i * 10, 'gc_number': i}
+        for i in range(20)
+    ]
+    result = detect_gc_starvation(events, gap_threshold_sec=30.0, max_heap_mb=1024, region_size_mb=1)
+    assert result["detected"] is False
+    assert result["long_gap_count"] == 0
+
+
+def test_detect_gc_starvation_long_gaps_low_heap():
+    """No starvation when gaps are long but heap is low (idle app)."""
+    # Long gaps but heap is near 0 (idle app)
+    events = [
+        {'uptime_sec': 0.0, 'old_after_regions': 10, 'gc_number': 0},
+        {'uptime_sec': 60.0, 'old_after_regions': 10, 'gc_number': 1},
+        {'uptime_sec': 120.0, 'old_after_regions': 10, 'gc_number': 2},
+    ]
+    result = detect_gc_starvation(events, gap_threshold_sec=30.0, max_heap_mb=1024, region_size_mb=1)
+    assert result["detected"] is False  # Heap is low, not starvation
+
+
+def test_detect_gc_starvation_finalizer_pattern():
+    """Detect starvation with long gaps + high growing heap."""
+    # Long gaps + high heap growing = classic finalizer pattern
+    events = [
+        {'uptime_sec': 0.0, 'old_after_regions': 500, 'gc_number': 0},
+        {'uptime_sec': 1.0, 'old_after_regions': 550, 'gc_number': 1},
+        {'uptime_sec': 2.0, 'old_after_regions': 600, 'gc_number': 2},
+        {'uptime_sec': 62.0, 'old_after_regions': 700, 'gc_number': 3},  # 60s gap
+        {'uptime_sec': 122.0, 'old_after_regions': 800, 'gc_number': 4},  # 60s gap
+        {'uptime_sec': 182.0, 'old_after_regions': 850, 'gc_number': 5},  # 60s gap
+    ]
+    result = detect_gc_starvation(events, gap_threshold_sec=30.0, max_heap_mb=1024, region_size_mb=1)
+    assert result["detected"] is True
+    assert result["long_gap_count"] == 3
+    assert result["max_gap_sec"] == 60.0
+    assert "STARVATION" in result["business_note"]
+
+
+def test_detect_gc_starvation_plateau_not_detected():
+    """No starvation for plateau pattern (stable heap, long gaps ok)."""
+    # Long gaps but heap is STABLE (plateau, not starvation)
+    events = [
+        {'uptime_sec': 0.0, 'old_after_regions': 600, 'gc_number': 0},
+        {'uptime_sec': 1.0, 'old_after_regions': 600, 'gc_number': 1},
+        {'uptime_sec': 61.0, 'old_after_regions': 600, 'gc_number': 2},  # 60s gap
+        {'uptime_sec': 121.0, 'old_after_regions': 600, 'gc_number': 3},  # 60s gap
+        {'uptime_sec': 181.0, 'old_after_regions': 600, 'gc_number': 4},  # 60s gap
+    ]
+    result = detect_gc_starvation(events, gap_threshold_sec=30.0, max_heap_mb=1024, region_size_mb=1)
+    assert result["detected"] is False  # Stable heap, not starvation
