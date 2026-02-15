@@ -7,6 +7,7 @@ from gc_diagnostic.analyzer import detect_retention_growth
 from gc_diagnostic.analyzer import detect_allocation_pressure
 from gc_diagnostic.analyzer import detect_humongous_pressure
 from gc_diagnostic.analyzer import detect_gc_starvation
+from gc_diagnostic.analyzer import detect_metaspace_leak
 
 @pytest.fixture
 def sample_events():
@@ -147,15 +148,16 @@ def test_detect_long_stw_pauses_with_long_pause():
 def test_analyze_events_orchestrates_multiple_suspects(sample_events):
     result = analyze_events(sample_events, tail_minutes=None, old_trend_threshold=40.0)
     assert "suspects" in result
-    assert len(result["suspects"]) == 5, "Doit analyser retention_growth + allocation_pressure + long_stw_pauses + humongous_pressure + gc_starvation"
+    assert len(result["suspects"]) == 6, "Doit analyser 6 suspects"
 
-    # Vérifie que les cinq types sont présents
+    # Vérifie que les six types sont présents
     types = {s["type"] for s in result["suspects"]}
     assert "retention_growth" in types
     assert "allocation_pressure" in types
     assert "long_stw_pauses" in types
     assert "humongous_pressure" in types
     assert "gc_starvation" in types
+    assert "metaspace_leak" in types
 
     # Vérifie que retention est détecté, les autres non
     retention = next(s for s in result["suspects"] if s["type"] == "retention_growth")
@@ -172,6 +174,9 @@ def test_analyze_events_orchestrates_multiple_suspects(sample_events):
 
     starvation = next(s for s in result["suspects"] if s["type"] == "gc_starvation")
     assert starvation["detected"] is False  # sample_events n'a pas de long gaps
+
+    metaspace = next(s for s in result["suspects"] if s["type"] == "metaspace_leak")
+    assert metaspace["detected"] is False  # sample_events n'a pas de metaspace data
 
 
 def test_detect_retention_growth_ignores_last_oom_crash():
@@ -380,3 +385,56 @@ def test_detect_gc_starvation_plateau_not_detected():
     ]
     result = detect_gc_starvation(events, gap_threshold_sec=30.0, max_heap_mb=1024, region_size_mb=1)
     assert result["detected"] is False  # Stable heap, not starvation
+
+
+# === Tests for Metaspace Leak ===
+
+def test_detect_metaspace_leak_no_data():
+    """No detection when no metaspace data available."""
+    events = [
+        {'uptime_sec': 0.0, 'old_after_regions': 100, 'gc_number': 0},
+        {'uptime_sec': 60.0, 'old_after_regions': 150, 'gc_number': 1},
+    ]
+    result = detect_metaspace_leak(events)
+    assert result["detected"] is False
+    assert "metaspace data" in result.get("reason", "")
+
+
+def test_detect_metaspace_leak_stable():
+    """No detection when metaspace is stable."""
+    events = [
+        {'uptime_sec': 0.0, 'old_after_regions': 100, 'metaspace_used_kb': 10000, 'gc_number': 0},
+        {'uptime_sec': 60.0, 'old_after_regions': 100, 'metaspace_used_kb': 10100, 'gc_number': 1},
+        {'uptime_sec': 120.0, 'old_after_regions': 100, 'metaspace_used_kb': 10050, 'gc_number': 2},
+    ]
+    result = detect_metaspace_leak(events)
+    assert result["detected"] is False
+
+
+def test_detect_metaspace_leak_growing():
+    """Detect metaspace leak when growing rapidly."""
+    # Metaspace grows from 10MB to 50MB in 1 minute = 40MB/min
+    events = [
+        {'uptime_sec': 0.0, 'old_after_regions': 100, 'metaspace_used_kb': 10000, 'gc_number': 0},
+        {'uptime_sec': 30.0, 'old_after_regions': 100, 'metaspace_used_kb': 30000, 'gc_number': 1},
+        {'uptime_sec': 60.0, 'old_after_regions': 100, 'metaspace_used_kb': 50000, 'gc_number': 2},
+    ]
+    result = detect_metaspace_leak(events)
+    assert result["detected"] is True
+    assert result["detected_by_growth"] is True
+    assert result["delta_mb"] == 39.1  # (50000 - 10000) / 1024
+    assert "METASPACE" in result["business_note"]
+
+
+def test_detect_metaspace_leak_metadata_gc_threshold():
+    """Detect metaspace pressure via Metadata GC Threshold triggers."""
+    # Many GCs triggered by metaspace pressure
+    events = [
+        {'uptime_sec': 0.0, 'old_after_regions': 100, 'metaspace_used_kb': 10000, 'metadata_gc_threshold': True, 'gc_number': 0},
+        {'uptime_sec': 30.0, 'old_after_regions': 100, 'metaspace_used_kb': 12000, 'metadata_gc_threshold': True, 'gc_number': 1},
+        {'uptime_sec': 60.0, 'old_after_regions': 100, 'metaspace_used_kb': 14000, 'metadata_gc_threshold': True, 'gc_number': 2},
+    ]
+    result = detect_metaspace_leak(events)
+    assert result["detected"] is True
+    assert result["detected_by_metadata_gc"] is True
+    assert result["metadata_gc_pct"] == 100.0

@@ -748,6 +748,159 @@ def detect_gc_starvation(
     }
 
 
+def detect_metaspace_leak(
+        filtered_events: List[Dict],
+        growth_threshold_kb_per_min: float = 500.0,
+        metadata_gc_threshold_pct: float = 30.0
+) -> Dict:
+    """
+    Détection de leak Metaspace (classloading dynamique, JSP, plugins).
+
+    Le Metaspace contient les métadonnées des classes chargées.
+    Un leak se produit quand des classes sont chargées mais jamais déchargées
+    (ex: hot deploy, frameworks anciens, JSP compilées).
+
+    Signaux:
+    1. Croissance du Metaspace (metaspace_used_kb augmente)
+    2. GCs déclenchés par "Metadata GC Threshold" (pression Metaspace)
+    """
+    # Filter events with metaspace data
+    events_with_metaspace = [
+        e for e in filtered_events
+        if e.get('metaspace_used_kb') is not None
+    ]
+
+    if len(events_with_metaspace) < 2:
+        return {
+            "type": "metaspace_leak",
+            "detected": False,
+            "confidence": "low",
+            "reason": f"only {len(events_with_metaspace)} events with metaspace data",
+            "evidence": [],
+            "next_steps": [],
+            "business_note": ""
+        }
+
+    # Calcul durée
+    first = events_with_metaspace[0]
+    last = events_with_metaspace[-1]
+    duration_sec = last['uptime_sec'] - first['uptime_sec']
+    duration_min = duration_sec / 60
+
+    if duration_min < 0.1:  # Minimum 6 seconds
+        return {
+            "type": "metaspace_leak",
+            "detected": False,
+            "confidence": "low",
+            "reason": "log duration too short",
+            "evidence": [],
+            "next_steps": [],
+            "business_note": ""
+        }
+
+    # Calcul croissance Metaspace
+    first_metaspace_kb = first['metaspace_used_kb']
+    last_metaspace_kb = last['metaspace_used_kb']
+    delta_kb = last_metaspace_kb - first_metaspace_kb
+    growth_kb_per_min = delta_kb / duration_min if duration_min > 0 else 0
+
+    # Convertir en MB pour affichage
+    first_metaspace_mb = first_metaspace_kb / 1024
+    last_metaspace_mb = last_metaspace_kb / 1024
+    delta_mb = delta_kb / 1024
+    growth_mb_per_min = growth_kb_per_min / 1024
+
+    # Compter les GCs déclenchés par Metadata GC Threshold
+    metadata_gc_count = sum(1 for e in filtered_events if e.get('metadata_gc_threshold', False))
+    total_gc_count = len(filtered_events)
+    metadata_gc_pct = (metadata_gc_count / total_gc_count * 100) if total_gc_count > 0 else 0
+
+    # === LOGIQUE DE DÉTECTION ===
+    # Signal 1: Croissance significative du Metaspace
+    detected_by_growth = growth_kb_per_min > growth_threshold_kb_per_min and delta_kb > 0
+
+    # Signal 2: Beaucoup de GCs déclenchés par Metaspace pressure
+    detected_by_metadata_gc = metadata_gc_pct >= metadata_gc_threshold_pct
+
+    # Détection: croissance OU beaucoup de metadata GCs
+    detected = detected_by_growth or detected_by_metadata_gc
+
+    # === CONFIDENCE ===
+    if detected:
+        if detected_by_growth and detected_by_metadata_gc:
+            confidence = "high"
+        elif detected_by_growth and growth_kb_per_min > growth_threshold_kb_per_min * 3:
+            confidence = "high"
+        elif detected_by_growth:
+            confidence = "medium"
+        else:
+            confidence = "low"
+    else:
+        confidence = "low"
+
+    # === EVIDENCE ===
+    evidence = []
+    evidence.append(f"Metaspace: {first_metaspace_mb:.1f} MB → {last_metaspace_mb:.1f} MB (+{delta_mb:.1f} MB)")
+    evidence.append(f"Growth rate: {growth_mb_per_min:.2f} MB/min over {duration_min:.1f} min")
+    evidence.append(f"GCs triggered by Metaspace: {metadata_gc_count}/{total_gc_count} ({metadata_gc_pct:.0f}%)")
+
+    # Montrer la progression
+    if len(events_with_metaspace) >= 3:
+        mid_idx = len(events_with_metaspace) // 2
+        mid = events_with_metaspace[mid_idx]
+        mid_mb = mid['metaspace_used_kb'] / 1024
+        mid_time = mid['uptime_sec'] / 60
+        evidence.append(f"Progression: {first_metaspace_mb:.0f}MB → {mid_mb:.0f}MB → {last_metaspace_mb:.0f}MB")
+
+    # === NEXT STEPS ===
+    next_steps = []
+    if detected:
+        next_steps = [
+            "jcmd <pid> VM.classloader_stats (check classloader hierarchy)",
+            "jcmd <pid> GC.class_stats (identify classes consuming metaspace)",
+            "Check for: hot deploys, JSP compilation, dynamic proxies, reflection-heavy frameworks",
+            "Set -XX:MaxMetaspaceSize to limit and get early OOM vs slow degradation",
+            "Consider -XX:+ClassUnloading -XX:+CMSClassUnloadingEnabled (if applicable)"
+        ]
+
+    # === BUSINESS NOTE ===
+    if detected:
+        if confidence == "high":
+            business_note = (
+                "METASPACE LEAK: Classes are being loaded but not unloaded. "
+                "Metaspace grew by {:.1f} MB in {:.1f} minutes ({:.2f} MB/min). "
+                "This is classic classloader leak behavior - common in applications with "
+                "hot deploy, JSP compilation, or dynamic class generation. "
+                "Left unchecked, this leads to OutOfMemoryError: Metaspace."
+            ).format(delta_mb, duration_min, growth_mb_per_min)
+        else:
+            business_note = (
+                "METASPACE PRESSURE detected: Metaspace is growing ({:.2f} MB/min). "
+                "This may indicate classloader leak or heavy dynamic class loading. "
+                "Monitor for continued growth after application warmup."
+            ).format(growth_mb_per_min)
+    else:
+        business_note = ""
+
+    return {
+        "type": "metaspace_leak",
+        "detected": detected,
+        "confidence": confidence,
+        "first_metaspace_mb": round(first_metaspace_mb, 1),
+        "last_metaspace_mb": round(last_metaspace_mb, 1),
+        "delta_mb": round(delta_mb, 1),
+        "growth_mb_per_min": round(growth_mb_per_min, 2),
+        "duration_min": round(duration_min, 1),
+        "metadata_gc_count": metadata_gc_count,
+        "metadata_gc_pct": round(metadata_gc_pct, 1),
+        "detected_by_growth": detected_by_growth,
+        "detected_by_metadata_gc": detected_by_metadata_gc,
+        "evidence": evidence,
+        "next_steps": next_steps,
+        "business_note": business_note
+    }
+
+
 def analyze_events(
         events: List[Dict],
         tail_minutes: Optional[int] = None,
@@ -783,6 +936,7 @@ def analyze_events(
         detect_long_stw_pauses(filtered_events, stw_threshold_ms),
         detect_humongous_pressure(filtered_events, max_heap_regions=max_heap_regions),
         detect_gc_starvation(filtered_events, max_heap_mb=max_heap_mb, region_size_mb=region_size_mb),
+        detect_metaspace_leak(filtered_events),
     ]
 
     # Filtre seulement les detected/suspected

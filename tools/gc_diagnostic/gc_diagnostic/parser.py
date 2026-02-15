@@ -22,10 +22,14 @@ class GCEvent:
     heap_before_mb: Optional[int] = None
     heap_after_mb: Optional[int] = None
     heap_total_mb: Optional[int] = None
+    # Metaspace (in KB for precision)
+    metaspace_used_kb: Optional[int] = None
+    metaspace_committed_kb: Optional[int] = None
     # Pause
     pause_ms: Optional[float] = None
     # Flags
     evacuation_failure: bool = False
+    metadata_gc_threshold: bool = False  # GC triggered by Metaspace pressure
 
     def to_dict(self) -> Dict:
         """Convert to dict for backward compatibility."""
@@ -42,8 +46,11 @@ class GCEvent:
             'heap_before_mb': self.heap_before_mb,
             'heap_after_mb': self.heap_after_mb,
             'heap_total_mb': self.heap_total_mb,
+            'metaspace_used_kb': self.metaspace_used_kb,
+            'metaspace_committed_kb': self.metaspace_committed_kb,
             'pause_ms': self.pause_ms,
             'evacuation_failure': self.evacuation_failure,
+            'metadata_gc_threshold': self.metadata_gc_threshold,
         }
 
 
@@ -83,6 +90,20 @@ PAUSE_LINE_PATTERN = re.compile(
 
 # Evacuation Failure detection (simple substring check is faster)
 EVACUATION_FAILURE_MARKER = '(Evacuation Failure)'
+
+# Metadata GC Threshold detection (GC triggered by Metaspace pressure)
+METADATA_GC_THRESHOLD_MARKER = '(Metadata GC Threshold)'
+
+# Metaspace pattern (gc,metaspace tag)
+# Example: [2026-02-15T07:06:43.878+0200][1.216s][info][gc,metaspace] GC(0) Metaspace: 15817K(16384K)->15817K(16384K) NonClass: ...
+METASPACE_PATTERN = re.compile(
+    r'\[([^\]]+)\]'                     # group 1: timestamp
+    r'\[([\d.]+)s\]'                    # group 2: uptime
+    r'\[info\]\[gc,metaspace\]'         # [gc,metaspace]
+    r'\s*GC\((\d+)\)'                   # group 3: GC number
+    r'\s*Metaspace:\s*(\d+)K\((\d+)K\)' # groups 4,5: used(committed) before
+    r'\s*->\s*(\d+)K\((\d+)K\)'         # groups 6,7: used(committed) after
+)
 
 
 # Regex pour Heap Max Capacity
@@ -193,6 +214,7 @@ def parse_log(lines: List[str]) -> List[Dict]:
             event.heap_total_mb = _parse_size_mb(heap_total, heap_total_unit)
             event.pause_ms = float(pause_ms_str)
             event.evacuation_failure = EVACUATION_FAILURE_MARKER in line
+            event.metadata_gc_threshold = METADATA_GC_THRESHOLD_MARKER in line
             continue
 
         # Try old regions pattern
@@ -231,6 +253,27 @@ def parse_log(lines: List[str]) -> List[Dict]:
             event = events_by_gc[gc_num]
             event.humongous_before = int(before_str)
             event.humongous_after = int(after_str)
+            continue
+
+        # Try metaspace pattern
+        match = METASPACE_PATTERN.search(line)
+        if match:
+            timestamp, uptime_str, gc_num_str = match.group(1, 2, 3)
+            # We take the "after" values (groups 6,7) as current state
+            metaspace_used_after = match.group(6)
+            metaspace_committed_after = match.group(7)
+            gc_num = int(gc_num_str)
+
+            if gc_num not in events_by_gc:
+                events_by_gc[gc_num] = GCEvent(
+                    gc_number=gc_num,
+                    timestamp=timestamp,
+                    uptime_sec=float(uptime_str),
+                )
+
+            event = events_by_gc[gc_num]
+            event.metaspace_used_kb = int(metaspace_used_after)
+            event.metaspace_committed_kb = int(metaspace_committed_after)
             continue
 
     # Convert to list, filter events that have old regions data, sort by uptime
