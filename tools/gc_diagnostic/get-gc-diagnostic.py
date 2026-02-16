@@ -62,6 +62,24 @@ def main():
     if collector_type is None:
         print("Warning: Collector type not found in log", file=sys.stderr)
 
+    # Si collector non-G1, on ne peut pas parser les events détaillés
+    # mais on peut quand même signaler le problème de collector
+    if collector_type and collector_type.upper() not in ('G1', 'ZGC', 'SHENANDOAH'):
+        from gc_diagnostic.analyzer import detect_collector_choice
+        collector_result = detect_collector_choice(collector_type, max_heap_mb=max_heap_mb)
+        findings = {
+            "summary": "1 issues DETECTED",
+            "suspects": [collector_result],
+            "filtered_events": [],
+            "region_size_mb": region_size_mb,
+            "note": f"Log format is {collector_type} (not G1) - detailed analysis not available"
+        }
+        report = generate_report(findings, format=args.format, debug=args.debug)
+        print(report)
+        print(f"\nNote: This tool is optimized for G1 GC logs. {collector_type} collector detected.")
+        print("Switch to G1 (-XX:+UseG1GC) for full diagnostic capabilities.")
+        sys.exit(0)
+
     try:
         events = parse_log(lines)
     except ValueError as e:
