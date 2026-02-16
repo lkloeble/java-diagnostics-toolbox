@@ -5,6 +5,7 @@ from pathlib import Path
 
 from gc_diagnostic.parser import extract_heap_region_size
 from gc_diagnostic.parser import extract_heap_max_capacity
+from gc_diagnostic.parser import extract_collector_type
 from gc_diagnostic.parser import parse_log
 from gc_diagnostic.analyzer import analyze_events
 from gc_diagnostic.reporter import generate_report
@@ -41,10 +42,12 @@ def main():
 
     max_heap_mb = 0
     region_size_mb = 0
+    collector_type = None
 
     try:
         max_heap_mb = extract_heap_max_capacity(lines)
         region_size_mb = extract_heap_region_size(lines)
+        collector_type = extract_collector_type(lines)
     except Exception as e:
         print(f"Erreur récupération du heap et de la region_size : {e}", file=sys.stderr)
         sys.exit(1)
@@ -55,6 +58,9 @@ def main():
     if region_size_mb is None:
         print("Warning: Heap Region Size not found - using fallback estimation", file=sys.stderr)
         region_size_mb = 1  # valeur très courante, on pourra la rendre configurable
+
+    if collector_type is None:
+        print("Warning: Collector type not found in log", file=sys.stderr)
 
     try:
         events = parse_log(lines)
@@ -71,7 +77,8 @@ def main():
         tail_minutes=args.tail_window,
         old_trend_threshold=args.old_trend_threshold,
         max_heap_mb=max_heap_mb,
-        region_size_mb=region_size_mb
+        region_size_mb=region_size_mb,
+        collector_type=collector_type
     )
 
     # Juste avant l'appel à generate_report

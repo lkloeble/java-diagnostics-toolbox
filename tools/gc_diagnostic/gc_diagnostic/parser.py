@@ -143,6 +143,14 @@ HEAP_REGION_PATTERN = re.compile(
     re.IGNORECASE
 )
 
+# Collector type pattern
+# Example: [2026-02-05T05:43:29.965+0200][0.004s][info][gc     ] Using G1
+# Possible values: G1, Serial, Parallel, ZGC, Shenandoah
+COLLECTOR_PATTERN = re.compile(
+    r'\[info\]\[gc\s*\]\s*Using\s+(G1|Serial|Parallel|ZGC|Shenandoah)',
+    re.IGNORECASE
+)
+
 
 def _parse_size(value: str, unit: str) -> int:
     """Convert size with unit to MB."""
@@ -185,6 +193,18 @@ def extract_heap_region_size(lines: list[str]) -> Optional[int]:
         if match:
             value, unit = match.groups()
             return _parse_size(value, unit)
+    return None
+
+
+def extract_collector_type(lines: list[str]) -> Optional[str]:
+    """
+    Recherche le type de collector GC utilisé.
+    Retourne: 'G1', 'Serial', 'Parallel', 'ZGC', 'Shenandoah', ou None si non trouvé.
+    """
+    for line in lines[:20]:
+        match = COLLECTOR_PATTERN.search(line)
+        if match:
+            return match.group(1)
     return None
 
 

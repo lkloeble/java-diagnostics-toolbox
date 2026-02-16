@@ -2,8 +2,9 @@ from pathlib import Path
 import pytest
 from gc_diagnostic.parser import (
     parse_log, validate_log_format, extract_heap_max_capacity,
-    extract_heap_region_size, OLD_REGIONS_PATTERN, PAUSE_LINE_PATTERN,
-    HUMONGOUS_REGIONS_PATTERN, EVACUATION_FAILURE_MARKER, TLAB_PATTERN
+    extract_heap_region_size, extract_collector_type, OLD_REGIONS_PATTERN,
+    PAUSE_LINE_PATTERN, HUMONGOUS_REGIONS_PATTERN, EVACUATION_FAILURE_MARKER,
+    TLAB_PATTERN, COLLECTOR_PATTERN
 )
 
 def test_parses_real_fast_leak_log(gc_fast_log_lines):
@@ -267,3 +268,44 @@ def test_parse_log_with_tlab_data():
     assert event['tlab_refills'] == 59
     assert event['tlab_slow_allocs'] == 19
     assert event['tlab_waste_pct'] == 23.0
+
+
+# === Collector type pattern tests ===
+
+def test_collector_pattern_g1():
+    """Test parsing of G1 collector line."""
+    line = "[2026-02-05T05:43:29.965+0200][0.004s][info][gc     ] Using G1"
+    match = COLLECTOR_PATTERN.search(line)
+    assert match is not None
+    assert match.group(1) == "G1"
+
+
+def test_collector_pattern_serial():
+    """Test parsing of Serial collector line."""
+    line = "[2026-02-05T05:43:29.965+0200][0.004s][info][gc     ] Using Serial"
+    match = COLLECTOR_PATTERN.search(line)
+    assert match is not None
+    assert match.group(1) == "Serial"
+
+
+def test_collector_pattern_parallel():
+    """Test parsing of Parallel collector line."""
+    line = "[2026-02-05T05:43:29.965+0200][0.004s][info][gc     ] Using Parallel"
+    match = COLLECTOR_PATTERN.search(line)
+    assert match is not None
+    assert match.group(1) == "Parallel"
+
+
+def test_extract_collector_type_g1():
+    """Test extracting G1 collector type."""
+    lines = [
+        "[2026-02-05T05:43:29.965+0200][0.004s][info][gc     ] Using G1",
+        "[2026-02-05T05:43:52.074+0200][22.113s][info][gc,heap     ] GC(0) Old regions: 0->17",
+    ]
+    assert extract_collector_type(lines) == "G1"
+
+
+def test_extract_collector_type_not_found():
+    """Test when collector type is not found."""
+    lines = ["random line", "no gc info"]
+    assert extract_collector_type(lines) is None

@@ -108,6 +108,7 @@ DETECTED (high confidence from GC logs)
 - **GC Starvation / Finalizer backlog**: Long gaps between GCs despite high heap usage — classic symptom of finalizer blocking.
 - **Metaspace leak (classloader issues)**: Metaspace grows continuously, often triggered by dynamic classloading (hot deploy, JSP, plugins).
 - **TLAB exhaustion** (requires `-Xlog:gc+tlab=debug`): High slow-path allocations indicate multi-threaded contention for TLAB buffers.
+- **Wrong collector choice**: Legacy collectors (Serial, Parallel) detected — suggests switching to G1 or modern collectors (ZGC, Shenandoah).
 
 SUSPECTED (triage only)
 
@@ -118,7 +119,7 @@ The "usual suspects" (context)
 Most GC-related production issues tend to fall into a few buckets.
 Different buckets require different evidence sources.
 
-This tool currently detects **7 suspects**:
+This tool currently detects **8 suspects**:
 
 | Suspect | Detection | Notes |
 |---------|-----------|-------|
@@ -129,6 +130,7 @@ This tool currently detects **7 suspects**:
 | Finalizers / GC starvation | Detected | Long inter-GC gaps + heap analysis |
 | Metaspace / classloader leaks | Detected | Metaspace growth + Metadata GC triggers |
 | TLAB exhaustion | Detected | Requires special logging (`-Xlog:gc+tlab=debug`) |
+| Wrong collector choice | Detected | Serial/Parallel → suggest G1 or ZGC |
 
 The point is to identify which bucket you should investigate first.
 

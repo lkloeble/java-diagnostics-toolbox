@@ -1047,17 +1047,118 @@ def detect_tlab_exhaustion(
     }
 
 
+def detect_collector_choice(
+        collector_type: Optional[str],
+        max_heap_mb: Optional[float] = None
+) -> Dict:
+    """
+    Détection de mauvais choix de collector GC.
+
+    Les applications legacy sont souvent bloquées sur Serial/Parallel/CMS
+    alors que G1 est le défaut depuis Java 9 et que ZGC/Shenandoah
+    sont meilleurs pour les grosses heaps et la latence.
+
+    Règles:
+    - Serial/Parallel → suggérer G1 (ou ZGC si heap > 8GB)
+    - G1 → OK (pas de détection)
+    - ZGC/Shenandoah → OK (modern collectors)
+    - Unknown → mentionner le risque
+    """
+    if collector_type is None:
+        return {
+            "type": "collector_choice",
+            "detected": False,
+            "confidence": "low",
+            "reason": "collector type not found in log",
+            "collector": None,
+            "evidence": ["Could not determine GC collector from log"],
+            "next_steps": [],
+            "business_note": ""
+        }
+
+    collector_upper = collector_type.upper()
+
+    # Modern collectors - OK
+    if collector_upper in ('G1', 'ZGC', 'SHENANDOAH'):
+        return {
+            "type": "collector_choice",
+            "detected": False,
+            "confidence": "low",
+            "collector": collector_type,
+            "evidence": [f"Using {collector_type} collector (modern, recommended)"],
+            "next_steps": [],
+            "business_note": ""
+        }
+
+    # Legacy collectors - suggest upgrade
+    detected = True
+    confidence = "high" if collector_upper in ('SERIAL', 'PARALLEL') else "medium"
+
+    evidence = [f"Using {collector_type} collector (legacy)"]
+
+    # Build recommendations based on heap size
+    next_steps = []
+    if collector_upper == 'SERIAL':
+        evidence.append("Serial collector is single-threaded - very slow for production workloads")
+        next_steps.append("Switch to G1: -XX:+UseG1GC (default since Java 9)")
+    elif collector_upper == 'PARALLEL':
+        evidence.append("Parallel collector optimizes throughput but has long STW pauses")
+        next_steps.append("Switch to G1: -XX:+UseG1GC (better pause times)")
+
+    # For large heaps, suggest ZGC
+    if max_heap_mb and max_heap_mb >= 8192:  # >= 8GB
+        evidence.append(f"Heap is {max_heap_mb/1024:.0f}GB - consider low-latency collectors")
+        next_steps.append("For large heaps (>8GB), consider ZGC: -XX:+UseZGC")
+        next_steps.append("Or Shenandoah: -XX:+UseShenandoahGC")
+    else:
+        next_steps.append("For low-latency needs: ZGC (-XX:+UseZGC) or Shenandoah")
+
+    next_steps.append("Benchmark before switching in production")
+
+    # Business note
+    if collector_upper == 'SERIAL':
+        business_note = (
+            "LEGACY COLLECTOR: Serial GC is designed for single-threaded apps and small heaps. "
+            "It will cause severe pause times in any modern application. "
+            "Switching to G1 is almost always beneficial."
+        )
+    elif collector_upper == 'PARALLEL':
+        business_note = (
+            "LEGACY COLLECTOR: Parallel GC prioritizes throughput over latency. "
+            "This can cause unpredictable long STW pauses (seconds). "
+            "G1 provides better pause time control with minimal throughput impact. "
+            "For heaps >8GB with latency requirements, consider ZGC or Shenandoah."
+        )
+    else:
+        business_note = (
+            f"UNKNOWN COLLECTOR: {collector_type}. "
+            "Consider using G1 (default since Java 9) or modern collectors (ZGC, Shenandoah)."
+        )
+
+    return {
+        "type": "collector_choice",
+        "detected": detected,
+        "confidence": confidence,
+        "collector": collector_type,
+        "max_heap_mb": max_heap_mb,
+        "evidence": evidence,
+        "next_steps": next_steps,
+        "business_note": business_note
+    }
+
+
 def analyze_events(
         events: List[Dict],
         tail_minutes: Optional[int] = None,
         old_trend_threshold: float = 30.0,
         stw_threshold_ms: int = 500,
         max_heap_mb: Optional[float] = None,
-        region_size_mb: Optional[float] = None
+        region_size_mb: Optional[float] = None,
+        collector_type: Optional[str] = None
 ) -> Dict:
     """
     Chef d'orchestre : applique filtre + appelle chaque détection de suspect + construit summary global.
-    Scalable pour 6+ suspects.
+    Scalable pour 8 suspects.
     """
     filtered_events = filter_by_tail_window(events, tail_minutes)
 
@@ -1084,6 +1185,7 @@ def analyze_events(
         detect_gc_starvation(filtered_events, max_heap_mb=max_heap_mb, region_size_mb=region_size_mb),
         detect_metaspace_leak(filtered_events),
         detect_tlab_exhaustion(filtered_events),
+        detect_collector_choice(collector_type, max_heap_mb=max_heap_mb),
     ]
 
     # Filtre seulement les detected/suspected

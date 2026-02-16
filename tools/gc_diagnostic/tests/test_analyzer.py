@@ -9,6 +9,7 @@ from gc_diagnostic.analyzer import detect_humongous_pressure
 from gc_diagnostic.analyzer import detect_gc_starvation
 from gc_diagnostic.analyzer import detect_metaspace_leak
 from gc_diagnostic.analyzer import detect_tlab_exhaustion
+from gc_diagnostic.analyzer import detect_collector_choice
 
 @pytest.fixture
 def sample_events():
@@ -149,9 +150,9 @@ def test_detect_long_stw_pauses_with_long_pause():
 def test_analyze_events_orchestrates_multiple_suspects(sample_events):
     result = analyze_events(sample_events, tail_minutes=None, old_trend_threshold=40.0)
     assert "suspects" in result
-    assert len(result["suspects"]) == 7, "Doit analyser 7 suspects"
+    assert len(result["suspects"]) == 8, "Doit analyser 8 suspects"
 
-    # Vérifie que les sept types sont présents
+    # Vérifie que les huit types sont présents
     types = {s["type"] for s in result["suspects"]}
     assert "retention_growth" in types
     assert "allocation_pressure" in types
@@ -160,6 +161,7 @@ def test_analyze_events_orchestrates_multiple_suspects(sample_events):
     assert "gc_starvation" in types
     assert "metaspace_leak" in types
     assert "tlab_exhaustion" in types
+    assert "collector_choice" in types
 
     # Vérifie que retention est détecté, les autres non
     retention = next(s for s in result["suspects"] if s["type"] == "retention_growth")
@@ -182,6 +184,9 @@ def test_analyze_events_orchestrates_multiple_suspects(sample_events):
 
     tlab = next(s for s in result["suspects"] if s["type"] == "tlab_exhaustion")
     assert tlab["detected"] is False  # sample_events n'a pas de tlab data
+
+    collector = next(s for s in result["suspects"] if s["type"] == "collector_choice")
+    assert collector["detected"] is False  # no collector_type passed
 
 
 def test_detect_retention_growth_ignores_last_oom_crash():
@@ -522,3 +527,54 @@ def test_detect_tlab_exhaustion_high_waste():
     assert result["detected_by_waste"] is True
     assert result["avg_waste_pct"] > 5.0
     assert result["max_waste_pct"] == 23.0
+
+
+# === Tests for Collector Choice ===
+
+def test_detect_collector_choice_no_data():
+    """No detection when collector type is unknown."""
+    result = detect_collector_choice(None)
+    assert result["detected"] is False
+    assert result["collector"] is None
+
+
+def test_detect_collector_choice_g1():
+    """No issue when using G1 collector."""
+    result = detect_collector_choice("G1")
+    assert result["detected"] is False
+    assert result["collector"] == "G1"
+    assert "modern" in str(result["evidence"])
+
+
+def test_detect_collector_choice_zgc():
+    """No issue when using ZGC collector."""
+    result = detect_collector_choice("ZGC")
+    assert result["detected"] is False
+    assert result["collector"] == "ZGC"
+
+
+def test_detect_collector_choice_serial():
+    """Detect legacy Serial collector."""
+    result = detect_collector_choice("Serial")
+    assert result["detected"] is True
+    assert result["confidence"] == "high"
+    assert result["collector"] == "Serial"
+    assert "LEGACY" in result["business_note"]
+    assert "G1" in str(result["next_steps"])
+
+
+def test_detect_collector_choice_parallel():
+    """Detect legacy Parallel collector."""
+    result = detect_collector_choice("Parallel")
+    assert result["detected"] is True
+    assert result["confidence"] == "high"
+    assert result["collector"] == "Parallel"
+    assert "throughput" in result["business_note"].lower()
+
+
+def test_detect_collector_choice_large_heap():
+    """Suggest ZGC for large heaps (>8GB)."""
+    result = detect_collector_choice("Parallel", max_heap_mb=16384)  # 16GB
+    assert result["detected"] is True
+    assert "ZGC" in str(result["next_steps"])
+    assert "16GB" in str(result["evidence"]) or "large" in str(result["evidence"]).lower()
