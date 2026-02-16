@@ -901,6 +901,152 @@ def detect_metaspace_leak(
     }
 
 
+def detect_tlab_exhaustion(
+        filtered_events: List[Dict],
+        slow_alloc_ratio_threshold: float = 30.0,
+        high_waste_threshold: float = 5.0
+) -> Dict:
+    """
+    Détection d'exhaustion TLAB (Thread Local Allocation Buffer).
+
+    Nécessite un logging spécial: -Xlog:gc+tlab=debug
+
+    TLAB exhaustion se produit quand les threads épuisent leur TLAB
+    et doivent faire des allocations "slow path" synchronisées.
+    Cela dégrade les performances en multi-threaded.
+
+    Signaux:
+    1. Ratio élevé slow_allocs / refills (beaucoup d'allocations hors TLAB)
+    2. Waste élevé (TLAB mal dimensionnés)
+
+    Fix: Tuner -XX:TLABSize, -XX:MinTLABSize, ou padding fields (@Contended)
+    """
+    # Filter events with TLAB data
+    events_with_tlab = [
+        e for e in filtered_events
+        if e.get('tlab_slow_allocs') is not None
+    ]
+
+    if len(events_with_tlab) < 2:
+        return {
+            "type": "tlab_exhaustion",
+            "detected": False,
+            "confidence": "low",
+            "reason": "no TLAB data (requires -Xlog:gc+tlab=debug)",
+            "evidence": ["TLAB stats not found in log - special logging required"],
+            "next_steps": ["Enable TLAB logging: -Xlog:gc+tlab=debug:file=gc.log:time,uptime,level,tags"],
+            "business_note": ""
+        }
+
+    # Calcul durée
+    first = events_with_tlab[0]
+    last = events_with_tlab[-1]
+    duration_sec = last['uptime_sec'] - first['uptime_sec']
+    duration_min = duration_sec / 60
+
+    # Agrégation des métriques TLAB
+    total_slow_allocs = sum(e['tlab_slow_allocs'] for e in events_with_tlab)
+    total_refills = sum(e['tlab_refills'] for e in events_with_tlab)
+    avg_waste_pct = sum(e['tlab_waste_pct'] for e in events_with_tlab) / len(events_with_tlab)
+    max_waste_pct = max(e['tlab_waste_pct'] for e in events_with_tlab)
+    avg_thrds = sum(e['tlab_thrds'] for e in events_with_tlab) / len(events_with_tlab)
+
+    # Calculer le ratio slow_allocs / refills
+    # Un ratio élevé signifie beaucoup d'allocations ne passent pas par TLAB
+    slow_alloc_ratio = (total_slow_allocs / total_refills * 100) if total_refills > 0 else 0
+
+    # Calculer slow allocs par seconde (indicateur de pression)
+    slow_allocs_per_sec = total_slow_allocs / duration_sec if duration_sec > 0 else 0
+
+    # === LOGIQUE DE DÉTECTION ===
+    # Signal 1: Ratio élevé slow_allocs / refills
+    detected_by_ratio = slow_alloc_ratio >= slow_alloc_ratio_threshold
+
+    # Signal 2: Waste élevé (TLABs mal dimensionnés)
+    detected_by_waste = avg_waste_pct >= high_waste_threshold
+
+    # Détection: ratio OU waste élevé
+    detected = detected_by_ratio or detected_by_waste
+
+    # === CONFIDENCE ===
+    if detected:
+        if detected_by_ratio and detected_by_waste:
+            confidence = "high"
+        elif slow_alloc_ratio >= slow_alloc_ratio_threshold * 1.5:
+            confidence = "high"
+        elif detected_by_ratio:
+            confidence = "medium"
+        else:
+            confidence = "low"
+    else:
+        confidence = "low"
+
+    # === EVIDENCE ===
+    evidence = []
+    evidence.append(f"TLAB slow allocs: {total_slow_allocs:,} ({slow_alloc_ratio:.1f}% of refills)")
+    evidence.append(f"TLAB refills: {total_refills:,}")
+    evidence.append(f"Avg TLAB waste: {avg_waste_pct:.1f}% (max: {max_waste_pct:.1f}%)")
+    evidence.append(f"Slow allocs/sec: {slow_allocs_per_sec:.0f}")
+    evidence.append(f"Avg threads: {avg_thrds:.0f} over {len(events_with_tlab)} GCs")
+
+    # Top 3 worst GCs
+    sorted_by_slow = sorted(events_with_tlab, key=lambda e: e['tlab_slow_allocs'], reverse=True)[:3]
+    for e in sorted_by_slow:
+        gc_num = e.get('gc_number', '?')
+        slow = e['tlab_slow_allocs']
+        waste = e['tlab_waste_pct']
+        evidence.append(f"  GC({gc_num}): {slow} slow allocs, {waste:.1f}% waste")
+
+    # === NEXT STEPS ===
+    next_steps = []
+    if detected:
+        next_steps = [
+            "Increase TLAB size: -XX:TLABSize=<size> (default ~512KB)",
+            "Set minimum TLAB: -XX:MinTLABSize=<size>",
+            "For false sharing: use @Contended annotation on hotspot fields",
+            "Profile allocation hotspots with JFR (focus on TLAB events)",
+            "Review large array allocations in multi-threaded code"
+        ]
+
+    # === BUSINESS NOTE ===
+    if detected:
+        if confidence == "high":
+            business_note = (
+                "TLAB EXHAUSTION: {:.0f}% of allocations are slow path (synchronized). "
+                "Threads are competing for heap allocation instead of using their local buffers. "
+                "This severely impacts multi-threaded performance and scalability. "
+                "Tune TLAB size or investigate allocation patterns."
+            ).format(slow_alloc_ratio)
+        else:
+            business_note = (
+                "TLAB PRESSURE detected: Elevated slow path allocations ({:.0f}%). "
+                "This indicates suboptimal TLAB sizing for the workload. "
+                "May cause latency spikes under high thread contention."
+            ).format(slow_alloc_ratio)
+    else:
+        business_note = ""
+
+    return {
+        "type": "tlab_exhaustion",
+        "detected": detected,
+        "confidence": confidence,
+        "total_slow_allocs": total_slow_allocs,
+        "total_refills": total_refills,
+        "slow_alloc_ratio": round(slow_alloc_ratio, 1),
+        "avg_waste_pct": round(avg_waste_pct, 1),
+        "max_waste_pct": round(max_waste_pct, 1),
+        "slow_allocs_per_sec": round(slow_allocs_per_sec, 0),
+        "avg_thrds": round(avg_thrds, 0),
+        "gc_count_with_tlab": len(events_with_tlab),
+        "duration_min": round(duration_min, 1),
+        "detected_by_ratio": detected_by_ratio,
+        "detected_by_waste": detected_by_waste,
+        "evidence": evidence,
+        "next_steps": next_steps,
+        "business_note": business_note
+    }
+
+
 def analyze_events(
         events: List[Dict],
         tail_minutes: Optional[int] = None,
@@ -937,6 +1083,7 @@ def analyze_events(
         detect_humongous_pressure(filtered_events, max_heap_regions=max_heap_regions),
         detect_gc_starvation(filtered_events, max_heap_mb=max_heap_mb, region_size_mb=region_size_mb),
         detect_metaspace_leak(filtered_events),
+        detect_tlab_exhaustion(filtered_events),
     ]
 
     # Filtre seulement les detected/suspected

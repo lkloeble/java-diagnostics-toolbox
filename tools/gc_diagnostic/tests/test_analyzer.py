@@ -8,6 +8,7 @@ from gc_diagnostic.analyzer import detect_allocation_pressure
 from gc_diagnostic.analyzer import detect_humongous_pressure
 from gc_diagnostic.analyzer import detect_gc_starvation
 from gc_diagnostic.analyzer import detect_metaspace_leak
+from gc_diagnostic.analyzer import detect_tlab_exhaustion
 
 @pytest.fixture
 def sample_events():
@@ -148,9 +149,9 @@ def test_detect_long_stw_pauses_with_long_pause():
 def test_analyze_events_orchestrates_multiple_suspects(sample_events):
     result = analyze_events(sample_events, tail_minutes=None, old_trend_threshold=40.0)
     assert "suspects" in result
-    assert len(result["suspects"]) == 6, "Doit analyser 6 suspects"
+    assert len(result["suspects"]) == 7, "Doit analyser 7 suspects"
 
-    # Vérifie que les six types sont présents
+    # Vérifie que les sept types sont présents
     types = {s["type"] for s in result["suspects"]}
     assert "retention_growth" in types
     assert "allocation_pressure" in types
@@ -158,6 +159,7 @@ def test_analyze_events_orchestrates_multiple_suspects(sample_events):
     assert "humongous_pressure" in types
     assert "gc_starvation" in types
     assert "metaspace_leak" in types
+    assert "tlab_exhaustion" in types
 
     # Vérifie que retention est détecté, les autres non
     retention = next(s for s in result["suspects"] if s["type"] == "retention_growth")
@@ -177,6 +179,9 @@ def test_analyze_events_orchestrates_multiple_suspects(sample_events):
 
     metaspace = next(s for s in result["suspects"] if s["type"] == "metaspace_leak")
     assert metaspace["detected"] is False  # sample_events n'a pas de metaspace data
+
+    tlab = next(s for s in result["suspects"] if s["type"] == "tlab_exhaustion")
+    assert tlab["detected"] is False  # sample_events n'a pas de tlab data
 
 
 def test_detect_retention_growth_ignores_last_oom_crash():
@@ -438,3 +443,82 @@ def test_detect_metaspace_leak_metadata_gc_threshold():
     assert result["detected"] is True
     assert result["detected_by_metadata_gc"] is True
     assert result["metadata_gc_pct"] == 100.0
+
+
+# === Tests for TLAB Exhaustion ===
+
+def test_detect_tlab_exhaustion_no_data():
+    """No detection when no TLAB data available."""
+    events = [
+        {'uptime_sec': 0.0, 'old_after_regions': 100, 'gc_number': 0},
+        {'uptime_sec': 60.0, 'old_after_regions': 150, 'gc_number': 1},
+    ]
+    result = detect_tlab_exhaustion(events)
+    assert result["detected"] is False
+    assert "TLAB" in result.get("reason", "")
+    assert "gc+tlab=debug" in str(result.get("next_steps", []))
+
+
+def test_detect_tlab_exhaustion_healthy():
+    """No detection when TLAB metrics are healthy (low slow allocs ratio)."""
+    events = [
+        {
+            'uptime_sec': 0.0, 'old_after_regions': 100, 'gc_number': 0,
+            'tlab_thrds': 14, 'tlab_refills': 1000, 'tlab_slow_allocs': 50, 'tlab_waste_pct': 1.5
+        },
+        {
+            'uptime_sec': 60.0, 'old_after_regions': 100, 'gc_number': 1,
+            'tlab_thrds': 14, 'tlab_refills': 1000, 'tlab_slow_allocs': 60, 'tlab_waste_pct': 1.4
+        },
+        {
+            'uptime_sec': 120.0, 'old_after_regions': 100, 'gc_number': 2,
+            'tlab_thrds': 14, 'tlab_refills': 1000, 'tlab_slow_allocs': 55, 'tlab_waste_pct': 1.6
+        },
+    ]
+    result = detect_tlab_exhaustion(events)
+    assert result["detected"] is False
+    # Slow allocs ratio = 165 / 3000 = 5.5% (below 30% threshold)
+    assert result["slow_alloc_ratio"] < 30
+
+
+def test_detect_tlab_exhaustion_high_ratio():
+    """Detect TLAB exhaustion when slow allocs ratio is high."""
+    events = [
+        {
+            'uptime_sec': 0.0, 'old_after_regions': 100, 'gc_number': 0,
+            'tlab_thrds': 14, 'tlab_refills': 1000, 'tlab_slow_allocs': 500, 'tlab_waste_pct': 1.5
+        },
+        {
+            'uptime_sec': 60.0, 'old_after_regions': 100, 'gc_number': 1,
+            'tlab_thrds': 14, 'tlab_refills': 1000, 'tlab_slow_allocs': 450, 'tlab_waste_pct': 1.4
+        },
+        {
+            'uptime_sec': 120.0, 'old_after_regions': 100, 'gc_number': 2,
+            'tlab_thrds': 14, 'tlab_refills': 1000, 'tlab_slow_allocs': 480, 'tlab_waste_pct': 1.6
+        },
+    ]
+    result = detect_tlab_exhaustion(events)
+    assert result["detected"] is True
+    assert result["detected_by_ratio"] is True
+    # Slow allocs ratio = 1430 / 3000 = 47.7% (above 30% threshold)
+    assert result["slow_alloc_ratio"] > 30
+    assert "TLAB" in result["business_note"]
+
+
+def test_detect_tlab_exhaustion_high_waste():
+    """Detect TLAB pressure via high waste percentage."""
+    events = [
+        {
+            'uptime_sec': 0.0, 'old_after_regions': 100, 'gc_number': 0,
+            'tlab_thrds': 20, 'tlab_refills': 100, 'tlab_slow_allocs': 10, 'tlab_waste_pct': 23.0
+        },
+        {
+            'uptime_sec': 60.0, 'old_after_regions': 100, 'gc_number': 1,
+            'tlab_thrds': 15, 'tlab_refills': 200, 'tlab_slow_allocs': 20, 'tlab_waste_pct': 8.0
+        },
+    ]
+    result = detect_tlab_exhaustion(events, high_waste_threshold=5.0)
+    assert result["detected"] is True
+    assert result["detected_by_waste"] is True
+    assert result["avg_waste_pct"] > 5.0
+    assert result["max_waste_pct"] == 23.0

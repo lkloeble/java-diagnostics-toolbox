@@ -25,6 +25,11 @@ class GCEvent:
     # Metaspace (in KB for precision)
     metaspace_used_kb: Optional[int] = None
     metaspace_committed_kb: Optional[int] = None
+    # TLAB stats (requires -Xlog:gc+tlab=debug)
+    tlab_thrds: Optional[int] = None        # Number of threads with TLAB
+    tlab_refills: Optional[int] = None      # Total TLAB refills
+    tlab_slow_allocs: Optional[int] = None  # Slow path allocations (TLAB exhaustion)
+    tlab_waste_pct: Optional[float] = None  # TLAB waste percentage
     # Pause
     pause_ms: Optional[float] = None
     # Flags
@@ -48,6 +53,10 @@ class GCEvent:
             'heap_total_mb': self.heap_total_mb,
             'metaspace_used_kb': self.metaspace_used_kb,
             'metaspace_committed_kb': self.metaspace_committed_kb,
+            'tlab_thrds': self.tlab_thrds,
+            'tlab_refills': self.tlab_refills,
+            'tlab_slow_allocs': self.tlab_slow_allocs,
+            'tlab_waste_pct': self.tlab_waste_pct,
             'pause_ms': self.pause_ms,
             'evacuation_failure': self.evacuation_failure,
             'metadata_gc_threshold': self.metadata_gc_threshold,
@@ -103,6 +112,22 @@ METASPACE_PATTERN = re.compile(
     r'\s*GC\((\d+)\)'                   # group 3: GC number
     r'\s*Metaspace:\s*(\d+)K\((\d+)K\)' # groups 4,5: used(committed) before
     r'\s*->\s*(\d+)K\((\d+)K\)'         # groups 6,7: used(committed) after
+)
+
+# TLAB pattern (gc,tlab tag - requires -Xlog:gc+tlab=debug)
+# Example: [2026-02-16T05:21:12.890+0200][0.075s][debug][gc,tlab] GC(0) TLAB totals: thrds: 20  refills: 59 max: 5 slow allocs: 19 max 4 waste: 23.0% ...
+TLAB_PATTERN = re.compile(
+    r'\[([^\]]+)\]'                     # group 1: timestamp
+    r'\[([\d.]+)s\]'                    # group 2: uptime
+    r'\[debug\]\[gc,tlab\]'             # [gc,tlab] at debug level
+    r'\s*GC\((\d+)\)'                   # group 3: GC number
+    r'\s*TLAB totals:'
+    r'\s*thrds:\s*(\d+)'                # group 4: number of threads
+    r'\s+refills:\s*(\d+)'              # group 5: total refills
+    r'\s+max:\s*\d+'                    # skip max refills per thread
+    r'\s+slow allocs:\s*(\d+)'          # group 6: slow allocations
+    r'\s+max\s+\d+'                     # skip max slow allocs per thread
+    r'\s+waste:\s*([0-9.]+)%'           # group 7: waste percentage
 )
 
 
@@ -274,6 +299,30 @@ def parse_log(lines: List[str]) -> List[Dict]:
             event = events_by_gc[gc_num]
             event.metaspace_used_kb = int(metaspace_used_after)
             event.metaspace_committed_kb = int(metaspace_committed_after)
+            continue
+
+        # Try TLAB pattern (requires -Xlog:gc+tlab=debug)
+        match = TLAB_PATTERN.search(line)
+        if match:
+            timestamp, uptime_str, gc_num_str = match.group(1, 2, 3)
+            thrds = match.group(4)
+            refills = match.group(5)
+            slow_allocs = match.group(6)
+            waste_pct = match.group(7)
+            gc_num = int(gc_num_str)
+
+            if gc_num not in events_by_gc:
+                events_by_gc[gc_num] = GCEvent(
+                    gc_number=gc_num,
+                    timestamp=timestamp,
+                    uptime_sec=float(uptime_str),
+                )
+
+            event = events_by_gc[gc_num]
+            event.tlab_thrds = int(thrds)
+            event.tlab_refills = int(refills)
+            event.tlab_slow_allocs = int(slow_allocs)
+            event.tlab_waste_pct = float(waste_pct)
             continue
 
     # Convert to list, filter events that have old regions data, sort by uptime

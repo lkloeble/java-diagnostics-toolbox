@@ -3,7 +3,7 @@ import pytest
 from gc_diagnostic.parser import (
     parse_log, validate_log_format, extract_heap_max_capacity,
     extract_heap_region_size, OLD_REGIONS_PATTERN, PAUSE_LINE_PATTERN,
-    HUMONGOUS_REGIONS_PATTERN, EVACUATION_FAILURE_MARKER
+    HUMONGOUS_REGIONS_PATTERN, EVACUATION_FAILURE_MARKER, TLAB_PATTERN
 )
 
 def test_parses_real_fast_leak_log(gc_fast_log_lines):
@@ -216,3 +216,54 @@ def test_parse_log_real_file_has_new_fields(gc_fast_log_lines):
     # At least some events should have pause_ms parsed
     events_with_pause = [e for e in events if e['pause_ms'] is not None]
     assert len(events_with_pause) > 0, "Expected some events to have pause_ms parsed"
+
+
+# === TLAB pattern tests ===
+
+def test_tlab_pattern():
+    """Test parsing of TLAB debug line."""
+    line = "[2026-02-16T05:21:12.890+0200][0.075s][debug][gc,tlab] GC(0) TLAB totals: thrds: 20  refills: 59 max: 5 slow allocs: 19 max 4 waste: 23.0% gc: 5720144B max: 523824B slow: 83200B max: 13368B"
+    match = TLAB_PATTERN.search(line)
+
+    assert match is not None
+    assert match.group(1) == "2026-02-16T05:21:12.890+0200"  # timestamp
+    assert match.group(2) == "0.075"  # uptime
+    assert match.group(3) == "0"  # GC number
+    assert match.group(4) == "20"  # thrds
+    assert match.group(5) == "59"  # refills
+    assert match.group(6) == "19"  # slow allocs
+    assert match.group(7) == "23.0"  # waste %
+
+
+def test_tlab_pattern_varied():
+    """Test TLAB parsing with different values."""
+    line = "[2026-02-16T05:21:13.098+0200][0.283s][debug][gc,tlab] GC(2) TLAB totals: thrds: 14  refills: 1331 max: 99 slow allocs: 765 max 62 waste:  1.2% gc: 1567712B max: 269216B slow: 1786192B max: 137560B"
+    match = TLAB_PATTERN.search(line)
+
+    assert match is not None
+    assert match.group(3) == "2"  # GC number
+    assert match.group(4) == "14"  # thrds
+    assert match.group(5) == "1331"  # refills
+    assert match.group(6) == "765"  # slow allocs
+    assert match.group(7) == "1.2"  # waste %
+
+
+def test_parse_log_with_tlab_data():
+    """Test that TLAB data is correctly merged into GC events."""
+    lines = [
+        "[2026-02-16T05:21:12.820+0200][0.005s][info][gc     ] Using G1",
+        "[2026-02-16T05:21:12.891+0200][0.076s][info][gc,heap     ] GC(0) Old regions: 0->0",
+        "[2026-02-16T05:21:12.891+0200][0.076s][info][gc,heap     ] GC(0) Humongous regions: 0->0",
+        "[2026-02-16T05:21:12.891+0200][0.076s][info][gc          ] GC(0) Pause Young (Normal) (G1 Evacuation Pause) 25M->2M(512M) 1.286ms",
+        "[2026-02-16T05:21:12.890+0200][0.075s][debug][gc,tlab] GC(0) TLAB totals: thrds: 20  refills: 59 max: 5 slow allocs: 19 max 4 waste: 23.0% gc: 5720144B max: 523824B slow: 83200B max: 13368B",
+    ]
+    events = parse_log(lines)
+
+    assert len(events) == 1
+    event = events[0]
+    assert event['gc_number'] == 0
+    assert event['old_after_regions'] == 0
+    assert event['tlab_thrds'] == 20
+    assert event['tlab_refills'] == 59
+    assert event['tlab_slow_allocs'] == 19
+    assert event['tlab_waste_pct'] == 23.0

@@ -69,6 +69,17 @@ Recommended flags (example):
 -Xlog:gc*,safepoint:file=gc.log:time,uptime,level,tags
 ```
 
+### Special logging for TLAB analysis
+
+To detect TLAB exhaustion (multi-threaded allocation contention), add TLAB debug logging:
+
+```bash
+-Xlog:gc*,gc+tlab=debug,safepoint:file=gc.log:time,uptime,level,tags
+```
+
+This is optional — TLAB issues are rare but impactful in heavily multi-threaded applications.
+Without this flag, TLAB analysis will simply report "no TLAB data available".
+
 Usage
 ```bash
 ./get-gc-diagnostic.py /path/to/gc.log
@@ -90,43 +101,35 @@ DETECTED: strong signals available directly in GC logs
 SUSPECTED: plausible patterns, but confirmation requires additional data
 
 DETECTED (high confidence from GC logs)
-Allocation pressure / GC thrash
-Young collections are excessively frequent and/or GC time is high relative to uptime.
 
-Humongous allocation pressure (G1)
-Humongous allocations/regions appear frequently and correlate with GC activity or pause spikes.
-
-Long STW pauses (tail latency risk)
-Stop-the-world pauses exceed a threshold and are frequent enough to impact user experience.
+- **Allocation pressure / GC thrash**: Young collections are excessively frequent and/or GC time is high relative to uptime.
+- **Humongous allocation pressure (G1)**: Humongous allocations/regions appear frequently and correlate with GC activity or pause spikes.
+- **Long STW pauses (tail latency risk)**: Stop-the-world pauses exceed a threshold and are frequent enough to impact user experience.
+- **GC Starvation / Finalizer backlog**: Long gaps between GCs despite high heap usage — classic symptom of finalizer blocking.
+- **Metaspace leak (classloader issues)**: Metaspace grows continuously, often triggered by dynamic classloading (hot deploy, JSP, plugins).
+- **TLAB exhaustion** (requires `-Xlog:gc+tlab=debug`): High slow-path allocations indicate multi-threaded contention for TLAB buffers.
 
 SUSPECTED (triage only)
-Retention / memory leak pattern
-Old-gen usage trends upward over time despite mixed cycles or repeated collections.
-GC logs can’t prove a leak — but they can show “old not coming down”.
 
-The “usual suspects” (context)
+- **Retention / memory leak pattern**: Old-gen usage trends upward over time despite mixed cycles or repeated collections. GC logs can't prove a leak — but they can show "old not coming down".
+
+The "usual suspects" (context)
+
 Most GC-related production issues tend to fall into a few buckets.
 Different buckets require different evidence sources.
 
-This tool is built around the following mental model (not a claim of universal statistics):
+This tool currently detects **7 suspects**:
 
-Heap retention / memory leaks (needs heap evidence; log-only = suspicion)
+| Suspect | Detection | Notes |
+|---------|-----------|-------|
+| Heap retention / memory leaks | Detected | Old gen trend analysis |
+| Long STW pauses | Detected | Pause time analysis |
+| Excessive allocation rate | Detected | Evacuation failure count |
+| G1 humongous allocations | Detected | Humongous region frequency + peak |
+| Finalizers / GC starvation | Detected | Long inter-GC gaps + heap analysis |
+| Metaspace / classloader leaks | Detected | Metaspace growth + Metadata GC triggers |
+| TLAB exhaustion | Detected | Requires special logging (`-Xlog:gc+tlab=debug`) |
 
-Long STW pauses (often visible in logs)
-
-Excessive allocation rate / GC frequency (often visible in logs)
-
-Collector mismatch for workload (requires context and measurement)
-
-G1 humongous allocations / fragmentation (often visible in logs)
-
-Finalizers / reference processing backlogs (may require JFR / more logging)
-
-Metaspace / classloader leaks (often needs classloader evidence; sometimes hinted in logs)
-
-TLAB / false sharing / contention effects (not a log-triage problem; needs profiling/JFR)
-
-The point is not to cover all of them here.
 The point is to identify which bucket you should investigate first.
 
 
