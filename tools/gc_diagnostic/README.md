@@ -136,24 +136,39 @@ The point is to identify which bucket you should investigate first.
 
 
 Example output (excerpt)
-GC FLU TEST — SUMMARY
 
-DETECTED:
-- Allocation pressure (young GC median interval: 0.38s)
-- Long STW pauses (p99 pause: 1.4s, max: 2.8s)
+```
+=== GC Flu Test Report ===
+Summary: 2 issues DETECTED → Retention Growth, Long Stw Pauses
 
-SUSPECTED:
-- Retention / leak pattern (old usage trending upward despite mixed cycles)
+RETENTION GROWTH - DETECTED
+Confidence: high
+Trend: 52.5 regions/min (above threshold)
+Delta: +210 regions over 4.0 min
+Estimated time to potential OOM (~90%): 45 min
+Heap occupation: ~850 / 1024 MB (83.0%)
 
-EVIDENCE (high level):
-- Old gen: 6.2G → 7.9G over 28min
-- Mixed cycles: 11, avg reclaimed: 2.1%
-- Young GC count: 4,320 over 28min (median interval: 0.39s)
+Evidence:
+  - Trend signal: 52.5 regions/min (threshold: 5.0)
+  - Start: 120 regions at 0.4min
+  - End: 330 regions at 4.4min
 
-NEXT LOW-EFFORT DATA:
-- jcmd `<pid>` GC.class_histogram
-- Start a short JFR capture focused on allocations
-- If the trend persists: heap dump for MAT analysis
+Business note:
+ACTIVE LEAK PATTERN: Old generation is growing at a significant rate...
+
+Next low-effort data:
+  - jcmd <pid> GC.class_histogram (check dominant classes)
+  - Short JFR capture (10-30 min, focus on allocations + GC phases)
+  - Heap dump + Eclipse MAT analysis
+
+LONG STW PAUSES - DETECTED
+Confidence: high
+
+Evidence:
+  - Found 5 pauses >= 500ms (max: 1842ms, avg: 1205ms)
+  - GC(42) at 3.2min: 1842ms - Pause Young (Mixed)
+  ...
+```
 What it will NOT do
 It will not “prove a memory leak” from logs.
 
@@ -201,38 +216,39 @@ get-gc-diagnostic.py gc.log --tail-window 30
 This analyzes only the last 30 minutes of the GC activity.
 
 ```bash
---old-trend-mb-per-min <value>
+--old-trend-threshold <value>
 ```
 
-Threshold used to detect a retention / leak-like growth pattern.
+Threshold used to detect a retention / leak-like growth pattern, in **regions per minute**.
 
-The tool computes the trend of Old Generation usage after GC over the
+The tool computes the trend of Old Generation regions after GC over the
 analyzed window.
 
 If the average growth rate exceeds this threshold, a retention pattern is
 reported as DETECTED.
 
-Default value:
+Default value: **5.0 regions per minute**
 
-10 MB per minute
 This value is intentionally conservative:
+- low enough to catch real production issues early
+- high enough to avoid flagging normal noise
 
-low enough to catch real production issues early
-
-high enough to avoid flagging normal noise
+To convert to MB: multiply by your region size (typically 1-32 MB depending on heap size).
 
 Example:
 
-``` bash
-get-gc-diagnostic.py gc.log --old-trend-mb-per-min 15 --format md
+```bash
+get-gc-diagnostic.py gc.log --old-trend-threshold 10 --format md
 ```
 
+```bash
+--format <md|txt>
+```
 
 Output format for the generated report.
 
-md (default): Markdown, readable as plain text and suitable for repositories
-
-txt: plain text, no Markdown syntax
+- **txt** (default): plain text, no Markdown syntax
+- **md**: Markdown, readable as plain text and suitable for repositories
 
 Example:
 
