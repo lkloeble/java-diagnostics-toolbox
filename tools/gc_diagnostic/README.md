@@ -256,6 +256,36 @@ Example:
 get-gc-diagnostic.py gc.log --format txt
 ```
 
+---
+
+## Exit codes
+
+The tool returns exit codes for easy integration into scripts and runbooks:
+
+| Code | Status | Meaning |
+|------|--------|---------|
+| 0 | HEALTHY | No issues detected |
+| 1 | WARNING | Issues detected, investigation recommended |
+| 2 | CRITICAL | Immediate action required |
+
+**CRITICAL (2)** is returned when:
+- Wrong collector detected (Serial, Parallel)
+- High-confidence memory retention (leak pattern)
+- Heap occupation > 90%
+- High-confidence allocation pressure
+
+Example usage in scripts:
+```bash
+get-gc-diagnostic.py gc.log > /dev/null 2>&1
+case $? in
+  0) echo "All good" ;;
+  1) echo "Warning - check report" ;;
+  2) echo "CRITICAL - alert oncall" && send-alert.sh ;;
+esac
+```
+
+---
+
 Notes on confidence
 The tool always uses all available data points within the analyzed window.
 

@@ -10,6 +10,56 @@ from gc_diagnostic.parser import parse_log
 from gc_diagnostic.analyzer import analyze_events
 from gc_diagnostic.reporter import generate_report
 
+# Exit codes
+EXIT_HEALTHY = 0   # No issues detected
+EXIT_WARNING = 1   # Issues detected (investigation recommended)
+EXIT_CRITICAL = 2  # Critical issues (immediate action required)
+
+
+def compute_exit_code(findings: dict) -> int:
+    """
+    Compute exit code based on findings severity.
+
+    EXIT_CRITICAL (2): Immediate action required
+      - Wrong collector (Serial/Parallel)
+      - Retention growth with high confidence
+      - Heap occupation > 90%
+
+    EXIT_WARNING (1): Investigation recommended
+      - Any suspect detected
+
+    EXIT_HEALTHY (0): No issues
+    """
+    suspects = findings.get("suspects", [])
+    detected = [s for s in suspects if s.get("detected")]
+
+    if not detected:
+        return EXIT_HEALTHY
+
+    # Check for critical conditions
+    for s in detected:
+        # Wrong collector is always critical
+        if s.get("type") == "collector_choice":
+            collector = s.get("collector", "").upper()
+            if collector in ("SERIAL", "PARALLEL"):
+                return EXIT_CRITICAL
+
+        # Retention with high confidence or critical heap occupation
+        if s.get("type") == "retention_growth":
+            if s.get("confidence") == "high":
+                return EXIT_CRITICAL
+            heap_pct = s.get("heap_occupation_pct")
+            if heap_pct and heap_pct > 90:
+                return EXIT_CRITICAL
+
+        # Severe allocation pressure
+        if s.get("type") == "allocation_pressure":
+            if s.get("confidence") == "high":
+                return EXIT_CRITICAL
+
+    # At least one detection but not critical
+    return EXIT_WARNING
+
 
 def main():
     parser = argparse.ArgumentParser(
@@ -92,7 +142,8 @@ def main():
         print(f"\nReports written to: {md_path.absolute()} and {txt_path.absolute()}")
         print(f"\nNote: This tool is optimized for G1 GC logs. {collector_type} collector detected.")
         print("Switch to G1 (-XX:+UseG1GC) for full diagnostic capabilities.")
-        sys.exit(0)
+        print(f"\nExit code: {EXIT_CRITICAL} (CRITICAL)")
+        sys.exit(EXIT_CRITICAL)
 
     try:
         events = parse_log(lines)
@@ -131,6 +182,12 @@ def main():
         print(report_txt)
 
     print(f"\nReports written to: {md_path.absolute()} and {txt_path.absolute()}")
+
+    # Compute and return exit code
+    exit_code = compute_exit_code(findings)
+    exit_labels = {EXIT_HEALTHY: "HEALTHY", EXIT_WARNING: "WARNING", EXIT_CRITICAL: "CRITICAL"}
+    print(f"Exit code: {exit_code} ({exit_labels[exit_code]})")
+    sys.exit(exit_code)
 
 
 if __name__ == "__main__":

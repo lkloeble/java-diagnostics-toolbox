@@ -36,5 +36,59 @@ def test_cli_healthy_no_signal(mock_log_file):
         [sys.executable, str(cli_path), mock_log_file],
         capture_output=True
     )
-    assert result.returncode == 0
+    assert result.returncode == 0  # EXIT_HEALTHY
     assert b"NO STRONG SIGNAL" in result.stdout
+    assert b"Exit code: 0 (HEALTHY)" in result.stdout
+
+
+# === Exit code tests ===
+
+def test_exit_code_healthy():
+    """Test compute_exit_code returns 0 for no detections."""
+    # Import here to avoid issues
+    import sys
+    sys.path.insert(0, str(Path(__file__).parent.parent))
+    from importlib import import_module
+    cli = import_module("get-gc-diagnostic")
+
+    findings = {"suspects": [{"detected": False, "type": "retention_growth"}]}
+    assert cli.compute_exit_code(findings) == 0
+
+
+def test_exit_code_warning():
+    """Test compute_exit_code returns 1 for non-critical detections."""
+    import sys
+    sys.path.insert(0, str(Path(__file__).parent.parent))
+    from importlib import import_module
+    cli = import_module("get-gc-diagnostic")
+
+    findings = {"suspects": [
+        {"detected": True, "type": "metaspace_leak", "confidence": "medium"}
+    ]}
+    assert cli.compute_exit_code(findings) == 1
+
+
+def test_exit_code_critical_collector():
+    """Test compute_exit_code returns 2 for Serial collector."""
+    import sys
+    sys.path.insert(0, str(Path(__file__).parent.parent))
+    from importlib import import_module
+    cli = import_module("get-gc-diagnostic")
+
+    findings = {"suspects": [
+        {"detected": True, "type": "collector_choice", "collector": "Serial"}
+    ]}
+    assert cli.compute_exit_code(findings) == 2
+
+
+def test_exit_code_critical_retention():
+    """Test compute_exit_code returns 2 for high confidence retention."""
+    import sys
+    sys.path.insert(0, str(Path(__file__).parent.parent))
+    from importlib import import_module
+    cli = import_module("get-gc-diagnostic")
+
+    findings = {"suspects": [
+        {"detected": True, "type": "retention_growth", "confidence": "high"}
+    ]}
+    assert cli.compute_exit_code(findings) == 2
