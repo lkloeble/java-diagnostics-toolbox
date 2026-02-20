@@ -3,9 +3,70 @@
 from typing import Dict, Optional, List
 
 
-# gc_diagnostic/reporter.py
+# Severity levels and their indicators
+SEVERITY_CRITICAL = "critical"
+SEVERITY_WARNING = "warning"
+SEVERITY_OK = "ok"
 
-from typing import Dict, Optional, List
+# Emoji indicators for file output
+SEVERITY_EMOJI = {
+    SEVERITY_CRITICAL: "🔴",
+    SEVERITY_WARNING: "🟡",
+    SEVERITY_OK: "🟢",
+}
+
+# ANSI color codes for terminal output
+ANSI_RESET = "\033[0m"
+ANSI_RED = "\033[91m"
+ANSI_YELLOW = "\033[93m"
+ANSI_GREEN = "\033[92m"
+
+SEVERITY_ANSI = {
+    SEVERITY_CRITICAL: ANSI_RED,
+    SEVERITY_WARNING: ANSI_YELLOW,
+    SEVERITY_OK: ANSI_GREEN,
+}
+
+
+def compute_suspect_severity(suspect: Dict) -> str:
+    """
+    Compute severity level for a suspect based on type and confidence.
+
+    CRITICAL: Immediate action required
+      - Wrong collector (Serial/Parallel)
+      - Retention growth with high confidence
+      - Allocation pressure with high confidence
+      - Heap occupation > 90%
+
+    WARNING: Investigation recommended
+      - Any other detected issue
+
+    OK: Not detected
+    """
+    if not suspect.get("detected"):
+        return SEVERITY_OK
+
+    suspect_type = suspect.get("type", "")
+    confidence = suspect.get("confidence", "low")
+
+    # Wrong collector is always critical
+    if suspect_type == "collector_choice":
+        collector = suspect.get("collector", "").upper()
+        if collector in ("SERIAL", "PARALLEL"):
+            return SEVERITY_CRITICAL
+
+    # High confidence retention or allocation pressure
+    if suspect_type in ("retention_growth", "allocation_pressure"):
+        if confidence == "high":
+            return SEVERITY_CRITICAL
+        # Check heap occupation for retention
+        if suspect_type == "retention_growth":
+            heap_pct = suspect.get("heap_occupation_pct")
+            if heap_pct and heap_pct > 90:
+                return SEVERITY_CRITICAL
+
+    # Any other detection is a warning
+    return SEVERITY_WARNING
 
 
 def generate_report(findings: Dict, format: str = "txt", debug: bool = False) -> str:
@@ -16,14 +77,23 @@ def generate_report(findings: Dict, format: str = "txt", debug: bool = False) ->
     detected_count = len(detected_suspects)
 
     if detected_count == 0:
-        summary_line = "NO STRONG SIGNAL"
+        summary_line = f"{SEVERITY_EMOJI[SEVERITY_OK]} NO STRONG SIGNAL"
     elif detected_count == 1:
         s = detected_suspects[0]
         type_name = s["type"].replace("_", " ").title()
-        summary_line = f"DETECTED - {type_name} ({s['confidence']} confidence)"
+        severity = compute_suspect_severity(s)
+        summary_line = f"{SEVERITY_EMOJI[severity]} DETECTED - {type_name} ({s['confidence']} confidence)"
     else:
+        # Use highest severity among all detected
+        severities = [compute_suspect_severity(s) for s in detected_suspects]
+        if SEVERITY_CRITICAL in severities:
+            max_severity = SEVERITY_CRITICAL
+        elif SEVERITY_WARNING in severities:
+            max_severity = SEVERITY_WARNING
+        else:
+            max_severity = SEVERITY_OK
         names = ", ".join(s["type"].replace("_", " ").title() for s in detected_suspects)
-        summary_line = f"{detected_count} issues DETECTED → {names}"
+        summary_line = f"{SEVERITY_EMOJI[max_severity]} {detected_count} issues DETECTED → {names}"
 
     # Header
     if format == "md":
@@ -87,12 +157,14 @@ def generate_report(findings: Dict, format: str = "txt", debug: bool = False) ->
     for suspect in findings.get("suspects", []):
         type_title = suspect["type"].replace("_", " ").title()
         status = "DETECTED" if suspect["detected"] else "NOT DETECTED"
+        severity = compute_suspect_severity(suspect)
+        emoji = SEVERITY_EMOJI[severity]
 
         if format == "md":
-            lines.append(f"## {type_title} - {status}")
+            lines.append(f"## {emoji} {type_title} - {status}")
             lines.append(f"**Confidence:** {suspect['confidence']}")
         else:
-            lines.append(f"{type_title.upper()} - {status}")
+            lines.append(f"{emoji} {type_title.upper()} - {status}")
             lines.append(f"Confidence: {suspect['confidence']}")
 
         # Toujours afficher le trend calculé (même si NOT DETECTED)
