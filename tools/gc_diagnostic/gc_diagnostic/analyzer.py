@@ -380,7 +380,7 @@ def detect_allocation_pressure(
             "Increase heap size (-Xmx) if possible",
             "JFR recording to identify allocation hotspots",
             "Review object allocation patterns (large arrays, frequent allocations)",
-            "Consider tuning G1 parameters: -XX:G1HeapRegionSize, -XX:G1ReservePercent"
+            "Check for memory-intensive batch operations or bulk data processing"
         ]
 
     # Business note
@@ -524,7 +524,7 @@ def detect_humongous_pressure(
             "Identify humongous allocations: -Xlog:gc+humongous=debug",
             "JFR recording to find allocation sites of large objects",
             "Review code for large arrays, collections, or buffers (> region_size/2)",
-            "Consider increasing G1HeapRegionSize to reduce humongous threshold"
+            "Consider splitting large objects or using off-heap storage (DirectByteBuffer)"
         ]
 
     # === BUSINESS NOTE ===
@@ -859,8 +859,7 @@ def detect_metaspace_leak(
             "jcmd <pid> VM.classloader_stats (check classloader hierarchy)",
             "jcmd <pid> GC.class_stats (identify classes consuming metaspace)",
             "Check for: hot deploys, JSP compilation, dynamic proxies, reflection-heavy frameworks",
-            "Set -XX:MaxMetaspaceSize to limit and get early OOM vs slow degradation",
-            "Consider -XX:+ClassUnloading -XX:+CMSClassUnloadingEnabled (if applicable)"
+            "Review application restart strategy (rolling restarts if leak is slow)"
         ]
 
     # === BUSINESS NOTE ===
@@ -1001,11 +1000,10 @@ def detect_tlab_exhaustion(
     next_steps = []
     if detected:
         next_steps = [
-            "Increase TLAB size: -XX:TLABSize=<size> (default ~512KB)",
-            "Set minimum TLAB: -XX:MinTLABSize=<size>",
-            "For false sharing: use @Contended annotation on hotspot fields",
             "Profile allocation hotspots with JFR (focus on TLAB events)",
-            "Review large array allocations in multi-threaded code"
+            "Review large array allocations in multi-threaded code",
+            "Check for allocation bursts in parallel stream operations",
+            "Consider reducing allocation rate in hot paths"
         ]
 
     # === BUSINESS NOTE ===
