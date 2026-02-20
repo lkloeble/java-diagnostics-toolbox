@@ -74,8 +74,22 @@ def main():
             "region_size_mb": region_size_mb,
             "note": f"Log format is {collector_type} (not G1) - detailed analysis not available"
         }
-        report = generate_report(findings, format=args.format, debug=args.debug)
-        print(report)
+
+        # Générer les deux rapports
+        report_md = generate_report(findings, format="md", debug=args.debug)
+        report_txt = generate_report(findings, format="txt", debug=args.debug)
+
+        md_path = Path("gc-diagnostic.md")
+        txt_path = Path("gc-diagnostic.txt")
+        md_path.write_text(report_md, encoding="utf-8")
+        txt_path.write_text(report_txt, encoding="utf-8")
+
+        if args.format == "md":
+            print(report_md)
+        else:
+            print(report_txt)
+
+        print(f"\nReports written to: {md_path.absolute()} and {txt_path.absolute()}")
         print(f"\nNote: This tool is optimized for G1 GC logs. {collector_type} collector detected.")
         print("Switch to G1 (-XX:+UseG1GC) for full diagnostic capabilities.")
         sys.exit(0)
@@ -99,13 +113,24 @@ def main():
         collector_type=collector_type
     )
 
-    # Juste avant l'appel à generate_report
-    report = generate_report(
-        findings,
-        format=args.format,
-        debug=args.debug
-    )
-    print(report)
+    # Générer les deux rapports (md et txt)
+    report_md = generate_report(findings, format="md", debug=args.debug)
+    report_txt = generate_report(findings, format="txt", debug=args.debug)
+
+    # Écrire les fichiers
+    md_path = Path("gc-diagnostic.md")
+    txt_path = Path("gc-diagnostic.txt")
+
+    md_path.write_text(report_md, encoding="utf-8")
+    txt_path.write_text(report_txt, encoding="utf-8")
+
+    # Afficher le format demandé sur stdout
+    if args.format == "md":
+        print(report_md)
+    else:
+        print(report_txt)
+
+    print(f"\nReports written to: {md_path.absolute()} and {txt_path.absolute()}")
 
 
 if __name__ == "__main__":
