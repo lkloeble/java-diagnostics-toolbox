@@ -1,5 +1,6 @@
 import pytest
 from gc_diagnostic.analyzer import filter_by_tail_window
+from gc_diagnostic.analyzer import compute_pause_statistics
 from gc_diagnostic.parser import parse_log
 from gc_diagnostic.analyzer import analyze_events
 from gc_diagnostic.analyzer import detect_long_stw_pauses
@@ -578,3 +579,57 @@ def test_detect_collector_choice_large_heap():
     assert result["detected"] is True
     assert "ZGC" in str(result["next_steps"])
     assert "16GB" in str(result["evidence"]) or "large" in str(result["evidence"]).lower()
+
+
+# === Pause Statistics Tests ===
+
+def test_compute_pause_statistics_basic():
+    """Test basic pause statistics computation."""
+    events = [
+        {'pause_ms': 10.0},
+        {'pause_ms': 20.0},
+        {'pause_ms': 30.0},
+        {'pause_ms': 40.0},
+        {'pause_ms': 100.0},  # outlier
+    ]
+    stats = compute_pause_statistics(events)
+    assert stats is not None
+    assert stats['count'] == 5
+    assert stats['min'] == 10.0
+    assert stats['max'] == 100.0
+    assert stats['mean'] == 40.0  # (10+20+30+40+100)/5
+    assert stats['p50'] == 30.0   # median
+
+
+def test_compute_pause_statistics_not_enough_data():
+    """Return None when less than 2 events."""
+    events = [{'pause_ms': 10.0}]
+    assert compute_pause_statistics(events) is None
+    assert compute_pause_statistics([]) is None
+
+
+def test_compute_pause_statistics_ignores_none():
+    """Skip events without pause_ms."""
+    events = [
+        {'pause_ms': 10.0},
+        {'pause_ms': None},
+        {'other_field': 'data'},
+        {'pause_ms': 20.0},
+        {'pause_ms': 30.0},
+    ]
+    stats = compute_pause_statistics(events)
+    assert stats is not None
+    assert stats['count'] == 3
+
+
+def test_analyze_events_includes_pause_stats():
+    """analyze_events should include pause_stats in findings."""
+    events = [
+        {'uptime_sec': 60.0, 'old_after_regions': 100, 'pause_ms': 10.0},
+        {'uptime_sec': 120.0, 'old_after_regions': 105, 'pause_ms': 20.0},
+        {'uptime_sec': 180.0, 'old_after_regions': 110, 'pause_ms': 30.0},
+    ]
+    findings = analyze_events(events)
+    assert 'pause_stats' in findings
+    assert findings['pause_stats'] is not None
+    assert findings['pause_stats']['count'] == 3

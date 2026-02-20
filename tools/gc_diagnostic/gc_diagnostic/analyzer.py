@@ -1,7 +1,7 @@
 # gc_diagnostic/analyzer.py
 
 from typing import List, Dict, Optional
-from statistics import stdev  # stdlib pour variance (optionnel)
+from statistics import stdev, mean, quantiles  # stdlib Python 3.8+
 
 
 def filter_by_tail_window(
@@ -28,6 +28,50 @@ def filter_by_tail_window(
     filtered = [e for e in events if e['uptime_sec'] >= cutoff]
 
     return filtered
+
+
+def compute_pause_statistics(events: List[Dict]) -> Optional[Dict]:
+    """
+    Compute descriptive statistics on GC pause times.
+
+    Returns dict with:
+      - count: number of GC events
+      - mean: average pause time (ms)
+      - min, max: extremes
+      - p25, p50, p75, p90, p99: percentiles
+
+    Returns None if not enough data (< 2 events with pause_ms).
+    """
+    # Extract pause times, filter out None values
+    pauses = [e['pause_ms'] for e in events if e.get('pause_ms') is not None]
+
+    if len(pauses) < 2:
+        return None
+
+    # Sort for percentile calculation
+    pauses_sorted = sorted(pauses)
+    n = len(pauses_sorted)
+
+    # Compute percentiles manually for precise control
+    # quantiles() with n=100 gives percentile boundaries
+    def percentile(data, p):
+        """Compute p-th percentile (0-100)."""
+        k = (len(data) - 1) * p / 100
+        f = int(k)
+        c = f + 1 if f + 1 < len(data) else f
+        return data[f] + (data[c] - data[f]) * (k - f)
+
+    return {
+        "count": n,
+        "mean": round(mean(pauses), 1),
+        "min": round(min(pauses), 1),
+        "max": round(max(pauses), 1),
+        "p25": round(percentile(pauses_sorted, 25), 1),
+        "p50": round(percentile(pauses_sorted, 50), 1),
+        "p75": round(percentile(pauses_sorted, 75), 1),
+        "p90": round(percentile(pauses_sorted, 90), 1),
+        "p99": round(percentile(pauses_sorted, 99), 1),
+    }
 
 
 def detect_retention_growth(
@@ -1199,9 +1243,13 @@ def analyze_events(
     detected_count = sum(1 for s in suspects if s["detected"])
     summary = f"{detected_count} issues DETECTED" if detected_count > 0 else "NO STRONG SIGNAL"
 
+    # Compute pause statistics
+    pause_stats = compute_pause_statistics(filtered_events)
+
     return {
         "summary": summary,
         "suspects": suspects,
         "filtered_events": filtered_events,  # TOUJOURS inclus
-        "region_size_mb": region_size_mb  # TOUJOURS inclus (ou None)
+        "region_size_mb": region_size_mb,  # TOUJOURS inclus (ou None)
+        "pause_stats": pause_stats  # GC pause percentiles (or None if < 2 events)
     }

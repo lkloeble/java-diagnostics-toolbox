@@ -73,12 +73,20 @@ def generate_slack_summary(findings: Dict) -> str:
     """
     Generate a one-liner summary suitable for Slack/incident channels.
 
-    Format: 🔴 CRITICAL: Issue1 (metric), Issue2 (metric) | heap X% | OOM ~Ymin
+    Format: 🔴 CRITICAL: Issue1 (metric), Issue2 (metric) | heap X% | p50/p99: Xms/Yms
     """
     suspects = findings.get("suspects", [])
     detected = [s for s in suspects if s.get("detected")]
+    pause_stats = findings.get("pause_stats")
+
+    # Build pause stats suffix (always shown if available)
+    pause_suffix = ""
+    if pause_stats:
+        pause_suffix = f"p50/p99: {pause_stats['p50']:.0f}ms/{pause_stats['p99']:.0f}ms"
 
     if not detected:
+        if pause_suffix:
+            return f"🟢 HEALTHY: No issues | {pause_suffix}"
         return "🟢 HEALTHY: No GC issues detected"
 
     # Compute overall severity
@@ -160,6 +168,9 @@ def generate_slack_summary(findings: Dict) -> str:
         else:
             parts.append(f"OOM ~{oom_eta/60:.1f}h")
 
+    if pause_suffix:
+        parts.append(pause_suffix)
+
     return " | ".join(parts)
 
 
@@ -204,6 +215,37 @@ def generate_report(findings: Dict, format: str = "txt", debug: bool = False) ->
     filtered_events = findings.get("filtered_events", [])
     stable_events = findings.get("stable_events", [])  # version nettoyée (sans crash final)
     region_size_mb = findings.get("region_size_mb", 1)
+    pause_stats = findings.get("pause_stats")
+
+    # === GC PAUSE STATISTICS ===
+    if pause_stats:
+        if format == "md":
+            lines.append("## GC Pause Statistics")
+            lines.append(f"**Events analyzed:** {pause_stats['count']}")
+            lines.append("")
+            lines.append("| Metric | Value |")
+            lines.append("|--------|-------|")
+            lines.append(f"| Mean   | {pause_stats['mean']}ms |")
+            lines.append(f"| Min    | {pause_stats['min']}ms |")
+            lines.append(f"| p25    | {pause_stats['p25']}ms |")
+            lines.append(f"| p50    | {pause_stats['p50']}ms |")
+            lines.append(f"| p75    | {pause_stats['p75']}ms |")
+            lines.append(f"| p90    | {pause_stats['p90']}ms |")
+            lines.append(f"| p99    | {pause_stats['p99']}ms |")
+            lines.append(f"| Max    | {pause_stats['max']}ms |")
+            lines.append("")
+        else:
+            lines.append("GC Pause Statistics")
+            lines.append(f"  Events: {pause_stats['count']}")
+            lines.append(f"  Mean:   {pause_stats['mean']}ms")
+            lines.append(f"  Min:    {pause_stats['min']}ms")
+            lines.append(f"  p25:    {pause_stats['p25']}ms")
+            lines.append(f"  p50:    {pause_stats['p50']}ms  (median)")
+            lines.append(f"  p75:    {pause_stats['p75']}ms")
+            lines.append(f"  p90:    {pause_stats['p90']}ms")
+            lines.append(f"  p99:    {pause_stats['p99']}ms  (tail latency)")
+            lines.append(f"  Max:    {pause_stats['max']}ms")
+            lines.append("")
 
     # === MODE DEBUG ===
     if debug:
