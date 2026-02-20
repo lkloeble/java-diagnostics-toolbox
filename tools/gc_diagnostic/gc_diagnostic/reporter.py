@@ -69,6 +69,100 @@ def compute_suspect_severity(suspect: Dict) -> str:
     return SEVERITY_WARNING
 
 
+def generate_slack_summary(findings: Dict) -> str:
+    """
+    Generate a one-liner summary suitable for Slack/incident channels.
+
+    Format: 🔴 CRITICAL: Issue1 (metric), Issue2 (metric) | heap X% | OOM ~Ymin
+    """
+    suspects = findings.get("suspects", [])
+    detected = [s for s in suspects if s.get("detected")]
+
+    if not detected:
+        return "🟢 HEALTHY: No GC issues detected"
+
+    # Compute overall severity
+    severities = [compute_suspect_severity(s) for s in detected]
+    if SEVERITY_CRITICAL in severities:
+        max_severity = SEVERITY_CRITICAL
+        status = "CRITICAL"
+    else:
+        max_severity = SEVERITY_WARNING
+        status = "WARNING"
+
+    emoji = SEVERITY_EMOJI[max_severity]
+
+    # Build compact issue descriptions
+    issue_parts = []
+    heap_pct = None
+    oom_eta = None
+
+    for s in detected:
+        stype = s.get("type", "")
+
+        if stype == "retention_growth":
+            trend = s.get("trend_regions_per_min", 0)
+            issue_parts.append(f"Retention (+{trend:.0f} reg/min)")
+            # Extract heap and OOM from this suspect
+            if "heap_occupation_pct" in s:
+                heap_pct = s["heap_occupation_pct"]
+            elif "last_old_regions" in s and "max_heap_mb" in s:
+                region_size = findings.get("region_size_mb", 1)
+                max_heap = s.get("max_heap_mb", 0)
+                if max_heap:
+                    current = s["last_old_regions"] * region_size
+                    heap_pct = (current / max_heap) * 100
+            # OOM estimation
+            if trend > 0 and s.get("max_heap_mb") and s.get("last_old_regions"):
+                region_size = findings.get("region_size_mb", 1)
+                current_mb = s["last_old_regions"] * region_size
+                max_heap = s["max_heap_mb"]
+                remaining = max_heap * 0.9 - current_mb
+                if remaining > 0:
+                    oom_eta = remaining / (trend * region_size)
+
+        elif stype == "allocation_pressure":
+            evac_fail = s.get("evacuation_failure_count", 0)
+            issue_parts.append(f"Alloc pressure ({evac_fail} evac fail)")
+
+        elif stype == "long_stw_pauses":
+            max_pause = s.get("max_pause_ms", 0)
+            issue_parts.append(f"Long STW (max {max_pause:.0f}ms)")
+
+        elif stype == "humongous_pressure":
+            count = s.get("humongous_count", 0)
+            issue_parts.append(f"Humongous ({count}x)")
+
+        elif stype == "gc_starvation":
+            gap = s.get("max_gap_sec", 0)
+            issue_parts.append(f"GC starvation ({gap:.0f}s gap)")
+
+        elif stype == "metaspace_leak":
+            issue_parts.append("Metaspace leak")
+
+        elif stype == "tlab_exhaustion":
+            ratio = s.get("slow_alloc_ratio", 0)
+            issue_parts.append(f"TLAB exhaust ({ratio:.0f}% slow)")
+
+        elif stype == "collector_choice":
+            collector = s.get("collector", "?")
+            issue_parts.append(f"{collector} collector")
+
+    # Build the line
+    parts = [f"{emoji} {status}: {', '.join(issue_parts)}"]
+
+    if heap_pct is not None:
+        parts.append(f"heap {heap_pct:.0f}%")
+
+    if oom_eta is not None:
+        if oom_eta < 60:
+            parts.append(f"OOM ~{oom_eta:.0f}min")
+        else:
+            parts.append(f"OOM ~{oom_eta/60:.1f}h")
+
+    return " | ".join(parts)
+
+
 def generate_report(findings: Dict, format: str = "txt", debug: bool = False) -> str:
     lines = []
 
@@ -262,6 +356,17 @@ def generate_report(findings: Dict, format: str = "txt", debug: bool = False) ->
                 lines.append(f"  - {step}")
 
         lines.append("")
+
+    # Add Slack-ready one-liner at the end
+    slack_line = generate_slack_summary(findings)
+    lines.append("---")
+    if format == "md":
+        lines.append("**Slack summary (copy-paste):**")
+        lines.append(f"```\n{slack_line}\n```")
+    else:
+        lines.append("Slack summary (copy-paste):")
+        lines.append(slack_line)
+    lines.append("")
 
     return "\n".join(lines)
 

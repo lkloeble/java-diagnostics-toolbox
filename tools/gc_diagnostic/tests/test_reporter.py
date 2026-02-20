@@ -1,6 +1,7 @@
 import pytest
 from gc_diagnostic.reporter import (
     generate_report,
+    generate_slack_summary,
     compute_suspect_severity,
     SEVERITY_CRITICAL,
     SEVERITY_WARNING,
@@ -52,6 +53,64 @@ def test_severity_other_detection():
     """Other detected issues should be WARNING."""
     suspect = {"detected": True, "type": "long_stw_pauses", "confidence": "medium"}
     assert compute_suspect_severity(suspect) == SEVERITY_WARNING
+
+
+# === Slack summary tests ===
+
+def test_slack_summary_healthy():
+    """Healthy findings should show green HEALTHY."""
+    findings = {"suspects": [{"detected": False, "type": "retention_growth"}]}
+    result = generate_slack_summary(findings)
+    assert "🟢 HEALTHY" in result
+    assert "No GC issues" in result
+
+
+def test_slack_summary_retention():
+    """Retention with trend should show metrics."""
+    findings = {
+        "suspects": [{
+            "detected": True,
+            "type": "retention_growth",
+            "confidence": "medium",
+            "trend_regions_per_min": 25,
+            "last_old_regions": 200,
+            "max_heap_mb": 256,
+        }],
+        "region_size_mb": 1
+    }
+    result = generate_slack_summary(findings)
+    assert "🟡 WARNING" in result
+    assert "Retention (+25 reg/min)" in result
+    assert "heap" in result
+
+
+def test_slack_summary_critical_collector():
+    """Serial collector should show red CRITICAL."""
+    findings = {
+        "suspects": [{
+            "detected": True,
+            "type": "collector_choice",
+            "collector": "Serial",
+            "confidence": "high"
+        }]
+    }
+    result = generate_slack_summary(findings)
+    assert "🔴 CRITICAL" in result
+    assert "Serial collector" in result
+
+
+def test_slack_summary_multiple_issues():
+    """Multiple issues should be listed."""
+    findings = {
+        "suspects": [
+            {"detected": True, "type": "retention_growth", "confidence": "medium", "trend_regions_per_min": 10},
+            {"detected": True, "type": "long_stw_pauses", "confidence": "medium", "max_pause_ms": 1500},
+        ]
+    }
+    result = generate_slack_summary(findings)
+    assert "Retention" in result
+    assert "Long STW" in result
+    assert "1500ms" in result
 
 
 # === Report generation tests ===
