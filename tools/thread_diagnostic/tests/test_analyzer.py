@@ -55,6 +55,46 @@ def test_real_blocked_dump_detects_contention(real_blocked_dump):
     assert deadlock["detected"] is False
 
 
+@pytest.fixture
+def real_deadlock_dump():
+    """Load real deadlock dump from samples."""
+    path = Path(__file__).parents[3] / "samples" / "dump_deadlock.txt"
+    if not path.exists():
+        pytest.skip(f"Sample not found: {path}")
+    return path.read_text()
+
+
+@pytest.fixture
+def real_pool_saturated_dump():
+    """Load real pool saturated dump from samples."""
+    path = Path(__file__).parents[3] / "samples" / "dump_pool_saturated.txt"
+    if not path.exists():
+        pytest.skip(f"Sample not found: {path}")
+    return path.read_text()
+
+
+def test_real_deadlock_dump(real_deadlock_dump):
+    """Real deadlock dump should detect deadlock."""
+    dump = parse_thread_dump(real_deadlock_dump)
+    findings = analyze_thread_dump(dump)
+
+    deadlock = next(s for s in findings["suspects"] if s["type"] == "deadlock")
+    assert deadlock["detected"] is True
+    assert deadlock["confidence"] == "high"
+    assert len(deadlock["evidence"]) > 0
+
+
+def test_real_pool_saturated_dump(real_pool_saturated_dump):
+    """Real pool saturated dump should detect saturation."""
+    dump = parse_thread_dump(real_pool_saturated_dump)
+    findings = analyze_thread_dump(dump)
+
+    saturation = next(s for s in findings["suspects"] if s["type"] == "thread_pool_saturation")
+    assert saturation["detected"] is True
+    assert saturation["confidence"] == "high"
+    assert len(saturation["saturated_pools"]) > 0
+
+
 def test_analyze_healthy_dump(simple_thread_dump):
     """Healthy dump should return no strong signal."""
     dump = parse_thread_dump(simple_thread_dump)

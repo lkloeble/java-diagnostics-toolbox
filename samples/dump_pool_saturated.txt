@@ -1,0 +1,716 @@
+2026-02-21 11:25:03
+Full thread dump OpenJDK 64-Bit Server VM (21+35-LTS mixed mode):
+
+Threads class SMR info:
+_java_thread_list=0x000060000082b040, length=39, elements={
+0x0000000125818c00, 0x0000000126824600, 0x0000000126821800, 0x0000000126822000,
+0x0000000126822800, 0x0000000126823000, 0x000000012599ca00, 0x000000012599e600,
+0x0000000125a03400, 0x0000000125a03c00, 0x0000000125a0d400, 0x0000000125a0dc00,
+0x0000000125a84600, 0x0000000125a84e00, 0x0000000125a85600, 0x000000012701b600,
+0x000000012701be00, 0x0000000127011800, 0x0000000127012000, 0x0000000125a85e00,
+0x0000000125a86600, 0x0000000125a86e00, 0x0000000127012800, 0x0000000127013000,
+0x0000000127058200, 0x0000000127058a00, 0x0000000127059200, 0x0000000125a87600,
+0x0000000125a87e00, 0x0000000125a88600, 0x0000000127059a00, 0x000000012705a200,
+0x000000012705aa00, 0x0000000125a88e00, 0x0000000125a89600, 0x0000000125a89e00,
+0x0000000125a8a600, 0x0000000125a8ae00, 0x0000000126855e00
+}
+
+"pool-sat-main" #1 [10243] prio=5 os_prio=31 cpu=61.09ms elapsed=37.61s tid=0x0000000125818c00 nid=10243 waiting on condition  [0x000000016bc36000]
+   java.lang.Thread.State: TIMED_WAITING (sleeping)
+	at java.lang.Thread.sleep0(java.base@21/Native Method)
+	at java.lang.Thread.sleep(java.base@21/Thread.java:558)
+	at java.util.concurrent.TimeUnit.sleep(java.base@21/TimeUnit.java:446)
+	at gc.harness.PoolSaturationSuspect.main(PoolSaturationSuspect.java:79)
+
+   Locked ownable synchronizers:
+	- None
+
+"Reference Handler" #9 [32003] daemon prio=10 os_prio=31 cpu=0.16ms elapsed=37.59s tid=0x0000000126824600 nid=32003 waiting on condition  [0x000000016cdae000]
+   java.lang.Thread.State: RUNNABLE
+	at java.lang.ref.Reference.waitForReferencePendingList(java.base@21/Native Method)
+	at java.lang.ref.Reference.processPendingReferences(java.base@21/Reference.java:246)
+	at java.lang.ref.Reference$ReferenceHandler.run(java.base@21/Reference.java:208)
+
+   Locked ownable synchronizers:
+	- None
+
+"Finalizer" #10 [31491] daemon prio=8 os_prio=31 cpu=0.09ms elapsed=37.59s tid=0x0000000126821800 nid=31491 in Object.wait()  [0x000000016cfba000]
+   java.lang.Thread.State: WAITING (on object monitor)
+	at java.lang.Object.wait0(java.base@21/Native Method)
+	- waiting on <0x00000007fff09ab0> (a java.lang.ref.NativeReferenceQueue$Lock)
+	at java.lang.Object.wait(java.base@21/Object.java:366)
+	at java.lang.Object.wait(java.base@21/Object.java:339)
+	at java.lang.ref.NativeReferenceQueue.await(java.base@21/NativeReferenceQueue.java:48)
+	at java.lang.ref.ReferenceQueue.remove0(java.base@21/ReferenceQueue.java:158)
+	at java.lang.ref.NativeReferenceQueue.remove(java.base@21/NativeReferenceQueue.java:89)
+	- locked <0x00000007fff09ab0> (a java.lang.ref.NativeReferenceQueue$Lock)
+	at java.lang.ref.Finalizer$FinalizerThread.run(java.base@21/Finalizer.java:173)
+
+   Locked ownable synchronizers:
+	- None
+
+"Signal Dispatcher" #11 [23043] daemon prio=9 os_prio=31 cpu=0.08ms elapsed=37.59s tid=0x0000000126822000 nid=23043 waiting on condition  [0x0000000000000000]
+   java.lang.Thread.State: RUNNABLE
+
+   Locked ownable synchronizers:
+	- None
+
+"Service Thread" #12 [23299] daemon prio=9 os_prio=31 cpu=0.02ms elapsed=37.59s tid=0x0000000126822800 nid=23299 runnable  [0x0000000000000000]
+   java.lang.Thread.State: RUNNABLE
+
+   Locked ownable synchronizers:
+	- None
+
+"Monitor Deflation Thread" #13 [23811] daemon prio=9 os_prio=31 cpu=3.06ms elapsed=37.59s tid=0x0000000126823000 nid=23811 runnable  [0x0000000000000000]
+   java.lang.Thread.State: RUNNABLE
+
+   Locked ownable synchronizers:
+	- None
+
+"C2 CompilerThread0" #14 [30723] daemon prio=9 os_prio=31 cpu=9.01ms elapsed=37.59s tid=0x000000012599ca00 nid=30723 waiting on condition  [0x0000000000000000]
+   java.lang.Thread.State: RUNNABLE
+   No compile task
+
+   Locked ownable synchronizers:
+	- None
+
+"C1 CompilerThread0" #17 [24323] daemon prio=9 os_prio=31 cpu=15.06ms elapsed=37.59s tid=0x000000012599e600 nid=24323 waiting on condition  [0x0000000000000000]
+   java.lang.Thread.State: RUNNABLE
+   No compile task
+
+   Locked ownable synchronizers:
+	- None
+
+"Notification Thread" #18 [24579] daemon prio=9 os_prio=31 cpu=0.02ms elapsed=37.58s tid=0x0000000125a03400 nid=24579 runnable  [0x0000000000000000]
+   java.lang.Thread.State: RUNNABLE
+
+   Locked ownable synchronizers:
+	- None
+
+"Common-Cleaner" #19 [24835] daemon prio=8 os_prio=31 cpu=0.22ms elapsed=37.58s tid=0x0000000125a03c00 nid=24835 waiting on condition  [0x000000016de0e000]
+   java.lang.Thread.State: TIMED_WAITING (parking)
+	at jdk.internal.misc.Unsafe.park(java.base@21/Native Method)
+	- parking to wait for  <0x00000007ffe813a8> (a java.util.concurrent.locks.AbstractQueuedSynchronizer$ConditionObject)
+	at java.util.concurrent.locks.LockSupport.parkNanos(java.base@21/LockSupport.java:269)
+	at java.util.concurrent.locks.AbstractQueuedSynchronizer$ConditionObject.await(java.base@21/AbstractQueuedSynchronizer.java:1847)
+	at java.lang.ref.ReferenceQueue.await(java.base@21/ReferenceQueue.java:71)
+	at java.lang.ref.ReferenceQueue.remove0(java.base@21/ReferenceQueue.java:143)
+	at java.lang.ref.ReferenceQueue.remove(java.base@21/ReferenceQueue.java:218)
+	at jdk.internal.ref.CleanerImpl.run(java.base@21/CleanerImpl.java:140)
+	at java.lang.Thread.runWith(java.base@21/Thread.java:1596)
+	at java.lang.Thread.run(java.base@21/Thread.java:1583)
+	at jdk.internal.misc.InnocuousThread.run(java.base@21/InnocuousThread.java:186)
+
+   Locked ownable synchronizers:
+	- None
+
+"pool-sat-worker-1" #20 [29699] prio=5 os_prio=31 cpu=0.17ms elapsed=37.55s tid=0x0000000125a0d400 nid=29699 waiting on condition  [0x000000016e01a000]
+   java.lang.Thread.State: WAITING (parking)
+	at jdk.internal.misc.Unsafe.park(java.base@21/Native Method)
+	- parking to wait for  <0x00000007ffdc3890> (a java.util.concurrent.CountDownLatch$Sync)
+	at java.util.concurrent.locks.LockSupport.park(java.base@21/LockSupport.java:221)
+	at java.util.concurrent.locks.AbstractQueuedSynchronizer.acquire(java.base@21/AbstractQueuedSynchronizer.java:754)
+	at java.util.concurrent.locks.AbstractQueuedSynchronizer.acquireSharedInterruptibly(java.base@21/AbstractQueuedSynchronizer.java:1099)
+	at java.util.concurrent.CountDownLatch.await(java.base@21/CountDownLatch.java:230)
+	at gc.harness.PoolSaturationSuspect.awaitForever(PoolSaturationSuspect.java:87)
+	at gc.harness.PoolSaturationSuspect.lambda$main$0(PoolSaturationSuspect.java:61)
+	at gc.harness.PoolSaturationSuspect$$Lambda/0x00000008000c1000.run(Unknown Source)
+	at java.util.concurrent.Executors$RunnableAdapter.call(java.base@21/Executors.java:572)
+	at java.util.concurrent.FutureTask.run(java.base@21/FutureTask.java:317)
+	at java.util.concurrent.ThreadPoolExecutor.runWorker(java.base@21/ThreadPoolExecutor.java:1144)
+	at java.util.concurrent.ThreadPoolExecutor$Worker.run(java.base@21/ThreadPoolExecutor.java:642)
+	at java.lang.Thread.runWith(java.base@21/Thread.java:1596)
+	at java.lang.Thread.run(java.base@21/Thread.java:1583)
+
+   Locked ownable synchronizers:
+	- <0x00000007ffdca150> (a java.util.concurrent.ThreadPoolExecutor$Worker)
+
+"pool-sat-worker-2" #21 [25347] prio=5 os_prio=31 cpu=0.12ms elapsed=37.55s tid=0x0000000125a0dc00 nid=25347 waiting on condition  [0x000000016e226000]
+   java.lang.Thread.State: WAITING (parking)
+	at jdk.internal.misc.Unsafe.park(java.base@21/Native Method)
+	- parking to wait for  <0x00000007ffdc3890> (a java.util.concurrent.CountDownLatch$Sync)
+	at java.util.concurrent.locks.LockSupport.park(java.base@21/LockSupport.java:221)
+	at java.util.concurrent.locks.AbstractQueuedSynchronizer.acquire(java.base@21/AbstractQueuedSynchronizer.java:754)
+	at java.util.concurrent.locks.AbstractQueuedSynchronizer.acquireSharedInterruptibly(java.base@21/AbstractQueuedSynchronizer.java:1099)
+	at java.util.concurrent.CountDownLatch.await(java.base@21/CountDownLatch.java:230)
+	at gc.harness.PoolSaturationSuspect.awaitForever(PoolSaturationSuspect.java:87)
+	at gc.harness.PoolSaturationSuspect.lambda$main$0(PoolSaturationSuspect.java:61)
+	at gc.harness.PoolSaturationSuspect$$Lambda/0x00000008000c1000.run(Unknown Source)
+	at java.util.concurrent.Executors$RunnableAdapter.call(java.base@21/Executors.java:572)
+	at java.util.concurrent.FutureTask.run(java.base@21/FutureTask.java:317)
+	at java.util.concurrent.ThreadPoolExecutor.runWorker(java.base@21/ThreadPoolExecutor.java:1144)
+	at java.util.concurrent.ThreadPoolExecutor$Worker.run(java.base@21/ThreadPoolExecutor.java:642)
+	at java.lang.Thread.runWith(java.base@21/Thread.java:1596)
+	at java.lang.Thread.run(java.base@21/Thread.java:1583)
+
+   Locked ownable synchronizers:
+	- <0x00000007ffc0c9e0> (a java.util.concurrent.ThreadPoolExecutor$Worker)
+
+"pool-sat-worker-3" #22 [25859] prio=5 os_prio=31 cpu=0.08ms elapsed=37.55s tid=0x0000000125a84600 nid=25859 waiting on condition  [0x000000016e432000]
+   java.lang.Thread.State: WAITING (parking)
+	at jdk.internal.misc.Unsafe.park(java.base@21/Native Method)
+	- parking to wait for  <0x00000007ffdc3890> (a java.util.concurrent.CountDownLatch$Sync)
+	at java.util.concurrent.locks.LockSupport.park(java.base@21/LockSupport.java:221)
+	at java.util.concurrent.locks.AbstractQueuedSynchronizer.acquire(java.base@21/AbstractQueuedSynchronizer.java:754)
+	at java.util.concurrent.locks.AbstractQueuedSynchronizer.acquireSharedInterruptibly(java.base@21/AbstractQueuedSynchronizer.java:1099)
+	at java.util.concurrent.CountDownLatch.await(java.base@21/CountDownLatch.java:230)
+	at gc.harness.PoolSaturationSuspect.awaitForever(PoolSaturationSuspect.java:87)
+	at gc.harness.PoolSaturationSuspect.lambda$main$0(PoolSaturationSuspect.java:61)
+	at gc.harness.PoolSaturationSuspect$$Lambda/0x00000008000c1000.run(Unknown Source)
+	at java.util.concurrent.Executors$RunnableAdapter.call(java.base@21/Executors.java:572)
+	at java.util.concurrent.FutureTask.run(java.base@21/FutureTask.java:317)
+	at java.util.concurrent.ThreadPoolExecutor.runWorker(java.base@21/ThreadPoolExecutor.java:1144)
+	at java.util.concurrent.ThreadPoolExecutor$Worker.run(java.base@21/ThreadPoolExecutor.java:642)
+	at java.lang.Thread.runWith(java.base@21/Thread.java:1596)
+	at java.lang.Thread.run(java.base@21/Thread.java:1583)
+
+   Locked ownable synchronizers:
+	- <0x00000007ffc0cba8> (a java.util.concurrent.ThreadPoolExecutor$Worker)
+
+"pool-sat-worker-4" #23 [26371] prio=5 os_prio=31 cpu=0.07ms elapsed=37.55s tid=0x0000000125a84e00 nid=26371 waiting on condition  [0x000000016e63e000]
+   java.lang.Thread.State: WAITING (parking)
+	at jdk.internal.misc.Unsafe.park(java.base@21/Native Method)
+	- parking to wait for  <0x00000007ffdc3890> (a java.util.concurrent.CountDownLatch$Sync)
+	at java.util.concurrent.locks.LockSupport.park(java.base@21/LockSupport.java:221)
+	at java.util.concurrent.locks.AbstractQueuedSynchronizer.acquire(java.base@21/AbstractQueuedSynchronizer.java:754)
+	at java.util.concurrent.locks.AbstractQueuedSynchronizer.acquireSharedInterruptibly(java.base@21/AbstractQueuedSynchronizer.java:1099)
+	at java.util.concurrent.CountDownLatch.await(java.base@21/CountDownLatch.java:230)
+	at gc.harness.PoolSaturationSuspect.awaitForever(PoolSaturationSuspect.java:87)
+	at gc.harness.PoolSaturationSuspect.lambda$main$0(PoolSaturationSuspect.java:61)
+	at gc.harness.PoolSaturationSuspect$$Lambda/0x00000008000c1000.run(Unknown Source)
+	at java.util.concurrent.Executors$RunnableAdapter.call(java.base@21/Executors.java:572)
+	at java.util.concurrent.FutureTask.run(java.base@21/FutureTask.java:317)
+	at java.util.concurrent.ThreadPoolExecutor.runWorker(java.base@21/ThreadPoolExecutor.java:1144)
+	at java.util.concurrent.ThreadPoolExecutor$Worker.run(java.base@21/ThreadPoolExecutor.java:642)
+	at java.lang.Thread.runWith(java.base@21/Thread.java:1596)
+	at java.lang.Thread.run(java.base@21/Thread.java:1583)
+
+   Locked ownable synchronizers:
+	- <0x00000007ffc0cd70> (a java.util.concurrent.ThreadPoolExecutor$Worker)
+
+"pool-sat-worker-5" #24 [26883] prio=5 os_prio=31 cpu=0.03ms elapsed=37.55s tid=0x0000000125a85600 nid=26883 waiting on condition  [0x000000016e84a000]
+   java.lang.Thread.State: WAITING (parking)
+	at jdk.internal.misc.Unsafe.park(java.base@21/Native Method)
+	- parking to wait for  <0x00000007ffdc3890> (a java.util.concurrent.CountDownLatch$Sync)
+	at java.util.concurrent.locks.LockSupport.park(java.base@21/LockSupport.java:221)
+	at java.util.concurrent.locks.AbstractQueuedSynchronizer.acquire(java.base@21/AbstractQueuedSynchronizer.java:754)
+	at java.util.concurrent.locks.AbstractQueuedSynchronizer.acquireSharedInterruptibly(java.base@21/AbstractQueuedSynchronizer.java:1099)
+	at java.util.concurrent.CountDownLatch.await(java.base@21/CountDownLatch.java:230)
+	at gc.harness.PoolSaturationSuspect.awaitForever(PoolSaturationSuspect.java:87)
+	at gc.harness.PoolSaturationSuspect.lambda$main$0(PoolSaturationSuspect.java:61)
+	at gc.harness.PoolSaturationSuspect$$Lambda/0x00000008000c1000.run(Unknown Source)
+	at java.util.concurrent.Executors$RunnableAdapter.call(java.base@21/Executors.java:572)
+	at java.util.concurrent.FutureTask.run(java.base@21/FutureTask.java:317)
+	at java.util.concurrent.ThreadPoolExecutor.runWorker(java.base@21/ThreadPoolExecutor.java:1144)
+	at java.util.concurrent.ThreadPoolExecutor$Worker.run(java.base@21/ThreadPoolExecutor.java:642)
+	at java.lang.Thread.runWith(java.base@21/Thread.java:1596)
+	at java.lang.Thread.run(java.base@21/Thread.java:1583)
+
+   Locked ownable synchronizers:
+	- <0x00000007ffc0cf38> (a java.util.concurrent.ThreadPoolExecutor$Worker)
+
+"pool-sat-worker-6" #25 [27139] prio=5 os_prio=31 cpu=0.02ms elapsed=37.55s tid=0x000000012701b600 nid=27139 waiting on condition  [0x000000016ea56000]
+   java.lang.Thread.State: WAITING (parking)
+	at jdk.internal.misc.Unsafe.park(java.base@21/Native Method)
+	- parking to wait for  <0x00000007ffdc3890> (a java.util.concurrent.CountDownLatch$Sync)
+	at java.util.concurrent.locks.LockSupport.park(java.base@21/LockSupport.java:221)
+	at java.util.concurrent.locks.AbstractQueuedSynchronizer.acquire(java.base@21/AbstractQueuedSynchronizer.java:754)
+	at java.util.concurrent.locks.AbstractQueuedSynchronizer.acquireSharedInterruptibly(java.base@21/AbstractQueuedSynchronizer.java:1099)
+	at java.util.concurrent.CountDownLatch.await(java.base@21/CountDownLatch.java:230)
+	at gc.harness.PoolSaturationSuspect.awaitForever(PoolSaturationSuspect.java:87)
+	at gc.harness.PoolSaturationSuspect.lambda$main$0(PoolSaturationSuspect.java:61)
+	at gc.harness.PoolSaturationSuspect$$Lambda/0x00000008000c1000.run(Unknown Source)
+	at java.util.concurrent.Executors$RunnableAdapter.call(java.base@21/Executors.java:572)
+	at java.util.concurrent.FutureTask.run(java.base@21/FutureTask.java:317)
+	at java.util.concurrent.ThreadPoolExecutor.runWorker(java.base@21/ThreadPoolExecutor.java:1144)
+	at java.util.concurrent.ThreadPoolExecutor$Worker.run(java.base@21/ThreadPoolExecutor.java:642)
+	at java.lang.Thread.runWith(java.base@21/Thread.java:1596)
+	at java.lang.Thread.run(java.base@21/Thread.java:1583)
+
+   Locked ownable synchronizers:
+	- <0x00000007ffc0d100> (a java.util.concurrent.ThreadPoolExecutor$Worker)
+
+"pool-sat-worker-7" #26 [27395] prio=5 os_prio=31 cpu=0.02ms elapsed=37.55s tid=0x000000012701be00 nid=27395 waiting on condition  [0x000000016ec62000]
+   java.lang.Thread.State: WAITING (parking)
+	at jdk.internal.misc.Unsafe.park(java.base@21/Native Method)
+	- parking to wait for  <0x00000007ffdc3890> (a java.util.concurrent.CountDownLatch$Sync)
+	at java.util.concurrent.locks.LockSupport.park(java.base@21/LockSupport.java:221)
+	at java.util.concurrent.locks.AbstractQueuedSynchronizer.acquire(java.base@21/AbstractQueuedSynchronizer.java:754)
+	at java.util.concurrent.locks.AbstractQueuedSynchronizer.acquireSharedInterruptibly(java.base@21/AbstractQueuedSynchronizer.java:1099)
+	at java.util.concurrent.CountDownLatch.await(java.base@21/CountDownLatch.java:230)
+	at gc.harness.PoolSaturationSuspect.awaitForever(PoolSaturationSuspect.java:87)
+	at gc.harness.PoolSaturationSuspect.lambda$main$0(PoolSaturationSuspect.java:61)
+	at gc.harness.PoolSaturationSuspect$$Lambda/0x00000008000c1000.run(Unknown Source)
+	at java.util.concurrent.Executors$RunnableAdapter.call(java.base@21/Executors.java:572)
+	at java.util.concurrent.FutureTask.run(java.base@21/FutureTask.java:317)
+	at java.util.concurrent.ThreadPoolExecutor.runWorker(java.base@21/ThreadPoolExecutor.java:1144)
+	at java.util.concurrent.ThreadPoolExecutor$Worker.run(java.base@21/ThreadPoolExecutor.java:642)
+	at java.lang.Thread.runWith(java.base@21/Thread.java:1596)
+	at java.lang.Thread.run(java.base@21/Thread.java:1583)
+
+   Locked ownable synchronizers:
+	- <0x00000007ffc0d2c8> (a java.util.concurrent.ThreadPoolExecutor$Worker)
+
+"pool-sat-worker-8" #27 [27907] prio=5 os_prio=31 cpu=0.03ms elapsed=37.55s tid=0x0000000127011800 nid=27907 waiting on condition  [0x000000016ee6e000]
+   java.lang.Thread.State: WAITING (parking)
+	at jdk.internal.misc.Unsafe.park(java.base@21/Native Method)
+	- parking to wait for  <0x00000007ffdc3890> (a java.util.concurrent.CountDownLatch$Sync)
+	at java.util.concurrent.locks.LockSupport.park(java.base@21/LockSupport.java:221)
+	at java.util.concurrent.locks.AbstractQueuedSynchronizer.acquire(java.base@21/AbstractQueuedSynchronizer.java:754)
+	at java.util.concurrent.locks.AbstractQueuedSynchronizer.acquireSharedInterruptibly(java.base@21/AbstractQueuedSynchronizer.java:1099)
+	at java.util.concurrent.CountDownLatch.await(java.base@21/CountDownLatch.java:230)
+	at gc.harness.PoolSaturationSuspect.awaitForever(PoolSaturationSuspect.java:87)
+	at gc.harness.PoolSaturationSuspect.lambda$main$0(PoolSaturationSuspect.java:61)
+	at gc.harness.PoolSaturationSuspect$$Lambda/0x00000008000c1000.run(Unknown Source)
+	at java.util.concurrent.Executors$RunnableAdapter.call(java.base@21/Executors.java:572)
+	at java.util.concurrent.FutureTask.run(java.base@21/FutureTask.java:317)
+	at java.util.concurrent.ThreadPoolExecutor.runWorker(java.base@21/ThreadPoolExecutor.java:1144)
+	at java.util.concurrent.ThreadPoolExecutor$Worker.run(java.base@21/ThreadPoolExecutor.java:642)
+	at java.lang.Thread.runWith(java.base@21/Thread.java:1596)
+	at java.lang.Thread.run(java.base@21/Thread.java:1583)
+
+   Locked ownable synchronizers:
+	- <0x00000007ffc0d490> (a java.util.concurrent.ThreadPoolExecutor$Worker)
+
+"pool-sat-worker-9" #28 [28419] prio=5 os_prio=31 cpu=0.03ms elapsed=37.55s tid=0x0000000127012000 nid=28419 waiting on condition  [0x000000016f07a000]
+   java.lang.Thread.State: WAITING (parking)
+	at jdk.internal.misc.Unsafe.park(java.base@21/Native Method)
+	- parking to wait for  <0x00000007ffdc3890> (a java.util.concurrent.CountDownLatch$Sync)
+	at java.util.concurrent.locks.LockSupport.park(java.base@21/LockSupport.java:221)
+	at java.util.concurrent.locks.AbstractQueuedSynchronizer.acquire(java.base@21/AbstractQueuedSynchronizer.java:754)
+	at java.util.concurrent.locks.AbstractQueuedSynchronizer.acquireSharedInterruptibly(java.base@21/AbstractQueuedSynchronizer.java:1099)
+	at java.util.concurrent.CountDownLatch.await(java.base@21/CountDownLatch.java:230)
+	at gc.harness.PoolSaturationSuspect.awaitForever(PoolSaturationSuspect.java:87)
+	at gc.harness.PoolSaturationSuspect.lambda$main$0(PoolSaturationSuspect.java:61)
+	at gc.harness.PoolSaturationSuspect$$Lambda/0x00000008000c1000.run(Unknown Source)
+	at java.util.concurrent.Executors$RunnableAdapter.call(java.base@21/Executors.java:572)
+	at java.util.concurrent.FutureTask.run(java.base@21/FutureTask.java:317)
+	at java.util.concurrent.ThreadPoolExecutor.runWorker(java.base@21/ThreadPoolExecutor.java:1144)
+	at java.util.concurrent.ThreadPoolExecutor$Worker.run(java.base@21/ThreadPoolExecutor.java:642)
+	at java.lang.Thread.runWith(java.base@21/Thread.java:1596)
+	at java.lang.Thread.run(java.base@21/Thread.java:1583)
+
+   Locked ownable synchronizers:
+	- <0x00000007ffc0d658> (a java.util.concurrent.ThreadPoolExecutor$Worker)
+
+"pool-sat-worker-10" #29 [32771] prio=5 os_prio=31 cpu=0.02ms elapsed=37.55s tid=0x0000000125a85e00 nid=32771 waiting on condition  [0x000000016f286000]
+   java.lang.Thread.State: WAITING (parking)
+	at jdk.internal.misc.Unsafe.park(java.base@21/Native Method)
+	- parking to wait for  <0x00000007ffdc3890> (a java.util.concurrent.CountDownLatch$Sync)
+	at java.util.concurrent.locks.LockSupport.park(java.base@21/LockSupport.java:221)
+	at java.util.concurrent.locks.AbstractQueuedSynchronizer.acquire(java.base@21/AbstractQueuedSynchronizer.java:754)
+	at java.util.concurrent.locks.AbstractQueuedSynchronizer.acquireSharedInterruptibly(java.base@21/AbstractQueuedSynchronizer.java:1099)
+	at java.util.concurrent.CountDownLatch.await(java.base@21/CountDownLatch.java:230)
+	at gc.harness.PoolSaturationSuspect.awaitForever(PoolSaturationSuspect.java:87)
+	at gc.harness.PoolSaturationSuspect.lambda$main$0(PoolSaturationSuspect.java:61)
+	at gc.harness.PoolSaturationSuspect$$Lambda/0x00000008000c1000.run(Unknown Source)
+	at java.util.concurrent.Executors$RunnableAdapter.call(java.base@21/Executors.java:572)
+	at java.util.concurrent.FutureTask.run(java.base@21/FutureTask.java:317)
+	at java.util.concurrent.ThreadPoolExecutor.runWorker(java.base@21/ThreadPoolExecutor.java:1144)
+	at java.util.concurrent.ThreadPoolExecutor$Worker.run(java.base@21/ThreadPoolExecutor.java:642)
+	at java.lang.Thread.runWith(java.base@21/Thread.java:1596)
+	at java.lang.Thread.run(java.base@21/Thread.java:1583)
+
+   Locked ownable synchronizers:
+	- <0x00000007ffc0d820> (a java.util.concurrent.ThreadPoolExecutor$Worker)
+
+"pool-sat-worker-11" #30 [43267] prio=5 os_prio=31 cpu=0.02ms elapsed=37.55s tid=0x0000000125a86600 nid=43267 waiting on condition  [0x000000016f492000]
+   java.lang.Thread.State: WAITING (parking)
+	at jdk.internal.misc.Unsafe.park(java.base@21/Native Method)
+	- parking to wait for  <0x00000007ffdc3890> (a java.util.concurrent.CountDownLatch$Sync)
+	at java.util.concurrent.locks.LockSupport.park(java.base@21/LockSupport.java:221)
+	at java.util.concurrent.locks.AbstractQueuedSynchronizer.acquire(java.base@21/AbstractQueuedSynchronizer.java:754)
+	at java.util.concurrent.locks.AbstractQueuedSynchronizer.acquireSharedInterruptibly(java.base@21/AbstractQueuedSynchronizer.java:1099)
+	at java.util.concurrent.CountDownLatch.await(java.base@21/CountDownLatch.java:230)
+	at gc.harness.PoolSaturationSuspect.awaitForever(PoolSaturationSuspect.java:87)
+	at gc.harness.PoolSaturationSuspect.lambda$main$0(PoolSaturationSuspect.java:61)
+	at gc.harness.PoolSaturationSuspect$$Lambda/0x00000008000c1000.run(Unknown Source)
+	at java.util.concurrent.Executors$RunnableAdapter.call(java.base@21/Executors.java:572)
+	at java.util.concurrent.FutureTask.run(java.base@21/FutureTask.java:317)
+	at java.util.concurrent.ThreadPoolExecutor.runWorker(java.base@21/ThreadPoolExecutor.java:1144)
+	at java.util.concurrent.ThreadPoolExecutor$Worker.run(java.base@21/ThreadPoolExecutor.java:642)
+	at java.lang.Thread.runWith(java.base@21/Thread.java:1596)
+	at java.lang.Thread.run(java.base@21/Thread.java:1583)
+
+   Locked ownable synchronizers:
+	- <0x00000007ffc0d9e8> (a java.util.concurrent.ThreadPoolExecutor$Worker)
+
+"pool-sat-worker-12" #31 [42755] prio=5 os_prio=31 cpu=0.02ms elapsed=37.55s tid=0x0000000125a86e00 nid=42755 waiting on condition  [0x000000016f69e000]
+   java.lang.Thread.State: WAITING (parking)
+	at jdk.internal.misc.Unsafe.park(java.base@21/Native Method)
+	- parking to wait for  <0x00000007ffdc3890> (a java.util.concurrent.CountDownLatch$Sync)
+	at java.util.concurrent.locks.LockSupport.park(java.base@21/LockSupport.java:221)
+	at java.util.concurrent.locks.AbstractQueuedSynchronizer.acquire(java.base@21/AbstractQueuedSynchronizer.java:754)
+	at java.util.concurrent.locks.AbstractQueuedSynchronizer.acquireSharedInterruptibly(java.base@21/AbstractQueuedSynchronizer.java:1099)
+	at java.util.concurrent.CountDownLatch.await(java.base@21/CountDownLatch.java:230)
+	at gc.harness.PoolSaturationSuspect.awaitForever(PoolSaturationSuspect.java:87)
+	at gc.harness.PoolSaturationSuspect.lambda$main$0(PoolSaturationSuspect.java:61)
+	at gc.harness.PoolSaturationSuspect$$Lambda/0x00000008000c1000.run(Unknown Source)
+	at java.util.concurrent.Executors$RunnableAdapter.call(java.base@21/Executors.java:572)
+	at java.util.concurrent.FutureTask.run(java.base@21/FutureTask.java:317)
+	at java.util.concurrent.ThreadPoolExecutor.runWorker(java.base@21/ThreadPoolExecutor.java:1144)
+	at java.util.concurrent.ThreadPoolExecutor$Worker.run(java.base@21/ThreadPoolExecutor.java:642)
+	at java.lang.Thread.runWith(java.base@21/Thread.java:1596)
+	at java.lang.Thread.run(java.base@21/Thread.java:1583)
+
+   Locked ownable synchronizers:
+	- <0x00000007ffc0dbb0> (a java.util.concurrent.ThreadPoolExecutor$Worker)
+
+"pool-sat-worker-13" #32 [42243] prio=5 os_prio=31 cpu=0.02ms elapsed=37.55s tid=0x0000000127012800 nid=42243 waiting on condition  [0x000000016f8aa000]
+   java.lang.Thread.State: WAITING (parking)
+	at jdk.internal.misc.Unsafe.park(java.base@21/Native Method)
+	- parking to wait for  <0x00000007ffdc3890> (a java.util.concurrent.CountDownLatch$Sync)
+	at java.util.concurrent.locks.LockSupport.park(java.base@21/LockSupport.java:221)
+	at java.util.concurrent.locks.AbstractQueuedSynchronizer.acquire(java.base@21/AbstractQueuedSynchronizer.java:754)
+	at java.util.concurrent.locks.AbstractQueuedSynchronizer.acquireSharedInterruptibly(java.base@21/AbstractQueuedSynchronizer.java:1099)
+	at java.util.concurrent.CountDownLatch.await(java.base@21/CountDownLatch.java:230)
+	at gc.harness.PoolSaturationSuspect.awaitForever(PoolSaturationSuspect.java:87)
+	at gc.harness.PoolSaturationSuspect.lambda$main$0(PoolSaturationSuspect.java:61)
+	at gc.harness.PoolSaturationSuspect$$Lambda/0x00000008000c1000.run(Unknown Source)
+	at java.util.concurrent.Executors$RunnableAdapter.call(java.base@21/Executors.java:572)
+	at java.util.concurrent.FutureTask.run(java.base@21/FutureTask.java:317)
+	at java.util.concurrent.ThreadPoolExecutor.runWorker(java.base@21/ThreadPoolExecutor.java:1144)
+	at java.util.concurrent.ThreadPoolExecutor$Worker.run(java.base@21/ThreadPoolExecutor.java:642)
+	at java.lang.Thread.runWith(java.base@21/Thread.java:1596)
+	at java.lang.Thread.run(java.base@21/Thread.java:1583)
+
+   Locked ownable synchronizers:
+	- <0x00000007ffc0dd78> (a java.util.concurrent.ThreadPoolExecutor$Worker)
+
+"pool-sat-worker-14" #33 [33539] prio=5 os_prio=31 cpu=0.02ms elapsed=37.55s tid=0x0000000127013000 nid=33539 waiting on condition  [0x000000016fab6000]
+   java.lang.Thread.State: WAITING (parking)
+	at jdk.internal.misc.Unsafe.park(java.base@21/Native Method)
+	- parking to wait for  <0x00000007ffdc3890> (a java.util.concurrent.CountDownLatch$Sync)
+	at java.util.concurrent.locks.LockSupport.park(java.base@21/LockSupport.java:221)
+	at java.util.concurrent.locks.AbstractQueuedSynchronizer.acquire(java.base@21/AbstractQueuedSynchronizer.java:754)
+	at java.util.concurrent.locks.AbstractQueuedSynchronizer.acquireSharedInterruptibly(java.base@21/AbstractQueuedSynchronizer.java:1099)
+	at java.util.concurrent.CountDownLatch.await(java.base@21/CountDownLatch.java:230)
+	at gc.harness.PoolSaturationSuspect.awaitForever(PoolSaturationSuspect.java:87)
+	at gc.harness.PoolSaturationSuspect.lambda$main$0(PoolSaturationSuspect.java:61)
+	at gc.harness.PoolSaturationSuspect$$Lambda/0x00000008000c1000.run(Unknown Source)
+	at java.util.concurrent.Executors$RunnableAdapter.call(java.base@21/Executors.java:572)
+	at java.util.concurrent.FutureTask.run(java.base@21/FutureTask.java:317)
+	at java.util.concurrent.ThreadPoolExecutor.runWorker(java.base@21/ThreadPoolExecutor.java:1144)
+	at java.util.concurrent.ThreadPoolExecutor$Worker.run(java.base@21/ThreadPoolExecutor.java:642)
+	at java.lang.Thread.runWith(java.base@21/Thread.java:1596)
+	at java.lang.Thread.run(java.base@21/Thread.java:1583)
+
+   Locked ownable synchronizers:
+	- <0x00000007ffc0dfd0> (a java.util.concurrent.ThreadPoolExecutor$Worker)
+
+"pool-sat-worker-15" #34 [41987] prio=5 os_prio=31 cpu=0.02ms elapsed=37.55s tid=0x0000000127058200 nid=41987 waiting on condition  [0x000000016fcc2000]
+   java.lang.Thread.State: WAITING (parking)
+	at jdk.internal.misc.Unsafe.park(java.base@21/Native Method)
+	- parking to wait for  <0x00000007ffdc3890> (a java.util.concurrent.CountDownLatch$Sync)
+	at java.util.concurrent.locks.LockSupport.park(java.base@21/LockSupport.java:221)
+	at java.util.concurrent.locks.AbstractQueuedSynchronizer.acquire(java.base@21/AbstractQueuedSynchronizer.java:754)
+	at java.util.concurrent.locks.AbstractQueuedSynchronizer.acquireSharedInterruptibly(java.base@21/AbstractQueuedSynchronizer.java:1099)
+	at java.util.concurrent.CountDownLatch.await(java.base@21/CountDownLatch.java:230)
+	at gc.harness.PoolSaturationSuspect.awaitForever(PoolSaturationSuspect.java:87)
+	at gc.harness.PoolSaturationSuspect.lambda$main$0(PoolSaturationSuspect.java:61)
+	at gc.harness.PoolSaturationSuspect$$Lambda/0x00000008000c1000.run(Unknown Source)
+	at java.util.concurrent.Executors$RunnableAdapter.call(java.base@21/Executors.java:572)
+	at java.util.concurrent.FutureTask.run(java.base@21/FutureTask.java:317)
+	at java.util.concurrent.ThreadPoolExecutor.runWorker(java.base@21/ThreadPoolExecutor.java:1144)
+	at java.util.concurrent.ThreadPoolExecutor$Worker.run(java.base@21/ThreadPoolExecutor.java:642)
+	at java.lang.Thread.runWith(java.base@21/Thread.java:1596)
+	at java.lang.Thread.run(java.base@21/Thread.java:1583)
+
+   Locked ownable synchronizers:
+	- <0x00000007ffc0e198> (a java.util.concurrent.ThreadPoolExecutor$Worker)
+
+"pool-sat-worker-16" #35 [41475] prio=5 os_prio=31 cpu=0.02ms elapsed=37.55s tid=0x0000000127058a00 nid=41475 waiting on condition  [0x000000016fece000]
+   java.lang.Thread.State: WAITING (parking)
+	at jdk.internal.misc.Unsafe.park(java.base@21/Native Method)
+	- parking to wait for  <0x00000007ffdc3890> (a java.util.concurrent.CountDownLatch$Sync)
+	at java.util.concurrent.locks.LockSupport.park(java.base@21/LockSupport.java:221)
+	at java.util.concurrent.locks.AbstractQueuedSynchronizer.acquire(java.base@21/AbstractQueuedSynchronizer.java:754)
+	at java.util.concurrent.locks.AbstractQueuedSynchronizer.acquireSharedInterruptibly(java.base@21/AbstractQueuedSynchronizer.java:1099)
+	at java.util.concurrent.CountDownLatch.await(java.base@21/CountDownLatch.java:230)
+	at gc.harness.PoolSaturationSuspect.awaitForever(PoolSaturationSuspect.java:87)
+	at gc.harness.PoolSaturationSuspect.lambda$main$0(PoolSaturationSuspect.java:61)
+	at gc.harness.PoolSaturationSuspect$$Lambda/0x00000008000c1000.run(Unknown Source)
+	at java.util.concurrent.Executors$RunnableAdapter.call(java.base@21/Executors.java:572)
+	at java.util.concurrent.FutureTask.run(java.base@21/FutureTask.java:317)
+	at java.util.concurrent.ThreadPoolExecutor.runWorker(java.base@21/ThreadPoolExecutor.java:1144)
+	at java.util.concurrent.ThreadPoolExecutor$Worker.run(java.base@21/ThreadPoolExecutor.java:642)
+	at java.lang.Thread.runWith(java.base@21/Thread.java:1596)
+	at java.lang.Thread.run(java.base@21/Thread.java:1583)
+
+   Locked ownable synchronizers:
+	- <0x00000007ffc0e360> (a java.util.concurrent.ThreadPoolExecutor$Worker)
+
+"pool-sat-worker-17" #36 [34051] prio=5 os_prio=31 cpu=0.02ms elapsed=37.55s tid=0x0000000127059200 nid=34051 waiting on condition  [0x00000001700da000]
+   java.lang.Thread.State: WAITING (parking)
+	at jdk.internal.misc.Unsafe.park(java.base@21/Native Method)
+	- parking to wait for  <0x00000007ffdc3890> (a java.util.concurrent.CountDownLatch$Sync)
+	at java.util.concurrent.locks.LockSupport.park(java.base@21/LockSupport.java:221)
+	at java.util.concurrent.locks.AbstractQueuedSynchronizer.acquire(java.base@21/AbstractQueuedSynchronizer.java:754)
+	at java.util.concurrent.locks.AbstractQueuedSynchronizer.acquireSharedInterruptibly(java.base@21/AbstractQueuedSynchronizer.java:1099)
+	at java.util.concurrent.CountDownLatch.await(java.base@21/CountDownLatch.java:230)
+	at gc.harness.PoolSaturationSuspect.awaitForever(PoolSaturationSuspect.java:87)
+	at gc.harness.PoolSaturationSuspect.lambda$main$0(PoolSaturationSuspect.java:61)
+	at gc.harness.PoolSaturationSuspect$$Lambda/0x00000008000c1000.run(Unknown Source)
+	at java.util.concurrent.Executors$RunnableAdapter.call(java.base@21/Executors.java:572)
+	at java.util.concurrent.FutureTask.run(java.base@21/FutureTask.java:317)
+	at java.util.concurrent.ThreadPoolExecutor.runWorker(java.base@21/ThreadPoolExecutor.java:1144)
+	at java.util.concurrent.ThreadPoolExecutor$Worker.run(java.base@21/ThreadPoolExecutor.java:642)
+	at java.lang.Thread.runWith(java.base@21/Thread.java:1596)
+	at java.lang.Thread.run(java.base@21/Thread.java:1583)
+
+   Locked ownable synchronizers:
+	- <0x00000007ffc0e528> (a java.util.concurrent.ThreadPoolExecutor$Worker)
+
+"pool-sat-worker-18" #37 [34307] prio=5 os_prio=31 cpu=0.03ms elapsed=37.55s tid=0x0000000125a87600 nid=34307 waiting on condition  [0x00000001702e6000]
+   java.lang.Thread.State: WAITING (parking)
+	at jdk.internal.misc.Unsafe.park(java.base@21/Native Method)
+	- parking to wait for  <0x00000007ffdc3890> (a java.util.concurrent.CountDownLatch$Sync)
+	at java.util.concurrent.locks.LockSupport.park(java.base@21/LockSupport.java:221)
+	at java.util.concurrent.locks.AbstractQueuedSynchronizer.acquire(java.base@21/AbstractQueuedSynchronizer.java:754)
+	at java.util.concurrent.locks.AbstractQueuedSynchronizer.acquireSharedInterruptibly(java.base@21/AbstractQueuedSynchronizer.java:1099)
+	at java.util.concurrent.CountDownLatch.await(java.base@21/CountDownLatch.java:230)
+	at gc.harness.PoolSaturationSuspect.awaitForever(PoolSaturationSuspect.java:87)
+	at gc.harness.PoolSaturationSuspect.lambda$main$0(PoolSaturationSuspect.java:61)
+	at gc.harness.PoolSaturationSuspect$$Lambda/0x00000008000c1000.run(Unknown Source)
+	at java.util.concurrent.Executors$RunnableAdapter.call(java.base@21/Executors.java:572)
+	at java.util.concurrent.FutureTask.run(java.base@21/FutureTask.java:317)
+	at java.util.concurrent.ThreadPoolExecutor.runWorker(java.base@21/ThreadPoolExecutor.java:1144)
+	at java.util.concurrent.ThreadPoolExecutor$Worker.run(java.base@21/ThreadPoolExecutor.java:642)
+	at java.lang.Thread.runWith(java.base@21/Thread.java:1596)
+	at java.lang.Thread.run(java.base@21/Thread.java:1583)
+
+   Locked ownable synchronizers:
+	- <0x00000007ffc0e6f0> (a java.util.concurrent.ThreadPoolExecutor$Worker)
+
+"pool-sat-worker-19" #38 [40451] prio=5 os_prio=31 cpu=0.02ms elapsed=37.55s tid=0x0000000125a87e00 nid=40451 waiting on condition  [0x00000001704f2000]
+   java.lang.Thread.State: WAITING (parking)
+	at jdk.internal.misc.Unsafe.park(java.base@21/Native Method)
+	- parking to wait for  <0x00000007ffdc3890> (a java.util.concurrent.CountDownLatch$Sync)
+	at java.util.concurrent.locks.LockSupport.park(java.base@21/LockSupport.java:221)
+	at java.util.concurrent.locks.AbstractQueuedSynchronizer.acquire(java.base@21/AbstractQueuedSynchronizer.java:754)
+	at java.util.concurrent.locks.AbstractQueuedSynchronizer.acquireSharedInterruptibly(java.base@21/AbstractQueuedSynchronizer.java:1099)
+	at java.util.concurrent.CountDownLatch.await(java.base@21/CountDownLatch.java:230)
+	at gc.harness.PoolSaturationSuspect.awaitForever(PoolSaturationSuspect.java:87)
+	at gc.harness.PoolSaturationSuspect.lambda$main$0(PoolSaturationSuspect.java:61)
+	at gc.harness.PoolSaturationSuspect$$Lambda/0x00000008000c1000.run(Unknown Source)
+	at java.util.concurrent.Executors$RunnableAdapter.call(java.base@21/Executors.java:572)
+	at java.util.concurrent.FutureTask.run(java.base@21/FutureTask.java:317)
+	at java.util.concurrent.ThreadPoolExecutor.runWorker(java.base@21/ThreadPoolExecutor.java:1144)
+	at java.util.concurrent.ThreadPoolExecutor$Worker.run(java.base@21/ThreadPoolExecutor.java:642)
+	at java.lang.Thread.runWith(java.base@21/Thread.java:1596)
+	at java.lang.Thread.run(java.base@21/Thread.java:1583)
+
+   Locked ownable synchronizers:
+	- <0x00000007ffc0e8b8> (a java.util.concurrent.ThreadPoolExecutor$Worker)
+
+"pool-sat-worker-20" #39 [40195] prio=5 os_prio=31 cpu=0.02ms elapsed=37.55s tid=0x0000000125a88600 nid=40195 waiting on condition  [0x00000001706fe000]
+   java.lang.Thread.State: WAITING (parking)
+	at jdk.internal.misc.Unsafe.park(java.base@21/Native Method)
+	- parking to wait for  <0x00000007ffdc3890> (a java.util.concurrent.CountDownLatch$Sync)
+	at java.util.concurrent.locks.LockSupport.park(java.base@21/LockSupport.java:221)
+	at java.util.concurrent.locks.AbstractQueuedSynchronizer.acquire(java.base@21/AbstractQueuedSynchronizer.java:754)
+	at java.util.concurrent.locks.AbstractQueuedSynchronizer.acquireSharedInterruptibly(java.base@21/AbstractQueuedSynchronizer.java:1099)
+	at java.util.concurrent.CountDownLatch.await(java.base@21/CountDownLatch.java:230)
+	at gc.harness.PoolSaturationSuspect.awaitForever(PoolSaturationSuspect.java:87)
+	at gc.harness.PoolSaturationSuspect.lambda$main$0(PoolSaturationSuspect.java:61)
+	at gc.harness.PoolSaturationSuspect$$Lambda/0x00000008000c1000.run(Unknown Source)
+	at java.util.concurrent.Executors$RunnableAdapter.call(java.base@21/Executors.java:572)
+	at java.util.concurrent.FutureTask.run(java.base@21/FutureTask.java:317)
+	at java.util.concurrent.ThreadPoolExecutor.runWorker(java.base@21/ThreadPoolExecutor.java:1144)
+	at java.util.concurrent.ThreadPoolExecutor$Worker.run(java.base@21/ThreadPoolExecutor.java:642)
+	at java.lang.Thread.runWith(java.base@21/Thread.java:1596)
+	at java.lang.Thread.run(java.base@21/Thread.java:1583)
+
+   Locked ownable synchronizers:
+	- <0x00000007ffc0ea80> (a java.util.concurrent.ThreadPoolExecutor$Worker)
+
+"pool-sat-worker-21" #40 [35075] prio=5 os_prio=31 cpu=0.02ms elapsed=37.55s tid=0x0000000127059a00 nid=35075 waiting on condition  [0x000000017090a000]
+   java.lang.Thread.State: WAITING (parking)
+	at jdk.internal.misc.Unsafe.park(java.base@21/Native Method)
+	- parking to wait for  <0x00000007ffdc3890> (a java.util.concurrent.CountDownLatch$Sync)
+	at java.util.concurrent.locks.LockSupport.park(java.base@21/LockSupport.java:221)
+	at java.util.concurrent.locks.AbstractQueuedSynchronizer.acquire(java.base@21/AbstractQueuedSynchronizer.java:754)
+	at java.util.concurrent.locks.AbstractQueuedSynchronizer.acquireSharedInterruptibly(java.base@21/AbstractQueuedSynchronizer.java:1099)
+	at java.util.concurrent.CountDownLatch.await(java.base@21/CountDownLatch.java:230)
+	at gc.harness.PoolSaturationSuspect.awaitForever(PoolSaturationSuspect.java:87)
+	at gc.harness.PoolSaturationSuspect.lambda$main$0(PoolSaturationSuspect.java:61)
+	at gc.harness.PoolSaturationSuspect$$Lambda/0x00000008000c1000.run(Unknown Source)
+	at java.util.concurrent.Executors$RunnableAdapter.call(java.base@21/Executors.java:572)
+	at java.util.concurrent.FutureTask.run(java.base@21/FutureTask.java:317)
+	at java.util.concurrent.ThreadPoolExecutor.runWorker(java.base@21/ThreadPoolExecutor.java:1144)
+	at java.util.concurrent.ThreadPoolExecutor$Worker.run(java.base@21/ThreadPoolExecutor.java:642)
+	at java.lang.Thread.runWith(java.base@21/Thread.java:1596)
+	at java.lang.Thread.run(java.base@21/Thread.java:1583)
+
+   Locked ownable synchronizers:
+	- <0x00000007ffc0ec48> (a java.util.concurrent.ThreadPoolExecutor$Worker)
+
+"pool-sat-worker-22" #41 [39939] prio=5 os_prio=31 cpu=0.02ms elapsed=37.55s tid=0x000000012705a200 nid=39939 waiting on condition  [0x0000000170b16000]
+   java.lang.Thread.State: WAITING (parking)
+	at jdk.internal.misc.Unsafe.park(java.base@21/Native Method)
+	- parking to wait for  <0x00000007ffdc3890> (a java.util.concurrent.CountDownLatch$Sync)
+	at java.util.concurrent.locks.LockSupport.park(java.base@21/LockSupport.java:221)
+	at java.util.concurrent.locks.AbstractQueuedSynchronizer.acquire(java.base@21/AbstractQueuedSynchronizer.java:754)
+	at java.util.concurrent.locks.AbstractQueuedSynchronizer.acquireSharedInterruptibly(java.base@21/AbstractQueuedSynchronizer.java:1099)
+	at java.util.concurrent.CountDownLatch.await(java.base@21/CountDownLatch.java:230)
+	at gc.harness.PoolSaturationSuspect.awaitForever(PoolSaturationSuspect.java:87)
+	at gc.harness.PoolSaturationSuspect.lambda$main$0(PoolSaturationSuspect.java:61)
+	at gc.harness.PoolSaturationSuspect$$Lambda/0x00000008000c1000.run(Unknown Source)
+	at java.util.concurrent.Executors$RunnableAdapter.call(java.base@21/Executors.java:572)
+	at java.util.concurrent.FutureTask.run(java.base@21/FutureTask.java:317)
+	at java.util.concurrent.ThreadPoolExecutor.runWorker(java.base@21/ThreadPoolExecutor.java:1144)
+	at java.util.concurrent.ThreadPoolExecutor$Worker.run(java.base@21/ThreadPoolExecutor.java:642)
+	at java.lang.Thread.runWith(java.base@21/Thread.java:1596)
+	at java.lang.Thread.run(java.base@21/Thread.java:1583)
+
+   Locked ownable synchronizers:
+	- <0x00000007ffc0ee10> (a java.util.concurrent.ThreadPoolExecutor$Worker)
+
+"pool-sat-worker-23" #42 [39683] prio=5 os_prio=31 cpu=0.02ms elapsed=37.55s tid=0x000000012705aa00 nid=39683 waiting on condition  [0x0000000170d22000]
+   java.lang.Thread.State: WAITING (parking)
+	at jdk.internal.misc.Unsafe.park(java.base@21/Native Method)
+	- parking to wait for  <0x00000007ffdc3890> (a java.util.concurrent.CountDownLatch$Sync)
+	at java.util.concurrent.locks.LockSupport.park(java.base@21/LockSupport.java:221)
+	at java.util.concurrent.locks.AbstractQueuedSynchronizer.acquire(java.base@21/AbstractQueuedSynchronizer.java:754)
+	at java.util.concurrent.locks.AbstractQueuedSynchronizer.acquireSharedInterruptibly(java.base@21/AbstractQueuedSynchronizer.java:1099)
+	at java.util.concurrent.CountDownLatch.await(java.base@21/CountDownLatch.java:230)
+	at gc.harness.PoolSaturationSuspect.awaitForever(PoolSaturationSuspect.java:87)
+	at gc.harness.PoolSaturationSuspect.lambda$main$0(PoolSaturationSuspect.java:61)
+	at gc.harness.PoolSaturationSuspect$$Lambda/0x00000008000c1000.run(Unknown Source)
+	at java.util.concurrent.Executors$RunnableAdapter.call(java.base@21/Executors.java:572)
+	at java.util.concurrent.FutureTask.run(java.base@21/FutureTask.java:317)
+	at java.util.concurrent.ThreadPoolExecutor.runWorker(java.base@21/ThreadPoolExecutor.java:1144)
+	at java.util.concurrent.ThreadPoolExecutor$Worker.run(java.base@21/ThreadPoolExecutor.java:642)
+	at java.lang.Thread.runWith(java.base@21/Thread.java:1596)
+	at java.lang.Thread.run(java.base@21/Thread.java:1583)
+
+   Locked ownable synchronizers:
+	- <0x00000007ffc0efd8> (a java.util.concurrent.ThreadPoolExecutor$Worker)
+
+"pool-sat-worker-24" #43 [39427] prio=5 os_prio=31 cpu=0.03ms elapsed=37.55s tid=0x0000000125a88e00 nid=39427 waiting on condition  [0x0000000170f2e000]
+   java.lang.Thread.State: WAITING (parking)
+	at jdk.internal.misc.Unsafe.park(java.base@21/Native Method)
+	- parking to wait for  <0x00000007ffdc3890> (a java.util.concurrent.CountDownLatch$Sync)
+	at java.util.concurrent.locks.LockSupport.park(java.base@21/LockSupport.java:221)
+	at java.util.concurrent.locks.AbstractQueuedSynchronizer.acquire(java.base@21/AbstractQueuedSynchronizer.java:754)
+	at java.util.concurrent.locks.AbstractQueuedSynchronizer.acquireSharedInterruptibly(java.base@21/AbstractQueuedSynchronizer.java:1099)
+	at java.util.concurrent.CountDownLatch.await(java.base@21/CountDownLatch.java:230)
+	at gc.harness.PoolSaturationSuspect.awaitForever(PoolSaturationSuspect.java:87)
+	at gc.harness.PoolSaturationSuspect.lambda$main$0(PoolSaturationSuspect.java:61)
+	at gc.harness.PoolSaturationSuspect$$Lambda/0x00000008000c1000.run(Unknown Source)
+	at java.util.concurrent.Executors$RunnableAdapter.call(java.base@21/Executors.java:572)
+	at java.util.concurrent.FutureTask.run(java.base@21/FutureTask.java:317)
+	at java.util.concurrent.ThreadPoolExecutor.runWorker(java.base@21/ThreadPoolExecutor.java:1144)
+	at java.util.concurrent.ThreadPoolExecutor$Worker.run(java.base@21/ThreadPoolExecutor.java:642)
+	at java.lang.Thread.runWith(java.base@21/Thread.java:1596)
+	at java.lang.Thread.run(java.base@21/Thread.java:1583)
+
+   Locked ownable synchronizers:
+	- <0x00000007ffc0f1a0> (a java.util.concurrent.ThreadPoolExecutor$Worker)
+
+"pool-sat-worker-25" #44 [39171] prio=5 os_prio=31 cpu=0.03ms elapsed=37.55s tid=0x0000000125a89600 nid=39171 waiting on condition  [0x000000017113a000]
+   java.lang.Thread.State: WAITING (parking)
+	at jdk.internal.misc.Unsafe.park(java.base@21/Native Method)
+	- parking to wait for  <0x00000007ffdc3890> (a java.util.concurrent.CountDownLatch$Sync)
+	at java.util.concurrent.locks.LockSupport.park(java.base@21/LockSupport.java:221)
+	at java.util.concurrent.locks.AbstractQueuedSynchronizer.acquire(java.base@21/AbstractQueuedSynchronizer.java:754)
+	at java.util.concurrent.locks.AbstractQueuedSynchronizer.acquireSharedInterruptibly(java.base@21/AbstractQueuedSynchronizer.java:1099)
+	at java.util.concurrent.CountDownLatch.await(java.base@21/CountDownLatch.java:230)
+	at gc.harness.PoolSaturationSuspect.awaitForever(PoolSaturationSuspect.java:87)
+	at gc.harness.PoolSaturationSuspect.lambda$main$0(PoolSaturationSuspect.java:61)
+	at gc.harness.PoolSaturationSuspect$$Lambda/0x00000008000c1000.run(Unknown Source)
+	at java.util.concurrent.Executors$RunnableAdapter.call(java.base@21/Executors.java:572)
+	at java.util.concurrent.FutureTask.run(java.base@21/FutureTask.java:317)
+	at java.util.concurrent.ThreadPoolExecutor.runWorker(java.base@21/ThreadPoolExecutor.java:1144)
+	at java.util.concurrent.ThreadPoolExecutor$Worker.run(java.base@21/ThreadPoolExecutor.java:642)
+	at java.lang.Thread.runWith(java.base@21/Thread.java:1596)
+	at java.lang.Thread.run(java.base@21/Thread.java:1583)
+
+   Locked ownable synchronizers:
+	- <0x00000007ffc0f368> (a java.util.concurrent.ThreadPoolExecutor$Worker)
+
+"pool-sat-worker-26" #45 [36355] prio=5 os_prio=31 cpu=0.03ms elapsed=37.55s tid=0x0000000125a89e00 nid=36355 waiting on condition  [0x0000000171346000]
+   java.lang.Thread.State: WAITING (parking)
+	at jdk.internal.misc.Unsafe.park(java.base@21/Native Method)
+	- parking to wait for  <0x00000007ffdc3890> (a java.util.concurrent.CountDownLatch$Sync)
+	at java.util.concurrent.locks.LockSupport.park(java.base@21/LockSupport.java:221)
+	at java.util.concurrent.locks.AbstractQueuedSynchronizer.acquire(java.base@21/AbstractQueuedSynchronizer.java:754)
+	at java.util.concurrent.locks.AbstractQueuedSynchronizer.acquireSharedInterruptibly(java.base@21/AbstractQueuedSynchronizer.java:1099)
+	at java.util.concurrent.CountDownLatch.await(java.base@21/CountDownLatch.java:230)
+	at gc.harness.PoolSaturationSuspect.awaitForever(PoolSaturationSuspect.java:87)
+	at gc.harness.PoolSaturationSuspect.lambda$main$0(PoolSaturationSuspect.java:61)
+	at gc.harness.PoolSaturationSuspect$$Lambda/0x00000008000c1000.run(Unknown Source)
+	at java.util.concurrent.Executors$RunnableAdapter.call(java.base@21/Executors.java:572)
+	at java.util.concurrent.FutureTask.run(java.base@21/FutureTask.java:317)
+	at java.util.concurrent.ThreadPoolExecutor.runWorker(java.base@21/ThreadPoolExecutor.java:1144)
+	at java.util.concurrent.ThreadPoolExecutor$Worker.run(java.base@21/ThreadPoolExecutor.java:642)
+	at java.lang.Thread.runWith(java.base@21/Thread.java:1596)
+	at java.lang.Thread.run(java.base@21/Thread.java:1583)
+
+   Locked ownable synchronizers:
+	- <0x00000007ffc0f640> (a java.util.concurrent.ThreadPoolExecutor$Worker)
+
+"pool-sat-worker-27" #46 [38659] prio=5 os_prio=31 cpu=0.02ms elapsed=37.55s tid=0x0000000125a8a600 nid=38659 waiting on condition  [0x0000000171552000]
+   java.lang.Thread.State: WAITING (parking)
+	at jdk.internal.misc.Unsafe.park(java.base@21/Native Method)
+	- parking to wait for  <0x00000007ffdc3890> (a java.util.concurrent.CountDownLatch$Sync)
+	at java.util.concurrent.locks.LockSupport.park(java.base@21/LockSupport.java:221)
+	at java.util.concurrent.locks.AbstractQueuedSynchronizer.acquire(java.base@21/AbstractQueuedSynchronizer.java:754)
+	at java.util.concurrent.locks.AbstractQueuedSynchronizer.acquireSharedInterruptibly(java.base@21/AbstractQueuedSynchronizer.java:1099)
+	at java.util.concurrent.CountDownLatch.await(java.base@21/CountDownLatch.java:230)
+	at gc.harness.PoolSaturationSuspect.awaitForever(PoolSaturationSuspect.java:87)
+	at gc.harness.PoolSaturationSuspect.lambda$main$0(PoolSaturationSuspect.java:61)
+	at gc.harness.PoolSaturationSuspect$$Lambda/0x00000008000c1000.run(Unknown Source)
+	at java.util.concurrent.Executors$RunnableAdapter.call(java.base@21/Executors.java:572)
+	at java.util.concurrent.FutureTask.run(java.base@21/FutureTask.java:317)
+	at java.util.concurrent.ThreadPoolExecutor.runWorker(java.base@21/ThreadPoolExecutor.java:1144)
+	at java.util.concurrent.ThreadPoolExecutor$Worker.run(java.base@21/ThreadPoolExecutor.java:642)
+	at java.lang.Thread.runWith(java.base@21/Thread.java:1596)
+	at java.lang.Thread.run(java.base@21/Thread.java:1583)
+
+   Locked ownable synchronizers:
+	- <0x00000007ffc0f808> (a java.util.concurrent.ThreadPoolExecutor$Worker)
+
+"pool-sat-worker-28" #47 [38147] prio=5 os_prio=31 cpu=0.02ms elapsed=37.55s tid=0x0000000125a8ae00 nid=38147 waiting on condition  [0x000000017175e000]
+   java.lang.Thread.State: WAITING (parking)
+	at jdk.internal.misc.Unsafe.park(java.base@21/Native Method)
+	- parking to wait for  <0x00000007ffdc3890> (a java.util.concurrent.CountDownLatch$Sync)
+	at java.util.concurrent.locks.LockSupport.park(java.base@21/LockSupport.java:221)
+	at java.util.concurrent.locks.AbstractQueuedSynchronizer.acquire(java.base@21/AbstractQueuedSynchronizer.java:754)
+	at java.util.concurrent.locks.AbstractQueuedSynchronizer.acquireSharedInterruptibly(java.base@21/AbstractQueuedSynchronizer.java:1099)
+	at java.util.concurrent.CountDownLatch.await(java.base@21/CountDownLatch.java:230)
+	at gc.harness.PoolSaturationSuspect.awaitForever(PoolSaturationSuspect.java:87)
+	at gc.harness.PoolSaturationSuspect.lambda$main$0(PoolSaturationSuspect.java:61)
+	at gc.harness.PoolSaturationSuspect$$Lambda/0x00000008000c1000.run(Unknown Source)
+	at java.util.concurrent.Executors$RunnableAdapter.call(java.base@21/Executors.java:572)
+	at java.util.concurrent.FutureTask.run(java.base@21/FutureTask.java:317)
+	at java.util.concurrent.ThreadPoolExecutor.runWorker(java.base@21/ThreadPoolExecutor.java:1144)
+	at java.util.concurrent.ThreadPoolExecutor$Worker.run(java.base@21/ThreadPoolExecutor.java:642)
+	at java.lang.Thread.runWith(java.base@21/Thread.java:1596)
+	at java.lang.Thread.run(java.base@21/Thread.java:1583)
+
+   Locked ownable synchronizers:
+	- <0x00000007ffc0f9d0> (a java.util.concurrent.ThreadPoolExecutor$Worker)
+
+"Attach Listener" #48 [22279] daemon prio=9 os_prio=31 cpu=0.27ms elapsed=0.11s tid=0x0000000126855e00 nid=22279 waiting on condition  [0x0000000000000000]
+   java.lang.Thread.State: RUNNABLE
+
+   Locked ownable synchronizers:
+	- None
+
+"VM Thread" os_prio=31 cpu=1.70ms elapsed=37.60s tid=0x000000012560cb50 nid=17667 runnable  
+
+"GC Thread#0" os_prio=31 cpu=0.03ms elapsed=37.61s tid=0x0000000125607890 nid=15107 runnable  
+
+"G1 Main Marker" os_prio=31 cpu=0.02ms elapsed=37.61s tid=0x0000000125608030 nid=13571 runnable  
+
+"G1 Conc#0" os_prio=31 cpu=0.02ms elapsed=37.61s tid=0x00000001256089a0 nid=14595 runnable  
+
+"G1 Refine#0" os_prio=31 cpu=0.02ms elapsed=37.61s tid=0x000000012581b000 nid=16387 runnable  
+
+"G1 Service" os_prio=31 cpu=0.99ms elapsed=37.61s tid=0x000000012560b700 nid=21251 runnable  
+
+"VM Periodic Task Thread" os_prio=31 cpu=18.65ms elapsed=37.61s tid=0x0000000125706000 nid=20483 waiting on condition  
+
+JNI global refs: 9, weak refs: 0
+
