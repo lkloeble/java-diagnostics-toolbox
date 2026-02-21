@@ -38,6 +38,9 @@ def detect_deadlocks(dump: ThreadDump) -> Dict:
     for thread in dump.threads:
         if thread.waiting_on and thread.waiting_on in lock_holders:
             holder = lock_holders[thread.waiting_on]
+            # Skip if same thread (Object.wait() holds and waits on same monitor)
+            if holder == thread.name:
+                continue
             holder_thread = next((t for t in dump.threads if t.name == holder), None)
             if holder_thread and holder_thread.waiting_on:
                 # Check if holder is waiting for a lock held by current thread

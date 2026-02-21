@@ -1,0 +1,454 @@
+2026-02-21 07:24:39
+Full thread dump OpenJDK 64-Bit Server VM (21+35-LTS mixed mode):
+
+Threads class SMR info:
+_java_thread_list=0x00006000037c8660, length=40, elements={
+0x000000012b808200, 0x000000012a814a00, 0x000000012a80f600, 0x000000012a80fe00,
+0x000000012a810600, 0x000000012a810e00, 0x000000012a850600, 0x000000012b9aa600,
+0x000000012b9b4e00, 0x000000012b921800, 0x000000012a097a00, 0x000000012a098200,
+0x000000012a098a00, 0x000000012a099200, 0x000000012a099a00, 0x000000012a0a4600,
+0x000000012a0a4e00, 0x000000012a0a5600, 0x000000012a0a5e00, 0x000000012a0a6600,
+0x000000012a8b3600, 0x000000012a8b3e00, 0x000000012a8b4600, 0x000000012a8b4e00,
+0x000000012a8b5600, 0x000000012a0a6e00, 0x000000012a0a7600, 0x000000012a0a7e00,
+0x000000012a0a8600, 0x000000012a0a8e00, 0x000000012a0a9600, 0x000000012b9b5e00,
+0x000000012a0a9e00, 0x000000012a0aa600, 0x000000012a8b5e00, 0x000000012a8b6600,
+0x000000011f80ac00, 0x000000011f80b400, 0x000000011f80bc00, 0x000000012e808200
+}
+
+"main" #1 [9475] prio=5 os_prio=31 cpu=47.16ms elapsed=23.60s tid=0x000000012b808200 nid=9475 waiting on condition  [0x000000016b26a000]
+   java.lang.Thread.State: TIMED_WAITING (sleeping)
+	at java.lang.Thread.sleep0(java.base@21/Native Method)
+	at java.lang.Thread.sleep(java.base@21/Thread.java:509)
+	at gc.harness.LockConvoySuspect.main(LockConvoySuspect.java:28)
+
+   Locked ownable synchronizers:
+	- None
+
+"Reference Handler" #9 [32003] daemon prio=10 os_prio=31 cpu=0.17ms elapsed=23.58s tid=0x000000012a814a00 nid=32003 waiting on condition  [0x000000016c3e2000]
+   java.lang.Thread.State: RUNNABLE
+	at java.lang.ref.Reference.waitForReferencePendingList(java.base@21/Native Method)
+	at java.lang.ref.Reference.processPendingReferences(java.base@21/Reference.java:246)
+	at java.lang.ref.Reference$ReferenceHandler.run(java.base@21/Reference.java:208)
+
+   Locked ownable synchronizers:
+	- None
+
+"Finalizer" #10 [31747] daemon prio=8 os_prio=31 cpu=0.07ms elapsed=23.58s tid=0x000000012a80f600 nid=31747 in Object.wait()  [0x000000016c5ee000]
+   java.lang.Thread.State: WAITING (on object monitor)
+	at java.lang.Object.wait0(java.base@21/Native Method)
+	- waiting on <0x00000007fff09ab0> (a java.lang.ref.NativeReferenceQueue$Lock)
+	at java.lang.Object.wait(java.base@21/Object.java:366)
+	at java.lang.Object.wait(java.base@21/Object.java:339)
+	at java.lang.ref.NativeReferenceQueue.await(java.base@21/NativeReferenceQueue.java:48)
+	at java.lang.ref.ReferenceQueue.remove0(java.base@21/ReferenceQueue.java:158)
+	at java.lang.ref.NativeReferenceQueue.remove(java.base@21/NativeReferenceQueue.java:89)
+	- locked <0x00000007fff09ab0> (a java.lang.ref.NativeReferenceQueue$Lock)
+	at java.lang.ref.Finalizer$FinalizerThread.run(java.base@21/Finalizer.java:173)
+
+   Locked ownable synchronizers:
+	- None
+
+"Signal Dispatcher" #11 [23555] daemon prio=9 os_prio=31 cpu=0.16ms elapsed=23.58s tid=0x000000012a80fe00 nid=23555 waiting on condition  [0x0000000000000000]
+   java.lang.Thread.State: RUNNABLE
+
+   Locked ownable synchronizers:
+	- None
+
+"Service Thread" #12 [31491] daemon prio=9 os_prio=31 cpu=0.05ms elapsed=23.58s tid=0x000000012a810600 nid=31491 runnable  [0x0000000000000000]
+   java.lang.Thread.State: RUNNABLE
+
+   Locked ownable synchronizers:
+	- None
+
+"Monitor Deflation Thread" #13 [31235] daemon prio=9 os_prio=31 cpu=1.57ms elapsed=23.58s tid=0x000000012a810e00 nid=31235 runnable  [0x0000000000000000]
+   java.lang.Thread.State: RUNNABLE
+
+   Locked ownable synchronizers:
+	- None
+
+"C2 CompilerThread0" #14 [24579] daemon prio=9 os_prio=31 cpu=30.66ms elapsed=23.58s tid=0x000000012a850600 nid=24579 waiting on condition  [0x0000000000000000]
+   java.lang.Thread.State: RUNNABLE
+   No compile task
+
+   Locked ownable synchronizers:
+	- None
+
+"C1 CompilerThread0" #17 [25091] daemon prio=9 os_prio=31 cpu=33.79ms elapsed=23.58s tid=0x000000012b9aa600 nid=25091 waiting on condition  [0x0000000000000000]
+   java.lang.Thread.State: RUNNABLE
+   No compile task
+
+   Locked ownable synchronizers:
+	- None
+
+"Notification Thread" #18 [25603] daemon prio=9 os_prio=31 cpu=0.02ms elapsed=23.57s tid=0x000000012b9b4e00 nid=25603 runnable  [0x0000000000000000]
+   java.lang.Thread.State: RUNNABLE
+
+   Locked ownable synchronizers:
+	- None
+
+"Common-Cleaner" #19 [25859] daemon prio=8 os_prio=31 cpu=0.21ms elapsed=23.57s tid=0x000000012b921800 nid=25859 waiting on condition  [0x000000016d442000]
+   java.lang.Thread.State: TIMED_WAITING (parking)
+	at jdk.internal.misc.Unsafe.park(java.base@21/Native Method)
+	- parking to wait for  <0x00000007ffe813a8> (a java.util.concurrent.locks.AbstractQueuedSynchronizer$ConditionObject)
+	at java.util.concurrent.locks.LockSupport.parkNanos(java.base@21/LockSupport.java:269)
+	at java.util.concurrent.locks.AbstractQueuedSynchronizer$ConditionObject.await(java.base@21/AbstractQueuedSynchronizer.java:1847)
+	at java.lang.ref.ReferenceQueue.await(java.base@21/ReferenceQueue.java:71)
+	at java.lang.ref.ReferenceQueue.remove0(java.base@21/ReferenceQueue.java:143)
+	at java.lang.ref.ReferenceQueue.remove(java.base@21/ReferenceQueue.java:218)
+	at jdk.internal.ref.CleanerImpl.run(java.base@21/CleanerImpl.java:140)
+	at java.lang.Thread.runWith(java.base@21/Thread.java:1596)
+	at java.lang.Thread.run(java.base@21/Thread.java:1583)
+	at jdk.internal.misc.InnocuousThread.run(java.base@21/InnocuousThread.java:186)
+
+   Locked ownable synchronizers:
+	- None
+
+"convoy-heartbeat" #20 [30723] daemon prio=5 os_prio=31 cpu=42.33ms elapsed=23.56s tid=0x000000012a097a00 nid=30723 waiting on condition  [0x000000016d64e000]
+   java.lang.Thread.State: TIMED_WAITING (sleeping)
+	at java.lang.Thread.sleep0(java.base@21/Native Method)
+	at java.lang.Thread.sleep(java.base@21/Thread.java:558)
+	at java.util.concurrent.TimeUnit.sleep(java.base@21/TimeUnit.java:446)
+	at gc.harness.LockConvoySuspect.sleep(LockConvoySuspect.java:70)
+	at gc.harness.LockConvoySuspect.lambda$startHeartbeat$0(LockConvoySuspect.java:49)
+	at gc.harness.LockConvoySuspect$$Lambda/0x0000000800000a00.run(Unknown Source)
+	at java.lang.Thread.runWith(java.base@21/Thread.java:1596)
+	at java.lang.Thread.run(java.base@21/Thread.java:1583)
+
+   Locked ownable synchronizers:
+	- None
+
+"convoy-0" #21 [30467] prio=5 os_prio=31 cpu=8.05ms elapsed=23.56s tid=0x000000012a098200 nid=30467 waiting for monitor entry  [0x000000016d85a000]
+   java.lang.Thread.State: BLOCKED (on object monitor)
+	at gc.harness.LockConvoySuspect.worker(LockConvoySuspect.java:38)
+	- waiting to lock <0x00000007ffe94060> (a java.lang.Object)
+	at gc.harness.LockConvoySuspect$$Lambda/0x0000000800000c18.run(Unknown Source)
+	at java.lang.Thread.runWith(java.base@21/Thread.java:1596)
+	at java.lang.Thread.run(java.base@21/Thread.java:1583)
+
+   Locked ownable synchronizers:
+	- None
+
+"convoy-1" #22 [26883] prio=5 os_prio=31 cpu=7.66ms elapsed=23.56s tid=0x000000012a098a00 nid=26883 waiting for monitor entry  [0x000000016da66000]
+   java.lang.Thread.State: BLOCKED (on object monitor)
+	at gc.harness.LockConvoySuspect.worker(LockConvoySuspect.java:38)
+	- waiting to lock <0x00000007ffe94060> (a java.lang.Object)
+	at gc.harness.LockConvoySuspect$$Lambda/0x0000000800000c18.run(Unknown Source)
+	at java.lang.Thread.runWith(java.base@21/Thread.java:1596)
+	at java.lang.Thread.run(java.base@21/Thread.java:1583)
+
+   Locked ownable synchronizers:
+	- None
+
+"convoy-2" #23 [27139] prio=5 os_prio=31 cpu=7.87ms elapsed=23.56s tid=0x000000012a099200 nid=27139 waiting for monitor entry  [0x000000016dc72000]
+   java.lang.Thread.State: BLOCKED (on object monitor)
+	at gc.harness.LockConvoySuspect.worker(LockConvoySuspect.java:38)
+	- waiting to lock <0x00000007ffe94060> (a java.lang.Object)
+	at gc.harness.LockConvoySuspect$$Lambda/0x0000000800000c18.run(Unknown Source)
+	at java.lang.Thread.runWith(java.base@21/Thread.java:1596)
+	at java.lang.Thread.run(java.base@21/Thread.java:1583)
+
+   Locked ownable synchronizers:
+	- None
+
+"convoy-3" #24 [27651] prio=5 os_prio=31 cpu=8.11ms elapsed=23.56s tid=0x000000012a099a00 nid=27651 waiting for monitor entry  [0x000000016de7e000]
+   java.lang.Thread.State: BLOCKED (on object monitor)
+	at gc.harness.LockConvoySuspect.worker(LockConvoySuspect.java:38)
+	- waiting to lock <0x00000007ffe94060> (a java.lang.Object)
+	at gc.harness.LockConvoySuspect$$Lambda/0x0000000800000c18.run(Unknown Source)
+	at java.lang.Thread.runWith(java.base@21/Thread.java:1596)
+	at java.lang.Thread.run(java.base@21/Thread.java:1583)
+
+   Locked ownable synchronizers:
+	- None
+
+"convoy-4" #25 [29955] prio=5 os_prio=31 cpu=7.42ms elapsed=23.56s tid=0x000000012a0a4600 nid=29955 waiting for monitor entry  [0x000000016e08a000]
+   java.lang.Thread.State: BLOCKED (on object monitor)
+	at gc.harness.LockConvoySuspect.worker(LockConvoySuspect.java:38)
+	- waiting to lock <0x00000007ffe94060> (a java.lang.Object)
+	at gc.harness.LockConvoySuspect$$Lambda/0x0000000800000c18.run(Unknown Source)
+	at java.lang.Thread.runWith(java.base@21/Thread.java:1596)
+	at java.lang.Thread.run(java.base@21/Thread.java:1583)
+
+   Locked ownable synchronizers:
+	- None
+
+"convoy-5" #26 [28163] prio=5 os_prio=31 cpu=8.55ms elapsed=23.56s tid=0x000000012a0a4e00 nid=28163 waiting for monitor entry  [0x000000016e296000]
+   java.lang.Thread.State: BLOCKED (on object monitor)
+	at gc.harness.LockConvoySuspect.worker(LockConvoySuspect.java:38)
+	- waiting to lock <0x00000007ffe94060> (a java.lang.Object)
+	at gc.harness.LockConvoySuspect$$Lambda/0x0000000800000c18.run(Unknown Source)
+	at java.lang.Thread.runWith(java.base@21/Thread.java:1596)
+	at java.lang.Thread.run(java.base@21/Thread.java:1583)
+
+   Locked ownable synchronizers:
+	- None
+
+"convoy-6" #27 [28675] prio=5 os_prio=31 cpu=7.52ms elapsed=23.56s tid=0x000000012a0a5600 nid=28675 waiting for monitor entry  [0x000000016e4a2000]
+   java.lang.Thread.State: BLOCKED (on object monitor)
+	at gc.harness.LockConvoySuspect.worker(LockConvoySuspect.java:38)
+	- waiting to lock <0x00000007ffe94060> (a java.lang.Object)
+	at gc.harness.LockConvoySuspect$$Lambda/0x0000000800000c18.run(Unknown Source)
+	at java.lang.Thread.runWith(java.base@21/Thread.java:1596)
+	at java.lang.Thread.run(java.base@21/Thread.java:1583)
+
+   Locked ownable synchronizers:
+	- None
+
+"convoy-7" #28 [29187] prio=5 os_prio=31 cpu=7.22ms elapsed=23.56s tid=0x000000012a0a5e00 nid=29187 waiting for monitor entry  [0x000000016e6ae000]
+   java.lang.Thread.State: BLOCKED (on object monitor)
+	at gc.harness.LockConvoySuspect.worker(LockConvoySuspect.java:38)
+	- waiting to lock <0x00000007ffe94060> (a java.lang.Object)
+	at gc.harness.LockConvoySuspect$$Lambda/0x0000000800000c18.run(Unknown Source)
+	at java.lang.Thread.runWith(java.base@21/Thread.java:1596)
+	at java.lang.Thread.run(java.base@21/Thread.java:1583)
+
+   Locked ownable synchronizers:
+	- None
+
+"convoy-8" #29 [32771] prio=5 os_prio=31 cpu=7.70ms elapsed=23.56s tid=0x000000012a0a6600 nid=32771 waiting for monitor entry  [0x000000016e8ba000]
+   java.lang.Thread.State: BLOCKED (on object monitor)
+	at gc.harness.LockConvoySuspect.worker(LockConvoySuspect.java:38)
+	- waiting to lock <0x00000007ffe94060> (a java.lang.Object)
+	at gc.harness.LockConvoySuspect$$Lambda/0x0000000800000c18.run(Unknown Source)
+	at java.lang.Thread.runWith(java.base@21/Thread.java:1596)
+	at java.lang.Thread.run(java.base@21/Thread.java:1583)
+
+   Locked ownable synchronizers:
+	- None
+
+"convoy-9" #30 [43267] prio=5 os_prio=31 cpu=7.73ms elapsed=23.56s tid=0x000000012a8b3600 nid=43267 waiting on condition  [0x000000016eac6000]
+   java.lang.Thread.State: TIMED_WAITING (sleeping)
+	at java.lang.Thread.sleep0(java.base@21/Native Method)
+	at java.lang.Thread.sleep(java.base@21/Thread.java:558)
+	at java.util.concurrent.TimeUnit.sleep(java.base@21/TimeUnit.java:446)
+	at gc.harness.LockConvoySuspect.sleep(LockConvoySuspect.java:70)
+	at gc.harness.LockConvoySuspect.sleepRnd(LockConvoySuspect.java:66)
+	at gc.harness.LockConvoySuspect.worker(LockConvoySuspect.java:39)
+	- locked <0x00000007ffe94060> (a java.lang.Object)
+	at gc.harness.LockConvoySuspect$$Lambda/0x0000000800000c18.run(Unknown Source)
+	at java.lang.Thread.runWith(java.base@21/Thread.java:1596)
+	at java.lang.Thread.run(java.base@21/Thread.java:1583)
+
+   Locked ownable synchronizers:
+	- None
+
+"convoy-10" #31 [33539] prio=5 os_prio=31 cpu=7.48ms elapsed=23.56s tid=0x000000012a8b3e00 nid=33539 waiting for monitor entry  [0x000000016ecd2000]
+   java.lang.Thread.State: BLOCKED (on object monitor)
+	at gc.harness.LockConvoySuspect.worker(LockConvoySuspect.java:38)
+	- waiting to lock <0x00000007ffe94060> (a java.lang.Object)
+	at gc.harness.LockConvoySuspect$$Lambda/0x0000000800000c18.run(Unknown Source)
+	at java.lang.Thread.runWith(java.base@21/Thread.java:1596)
+	at java.lang.Thread.run(java.base@21/Thread.java:1583)
+
+   Locked ownable synchronizers:
+	- None
+
+"convoy-11" #32 [42755] prio=5 os_prio=31 cpu=4.59ms elapsed=23.56s tid=0x000000012a8b4600 nid=42755 waiting for monitor entry  [0x000000016eede000]
+   java.lang.Thread.State: BLOCKED (on object monitor)
+	at gc.harness.LockConvoySuspect.worker(LockConvoySuspect.java:38)
+	- waiting to lock <0x00000007ffe94060> (a java.lang.Object)
+	at gc.harness.LockConvoySuspect$$Lambda/0x0000000800000c18.run(Unknown Source)
+	at java.lang.Thread.runWith(java.base@21/Thread.java:1596)
+	at java.lang.Thread.run(java.base@21/Thread.java:1583)
+
+   Locked ownable synchronizers:
+	- None
+
+"convoy-12" #33 [42499] prio=5 os_prio=31 cpu=7.03ms elapsed=23.56s tid=0x000000012a8b4e00 nid=42499 waiting for monitor entry  [0x000000016f0ea000]
+   java.lang.Thread.State: BLOCKED (on object monitor)
+	at gc.harness.LockConvoySuspect.worker(LockConvoySuspect.java:38)
+	- waiting to lock <0x00000007ffe94060> (a java.lang.Object)
+	at gc.harness.LockConvoySuspect$$Lambda/0x0000000800000c18.run(Unknown Source)
+	at java.lang.Thread.runWith(java.base@21/Thread.java:1596)
+	at java.lang.Thread.run(java.base@21/Thread.java:1583)
+
+   Locked ownable synchronizers:
+	- None
+
+"convoy-13" #34 [34051] prio=5 os_prio=31 cpu=7.31ms elapsed=23.56s tid=0x000000012a8b5600 nid=34051 waiting for monitor entry  [0x000000016f2f6000]
+   java.lang.Thread.State: BLOCKED (on object monitor)
+	at gc.harness.LockConvoySuspect.worker(LockConvoySuspect.java:38)
+	- waiting to lock <0x00000007ffe94060> (a java.lang.Object)
+	at gc.harness.LockConvoySuspect$$Lambda/0x0000000800000c18.run(Unknown Source)
+	at java.lang.Thread.runWith(java.base@21/Thread.java:1596)
+	at java.lang.Thread.run(java.base@21/Thread.java:1583)
+
+   Locked ownable synchronizers:
+	- None
+
+"convoy-14" #35 [34563] prio=5 os_prio=31 cpu=7.25ms elapsed=23.56s tid=0x000000012a0a6e00 nid=34563 waiting for monitor entry  [0x000000016f502000]
+   java.lang.Thread.State: BLOCKED (on object monitor)
+	at gc.harness.LockConvoySuspect.worker(LockConvoySuspect.java:38)
+	- waiting to lock <0x00000007ffe94060> (a java.lang.Object)
+	at gc.harness.LockConvoySuspect$$Lambda/0x0000000800000c18.run(Unknown Source)
+	at java.lang.Thread.runWith(java.base@21/Thread.java:1596)
+	at java.lang.Thread.run(java.base@21/Thread.java:1583)
+
+   Locked ownable synchronizers:
+	- None
+
+"convoy-15" #36 [35075] prio=5 os_prio=31 cpu=7.65ms elapsed=23.56s tid=0x000000012a0a7600 nid=35075 waiting for monitor entry  [0x000000016f70e000]
+   java.lang.Thread.State: BLOCKED (on object monitor)
+	at gc.harness.LockConvoySuspect.worker(LockConvoySuspect.java:38)
+	- waiting to lock <0x00000007ffe94060> (a java.lang.Object)
+	at gc.harness.LockConvoySuspect$$Lambda/0x0000000800000c18.run(Unknown Source)
+	at java.lang.Thread.runWith(java.base@21/Thread.java:1596)
+	at java.lang.Thread.run(java.base@21/Thread.java:1583)
+
+   Locked ownable synchronizers:
+	- None
+
+"convoy-16" #37 [35331] prio=5 os_prio=31 cpu=7.48ms elapsed=23.56s tid=0x000000012a0a7e00 nid=35331 waiting for monitor entry  [0x000000016f91a000]
+   java.lang.Thread.State: BLOCKED (on object monitor)
+	at gc.harness.LockConvoySuspect.worker(LockConvoySuspect.java:38)
+	- waiting to lock <0x00000007ffe94060> (a java.lang.Object)
+	at gc.harness.LockConvoySuspect$$Lambda/0x0000000800000c18.run(Unknown Source)
+	at java.lang.Thread.runWith(java.base@21/Thread.java:1596)
+	at java.lang.Thread.run(java.base@21/Thread.java:1583)
+
+   Locked ownable synchronizers:
+	- None
+
+"convoy-17" #38 [41731] prio=5 os_prio=31 cpu=7.71ms elapsed=23.56s tid=0x000000012a0a8600 nid=41731 waiting for monitor entry  [0x000000016fb26000]
+   java.lang.Thread.State: BLOCKED (on object monitor)
+	at gc.harness.LockConvoySuspect.worker(LockConvoySuspect.java:38)
+	- waiting to lock <0x00000007ffe94060> (a java.lang.Object)
+	at gc.harness.LockConvoySuspect$$Lambda/0x0000000800000c18.run(Unknown Source)
+	at java.lang.Thread.runWith(java.base@21/Thread.java:1596)
+	at java.lang.Thread.run(java.base@21/Thread.java:1583)
+
+   Locked ownable synchronizers:
+	- None
+
+"convoy-18" #39 [41219] prio=5 os_prio=31 cpu=7.73ms elapsed=23.56s tid=0x000000012a0a8e00 nid=41219 waiting for monitor entry  [0x000000016fd32000]
+   java.lang.Thread.State: BLOCKED (on object monitor)
+	at gc.harness.LockConvoySuspect.worker(LockConvoySuspect.java:38)
+	- waiting to lock <0x00000007ffe94060> (a java.lang.Object)
+	at gc.harness.LockConvoySuspect$$Lambda/0x0000000800000c18.run(Unknown Source)
+	at java.lang.Thread.runWith(java.base@21/Thread.java:1596)
+	at java.lang.Thread.run(java.base@21/Thread.java:1583)
+
+   Locked ownable synchronizers:
+	- None
+
+"convoy-19" #40 [40707] prio=5 os_prio=31 cpu=7.85ms elapsed=23.56s tid=0x000000012a0a9600 nid=40707 waiting for monitor entry  [0x000000016ff3e000]
+   java.lang.Thread.State: BLOCKED (on object monitor)
+	at gc.harness.LockConvoySuspect.worker(LockConvoySuspect.java:38)
+	- waiting to lock <0x00000007ffe94060> (a java.lang.Object)
+	at gc.harness.LockConvoySuspect$$Lambda/0x0000000800000c18.run(Unknown Source)
+	at java.lang.Thread.runWith(java.base@21/Thread.java:1596)
+	at java.lang.Thread.run(java.base@21/Thread.java:1583)
+
+   Locked ownable synchronizers:
+	- None
+
+"convoy-20" #41 [40195] prio=5 os_prio=31 cpu=7.05ms elapsed=23.56s tid=0x000000012b9b5e00 nid=40195 waiting for monitor entry  [0x000000017014a000]
+   java.lang.Thread.State: BLOCKED (on object monitor)
+	at gc.harness.LockConvoySuspect.worker(LockConvoySuspect.java:38)
+	- waiting to lock <0x00000007ffe94060> (a java.lang.Object)
+	at gc.harness.LockConvoySuspect$$Lambda/0x0000000800000c18.run(Unknown Source)
+	at java.lang.Thread.runWith(java.base@21/Thread.java:1596)
+	at java.lang.Thread.run(java.base@21/Thread.java:1583)
+
+   Locked ownable synchronizers:
+	- None
+
+"convoy-21" #42 [35843] prio=5 os_prio=31 cpu=7.60ms elapsed=23.56s tid=0x000000012a0a9e00 nid=35843 waiting for monitor entry  [0x0000000170356000]
+   java.lang.Thread.State: BLOCKED (on object monitor)
+	at gc.harness.LockConvoySuspect.worker(LockConvoySuspect.java:38)
+	- waiting to lock <0x00000007ffe94060> (a java.lang.Object)
+	at gc.harness.LockConvoySuspect$$Lambda/0x0000000800000c18.run(Unknown Source)
+	at java.lang.Thread.runWith(java.base@21/Thread.java:1596)
+	at java.lang.Thread.run(java.base@21/Thread.java:1583)
+
+   Locked ownable synchronizers:
+	- None
+
+"convoy-22" #43 [36355] prio=5 os_prio=31 cpu=4.56ms elapsed=23.56s tid=0x000000012a0aa600 nid=36355 waiting for monitor entry  [0x0000000170562000]
+   java.lang.Thread.State: BLOCKED (on object monitor)
+	at gc.harness.LockConvoySuspect.worker(LockConvoySuspect.java:38)
+	- waiting to lock <0x00000007ffe94060> (a java.lang.Object)
+	at gc.harness.LockConvoySuspect$$Lambda/0x0000000800000c18.run(Unknown Source)
+	at java.lang.Thread.runWith(java.base@21/Thread.java:1596)
+	at java.lang.Thread.run(java.base@21/Thread.java:1583)
+
+   Locked ownable synchronizers:
+	- None
+
+"convoy-23" #44 [36611] prio=5 os_prio=31 cpu=7.64ms elapsed=23.56s tid=0x000000012a8b5e00 nid=36611 waiting for monitor entry  [0x000000017076e000]
+   java.lang.Thread.State: BLOCKED (on object monitor)
+	at gc.harness.LockConvoySuspect.worker(LockConvoySuspect.java:38)
+	- waiting to lock <0x00000007ffe94060> (a java.lang.Object)
+	at gc.harness.LockConvoySuspect$$Lambda/0x0000000800000c18.run(Unknown Source)
+	at java.lang.Thread.runWith(java.base@21/Thread.java:1596)
+	at java.lang.Thread.run(java.base@21/Thread.java:1583)
+
+   Locked ownable synchronizers:
+	- None
+
+"convoy-24" #45 [39171] prio=5 os_prio=31 cpu=6.97ms elapsed=23.56s tid=0x000000012a8b6600 nid=39171 waiting for monitor entry  [0x000000017097a000]
+   java.lang.Thread.State: BLOCKED (on object monitor)
+	at gc.harness.LockConvoySuspect.worker(LockConvoySuspect.java:38)
+	- waiting to lock <0x00000007ffe94060> (a java.lang.Object)
+	at gc.harness.LockConvoySuspect$$Lambda/0x0000000800000c18.run(Unknown Source)
+	at java.lang.Thread.runWith(java.base@21/Thread.java:1596)
+	at java.lang.Thread.run(java.base@21/Thread.java:1583)
+
+   Locked ownable synchronizers:
+	- None
+
+"convoy-25" #46 [38915] prio=5 os_prio=31 cpu=7.78ms elapsed=23.56s tid=0x000000011f80ac00 nid=38915 waiting for monitor entry  [0x0000000170b86000]
+   java.lang.Thread.State: BLOCKED (on object monitor)
+	at gc.harness.LockConvoySuspect.worker(LockConvoySuspect.java:38)
+	- waiting to lock <0x00000007ffe94060> (a java.lang.Object)
+	at gc.harness.LockConvoySuspect$$Lambda/0x0000000800000c18.run(Unknown Source)
+	at java.lang.Thread.runWith(java.base@21/Thread.java:1596)
+	at java.lang.Thread.run(java.base@21/Thread.java:1583)
+
+   Locked ownable synchronizers:
+	- None
+
+"convoy-26" #47 [37123] prio=5 os_prio=31 cpu=7.44ms elapsed=23.56s tid=0x000000011f80b400 nid=37123 waiting for monitor entry  [0x0000000170d92000]
+   java.lang.Thread.State: BLOCKED (on object monitor)
+	at gc.harness.LockConvoySuspect.worker(LockConvoySuspect.java:38)
+	- waiting to lock <0x00000007ffe94060> (a java.lang.Object)
+	at gc.harness.LockConvoySuspect$$Lambda/0x0000000800000c18.run(Unknown Source)
+	at java.lang.Thread.runWith(java.base@21/Thread.java:1596)
+	at java.lang.Thread.run(java.base@21/Thread.java:1583)
+
+   Locked ownable synchronizers:
+	- None
+
+"convoy-27" #48 [38403] prio=5 os_prio=31 cpu=7.14ms elapsed=23.56s tid=0x000000011f80bc00 nid=38403 waiting for monitor entry  [0x0000000170f9e000]
+   java.lang.Thread.State: BLOCKED (on object monitor)
+	at gc.harness.LockConvoySuspect.worker(LockConvoySuspect.java:38)
+	- waiting to lock <0x00000007ffe94060> (a java.lang.Object)
+	at gc.harness.LockConvoySuspect$$Lambda/0x0000000800000c18.run(Unknown Source)
+	at java.lang.Thread.runWith(java.base@21/Thread.java:1596)
+	at java.lang.Thread.run(java.base@21/Thread.java:1583)
+
+   Locked ownable synchronizers:
+	- None
+
+"Attach Listener" #49 [32519] daemon prio=9 os_prio=31 cpu=0.28ms elapsed=0.11s tid=0x000000012e808200 nid=32519 waiting on condition  [0x0000000000000000]
+   java.lang.Thread.State: RUNNABLE
+
+   Locked ownable synchronizers:
+	- None
+
+"VM Thread" os_prio=31 cpu=1.54ms elapsed=23.59s tid=0x000000012b00e6a0 nid=20227 runnable  
+
+"GC Thread#0" os_prio=31 cpu=0.02ms elapsed=23.60s tid=0x000000012b006b60 nid=12035 runnable  
+
+"G1 Main Marker" os_prio=31 cpu=0.02ms elapsed=23.60s tid=0x000000012b007300 nid=13571 runnable  
+
+"G1 Conc#0" os_prio=31 cpu=0.01ms elapsed=23.60s tid=0x000000012b007c70 nid=12547 runnable  
+
+"G1 Refine#0" os_prio=31 cpu=0.02ms elapsed=23.60s tid=0x000000012b918400 nid=16387 runnable  
+
+"G1 Service" os_prio=31 cpu=0.44ms elapsed=23.60s tid=0x000000012b00a9d0 nid=21507 runnable  
+
+"VM Periodic Task Thread" os_prio=31 cpu=8.67ms elapsed=23.60s tid=0x000000012b00bf60 nid=20739 waiting on condition  
+
+JNI global refs: 9, weak refs: 0
+

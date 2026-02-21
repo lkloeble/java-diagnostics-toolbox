@@ -29,18 +29,20 @@ class ThreadDump:
     deadlocks: List[Dict] = field(default_factory=list)
 
 
-# Thread header pattern:
-# "pool-1-thread-3" #15 daemon prio=5 os_prio=0 tid=0x00007f... nid=0x1234 waiting on condition
+# Thread header pattern - supports multiple JDK formats:
+# Java 8-11: "pool-1-thread-3" #15 daemon prio=5 os_prio=0 tid=0x00007f... nid=0x1234 waiting on condition
+# Java 17+:  "main" #1 [9987] prio=5 os_prio=31 cpu=180.13ms elapsed=109.77s tid=0x... nid=9987 state
 THREAD_HEADER_PATTERN = re.compile(
     r'^"([^"]+)"'  # Thread name in quotes
     r'\s+#(\d+)'   # Thread number
+    r'(?:\s+\[\d+\])?'  # Optional [native_id] (Java 17+)
     r'(?:\s+(daemon))?'  # Optional daemon flag
     r'\s+prio=(\d+)'  # Priority
     r'(?:\s+os_prio=\d+)?'  # Optional OS priority
-    r'(?:\s+cpu=[\d.]+ms)?'  # Optional CPU time
+    r'(?:\s+cpu=[\d.]+m?s)?'  # Optional CPU time
     r'(?:\s+elapsed=[\d.]+s)?'  # Optional elapsed time
     r'\s+tid=(0x[0-9a-fA-F]+)'  # Thread ID
-    r'\s+nid=(0x[0-9a-fA-F]+|\d+)'  # Native ID
+    r'\s+nid=(\d+|0x[0-9a-fA-F]+)'  # Native ID (decimal or hex)
     r'\s+(.+)$'  # State description
 )
 

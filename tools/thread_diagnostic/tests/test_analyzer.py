@@ -1,4 +1,5 @@
 import pytest
+from pathlib import Path
 from thread_diagnostic.parser import parse_thread_dump
 from thread_diagnostic.analyzer import (
     analyze_thread_dump,
@@ -8,6 +9,50 @@ from thread_diagnostic.analyzer import (
     detect_stuck_threads,
     compute_thread_state_summary,
 )
+
+
+# === Real file tests ===
+
+@pytest.fixture
+def real_normal_dump():
+    """Load real normal dump from samples."""
+    path = Path(__file__).parents[3] / "samples" / "dump_normal.txt"
+    if not path.exists():
+        pytest.skip(f"Sample not found: {path}")
+    return path.read_text()
+
+
+@pytest.fixture
+def real_blocked_dump():
+    """Load real blocked dump from samples."""
+    path = Path(__file__).parents[3] / "samples" / "dump_blocked.txt"
+    if not path.exists():
+        pytest.skip(f"Sample not found: {path}")
+    return path.read_text()
+
+
+def test_real_normal_dump_is_healthy(real_normal_dump):
+    """Real normal dump should show no issues."""
+    dump = parse_thread_dump(real_normal_dump)
+    findings = analyze_thread_dump(dump)
+
+    assert "NO STRONG SIGNAL" in findings["summary"]
+    detected = [s for s in findings["suspects"] if s["detected"]]
+    assert len(detected) == 0
+
+
+def test_real_blocked_dump_detects_contention(real_blocked_dump):
+    """Real blocked dump should detect lock contention."""
+    dump = parse_thread_dump(real_blocked_dump)
+    findings = analyze_thread_dump(dump)
+
+    contention = next(s for s in findings["suspects"] if s["type"] == "lock_contention")
+    assert contention["detected"] is True
+    assert contention["max_waiters"] >= 20
+
+    # Should NOT detect deadlock (it's contention, not deadlock)
+    deadlock = next(s for s in findings["suspects"] if s["type"] == "deadlock")
+    assert deadlock["detected"] is False
 
 
 def test_analyze_healthy_dump(simple_thread_dump):
