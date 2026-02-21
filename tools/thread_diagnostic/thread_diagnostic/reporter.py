@@ -147,10 +147,12 @@ def generate_report(findings: Dict, format: str = "txt") -> str:
 
         if format == "md":
             lines.append(f"## {emoji} {type_title} - {status}")
-            lines.append(f"**Confidence:** {suspect['confidence']}")
+            if suspect["detected"]:
+                lines.append(f"**Confidence:** {suspect['confidence']}")
         else:
             lines.append(f"{emoji} {type_title.upper()} - {status}")
-            lines.append(f"Confidence: {suspect['confidence']}")
+            if suspect["detected"]:
+                lines.append(f"Confidence: {suspect['confidence']}")
 
         if suspect["detected"]:
             # Evidence

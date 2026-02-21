@@ -298,10 +298,12 @@ def generate_report(findings: Dict, format: str = "txt", debug: bool = False) ->
 
         if format == "md":
             lines.append(f"## {emoji} {type_title} - {status}")
-            lines.append(f"**Confidence:** {suspect['confidence']}")
+            if suspect["detected"]:
+                lines.append(f"**Confidence:** {suspect['confidence']}")
         else:
             lines.append(f"{emoji} {type_title.upper()} - {status}")
-            lines.append(f"Confidence: {suspect['confidence']}")
+            if suspect["detected"]:
+                lines.append(f"Confidence: {suspect['confidence']}")
 
         # Toujours afficher le trend calculé (même si NOT DETECTED)
         if "trend_regions_per_min" in suspect:
