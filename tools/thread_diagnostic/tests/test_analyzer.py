@@ -86,6 +86,28 @@ def test_real_deadlock_dump(real_deadlock_dump):
     assert len(deadlock["evidence"]) > 0
 
 
+@pytest.fixture
+def real_cpu_storm_dump():
+    """Load real cpu storm dump from samples."""
+    path = Path(__file__).parents[3] / "samples" / "dump_cpu_storm.txt"
+    if not path.exists():
+        pytest.skip(f"Sample not found: {path}")
+    return path.read_text()
+
+
+def test_real_cpu_storm_dump(real_cpu_storm_dump):
+    """Real cpu storm dump should detect cpu_storm with high confidence."""
+    dump = parse_thread_dump(real_cpu_storm_dump)
+    findings = analyze_thread_dump(dump)
+
+    cpu_storm = next(s for s in findings["suspects"] if s["type"] == "cpu_storm")
+    assert cpu_storm["detected"] is True
+    assert cpu_storm["confidence"] == "high"
+    assert cpu_storm["runnable_pct"] >= 50.0
+    assert len(cpu_storm["hot_locations"]) > 0
+    assert cpu_storm["hot_locations"][0]["count"] == 14
+
+
 def test_real_pool_saturated_dump(real_pool_saturated_dump):
     """Real pool saturated dump should detect saturation."""
     dump = parse_thread_dump(real_pool_saturated_dump)
