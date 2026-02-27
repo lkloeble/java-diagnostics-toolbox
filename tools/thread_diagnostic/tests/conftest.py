@@ -55,6 +55,46 @@ Found 1 deadlock.
 
 
 @pytest.fixture
+def io_stall_thread_dump():
+    """Thread dump with threads blocked on socket I/O."""
+    return '''2024-01-15 10:30:45
+Full thread dump OpenJDK 64-Bit Server VM (17.0.1+12 mixed mode):
+
+"main" #1 prio=5 os_prio=0 tid=0x00007f1234567890 nid=0x1 runnable
+   java.lang.Thread.State: RUNNABLE
+	at com.example.Main.main(Main.java:5)
+
+"db-client-1" #10 prio=5 os_prio=0 tid=0x00007f1234567891 nid=0xa runnable
+   java.lang.Thread.State: RUNNABLE
+	at sun.nio.ch.SocketDispatcher.read0(Native Method)
+	at sun.nio.ch.SocketDispatcher.read(SocketDispatcher.java:47)
+	at java.net.Socket$SocketInputStream.read(Socket.java:1099)
+	at com.example.DbClient.query(DbClient.java:42)
+
+"db-client-2" #11 prio=5 os_prio=0 tid=0x00007f1234567892 nid=0xb runnable
+   java.lang.Thread.State: RUNNABLE
+	at sun.nio.ch.SocketDispatcher.read0(Native Method)
+	at sun.nio.ch.SocketDispatcher.read(SocketDispatcher.java:47)
+	at java.net.Socket$SocketInputStream.read(Socket.java:1099)
+	at com.example.DbClient.query(DbClient.java:42)
+
+"db-client-3" #12 prio=5 os_prio=0 tid=0x00007f1234567893 nid=0xc runnable
+   java.lang.Thread.State: RUNNABLE
+	at sun.nio.ch.SocketDispatcher.read0(Native Method)
+	at sun.nio.ch.SocketDispatcher.read(SocketDispatcher.java:47)
+	at java.net.Socket$SocketInputStream.read(Socket.java:1099)
+	at com.example.DbClient.query(DbClient.java:42)
+
+"db-client-4" #13 prio=5 os_prio=0 tid=0x00007f1234567894 nid=0xd runnable
+   java.lang.Thread.State: RUNNABLE
+	at sun.nio.ch.SocketDispatcher.read0(Native Method)
+	at sun.nio.ch.SocketDispatcher.read(SocketDispatcher.java:47)
+	at java.net.Socket$SocketInputStream.read(Socket.java:1099)
+	at com.example.DbClient.query(DbClient.java:42)
+'''
+
+
+@pytest.fixture
 def cpu_storm_thread_dump():
     """Thread dump with CPU storm - many RUNNABLE threads clustering at the same hot location."""
     return '''2024-01-15 10:30:45

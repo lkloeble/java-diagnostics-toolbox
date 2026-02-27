@@ -1,0 +1,1195 @@
+2026-02-27 11:51:00
+Full thread dump OpenJDK 64-Bit Server VM (21+35-LTS mixed mode):
+
+Threads class SMR info:
+_java_thread_list=0x0000600003bb1160, length=69, elements={
+0x000000012c01ea00, 0x000000012c13ea00, 0x000000012c13f200, 0x000000012c13fa00,
+0x000000012c140200, 0x000000012c17ae00, 0x000000012c17b600, 0x000000012c17be00,
+0x000000010304be00, 0x0000000103008600, 0x000000010304d400, 0x000000010304dc00,
+0x0000000103059400, 0x0000000103059c00, 0x00000001030c8800, 0x00000001030c9000,
+0x000000012c80a400, 0x000000012c808800, 0x000000011e80ac00, 0x000000012c0b5400,
+0x000000012c809000, 0x000000012c80f600, 0x000000012c80fe00, 0x000000012c810600,
+0x000000012c810e00, 0x000000012c811600, 0x000000012c811e00, 0x000000012c812600,
+0x000000012c812e00, 0x000000012c813600, 0x000000012c900800, 0x000000012c901000,
+0x000000012c0b5c00, 0x000000012c171200, 0x000000012c171a00, 0x000000012c172200,
+0x000000012c266800, 0x000000012c267000, 0x000000012c267800, 0x000000012c268000,
+0x000000011e80bc00, 0x000000012c268800, 0x000000012a00a400, 0x000000012c901800,
+0x000000012a00ac00, 0x000000011f00aa00, 0x000000012c269000, 0x000000012c269800,
+0x000000012c26a000, 0x000000012c26a800, 0x000000012c26b000, 0x000000012c26b800,
+0x000000012c26c000, 0x000000012c26c800, 0x000000012c26d000, 0x000000012c26d800,
+0x000000012c26e000, 0x000000012c26e800, 0x000000012c26f000, 0x000000012c26f800,
+0x000000012c270000, 0x000000012c264600, 0x000000012c264e00, 0x000000012c265600,
+0x000000012c265e00, 0x000000012c272a00, 0x000000012c273200, 0x000000012c273a00,
+0x000000012c896600
+}
+
+"io-stalls-main" #1 [10243] prio=5 os_prio=31 cpu=58.37ms elapsed=31.54s tid=0x000000012c01ea00 nid=10243 waiting on condition  [0x000000016da02000]
+   java.lang.Thread.State: TIMED_WAITING (sleeping)
+	at java.lang.Thread.sleep0(java.base@21/Native Method)
+	at java.lang.Thread.sleep(java.base@21/Thread.java:558)
+	at java.util.concurrent.TimeUnit.sleep(java.base@21/TimeUnit.java:446)
+	at gc.harness.IoStallsSuspect.main(IoStallsSuspect.java:58)
+
+   Locked ownable synchronizers:
+	- None
+
+"Reference Handler" #9 [32003] daemon prio=10 os_prio=31 cpu=0.26ms elapsed=31.52s tid=0x000000012c13ea00 nid=32003 waiting on condition  [0x000000016eb7a000]
+   java.lang.Thread.State: RUNNABLE
+	at java.lang.ref.Reference.waitForReferencePendingList(java.base@21/Native Method)
+	at java.lang.ref.Reference.processPendingReferences(java.base@21/Reference.java:246)
+	at java.lang.ref.Reference$ReferenceHandler.run(java.base@21/Reference.java:208)
+
+   Locked ownable synchronizers:
+	- None
+
+"Finalizer" #10 [31491] daemon prio=8 os_prio=31 cpu=0.09ms elapsed=31.52s tid=0x000000012c13f200 nid=31491 in Object.wait()  [0x000000016ed86000]
+   java.lang.Thread.State: WAITING (on object monitor)
+	at java.lang.Object.wait0(java.base@21/Native Method)
+	- waiting on <0x000000043c810078> (a java.lang.ref.NativeReferenceQueue$Lock)
+	at java.lang.Object.wait(java.base@21/Object.java:366)
+	at java.lang.Object.wait(java.base@21/Object.java:339)
+	at java.lang.ref.NativeReferenceQueue.await(java.base@21/NativeReferenceQueue.java:48)
+	at java.lang.ref.ReferenceQueue.remove0(java.base@21/ReferenceQueue.java:158)
+	at java.lang.ref.NativeReferenceQueue.remove(java.base@21/NativeReferenceQueue.java:89)
+	- locked <0x000000043c810078> (a java.lang.ref.NativeReferenceQueue$Lock)
+	at java.lang.ref.Finalizer$FinalizerThread.run(java.base@21/Finalizer.java:173)
+
+   Locked ownable synchronizers:
+	- None
+
+"Signal Dispatcher" #11 [31235] daemon prio=9 os_prio=31 cpu=0.11ms elapsed=31.52s tid=0x000000012c13fa00 nid=31235 waiting on condition  [0x0000000000000000]
+   java.lang.Thread.State: RUNNABLE
+
+   Locked ownable synchronizers:
+	- None
+
+"Service Thread" #12 [30723] daemon prio=9 os_prio=31 cpu=0.01ms elapsed=31.52s tid=0x000000012c140200 nid=30723 runnable  [0x0000000000000000]
+   java.lang.Thread.State: RUNNABLE
+
+   Locked ownable synchronizers:
+	- None
+
+"Monitor Deflation Thread" #13 [30211] daemon prio=9 os_prio=31 cpu=2.40ms elapsed=31.52s tid=0x000000012c17ae00 nid=30211 runnable  [0x0000000000000000]
+   java.lang.Thread.State: RUNNABLE
+
+   Locked ownable synchronizers:
+	- None
+
+"C2 CompilerThread0" #14 [23555] daemon prio=9 os_prio=31 cpu=10.91ms elapsed=31.52s tid=0x000000012c17b600 nid=23555 waiting on condition  [0x0000000000000000]
+   java.lang.Thread.State: RUNNABLE
+   No compile task
+
+   Locked ownable synchronizers:
+	- None
+
+"C1 CompilerThread0" #17 [24067] daemon prio=9 os_prio=31 cpu=37.84ms elapsed=31.52s tid=0x000000012c17be00 nid=24067 waiting on condition  [0x0000000000000000]
+   java.lang.Thread.State: RUNNABLE
+   No compile task
+
+   Locked ownable synchronizers:
+	- None
+
+"Notification Thread" #18 [24323] daemon prio=9 os_prio=31 cpu=0.02ms elapsed=31.51s tid=0x000000010304be00 nid=24323 runnable  [0x0000000000000000]
+   java.lang.Thread.State: RUNNABLE
+
+   Locked ownable synchronizers:
+	- None
+
+"Common-Cleaner" #19 [24835] daemon prio=8 os_prio=31 cpu=0.31ms elapsed=31.51s tid=0x0000000103008600 nid=24835 waiting on condition  [0x000000016fbda000]
+   java.lang.Thread.State: TIMED_WAITING (parking)
+	at jdk.internal.misc.Unsafe.park(java.base@21/Native Method)
+	- parking to wait for  <0x000000043c8201d0> (a java.util.concurrent.locks.AbstractQueuedSynchronizer$ConditionObject)
+	at java.util.concurrent.locks.LockSupport.parkNanos(java.base@21/LockSupport.java:269)
+	at java.util.concurrent.locks.AbstractQueuedSynchronizer$ConditionObject.await(java.base@21/AbstractQueuedSynchronizer.java:1847)
+	at java.lang.ref.ReferenceQueue.await(java.base@21/ReferenceQueue.java:71)
+	at java.lang.ref.ReferenceQueue.remove0(java.base@21/ReferenceQueue.java:143)
+	at java.lang.ref.ReferenceQueue.remove(java.base@21/ReferenceQueue.java:218)
+	at jdk.internal.ref.CleanerImpl.run(java.base@21/CleanerImpl.java:140)
+	at java.lang.Thread.runWith(java.base@21/Thread.java:1596)
+	at java.lang.Thread.run(java.base@21/Thread.java:1583)
+	at jdk.internal.misc.InnocuousThread.run(java.base@21/InnocuousThread.java:186)
+
+   Locked ownable synchronizers:
+	- None
+
+"io-blackhole-acceptor" #20 [29699] daemon prio=5 os_prio=31 cpu=7.62ms elapsed=31.49s tid=0x000000010304d400 nid=29699 runnable  [0x000000016fde6000]
+   java.lang.Thread.State: RUNNABLE
+	at sun.nio.ch.Net.accept(java.base@21/Native Method)
+	at sun.nio.ch.NioSocketImpl.accept(java.base@21/NioSocketImpl.java:748)
+	at java.net.ServerSocket.implAccept(java.base@21/ServerSocket.java:698)
+	at java.net.ServerSocket.platformImplAccept(java.base@21/ServerSocket.java:663)
+	at java.net.ServerSocket.implAccept(java.base@21/ServerSocket.java:639)
+	at java.net.ServerSocket.implAccept(java.base@21/ServerSocket.java:585)
+	at java.net.ServerSocket.accept(java.base@21/ServerSocket.java:543)
+	at gc.harness.IoStallsSuspect.lambda$startBlackholeServer$1(IoStallsSuspect.java:67)
+	at gc.harness.IoStallsSuspect$$Lambda/0x0000000800000a00.run(Unknown Source)
+	at java.lang.Thread.runWith(java.base@21/Thread.java:1596)
+	at java.lang.Thread.run(java.base@21/Thread.java:1583)
+
+   Locked ownable synchronizers:
+	- <0x000000043c823be0> (a java.util.concurrent.locks.ReentrantLock$NonfairSync)
+
+"io-stalls-heartbeat" #21 [25347] daemon prio=5 os_prio=31 cpu=23.06ms elapsed=31.38s tid=0x000000010304dc00 nid=25347 waiting on condition  [0x000000016fff2000]
+   java.lang.Thread.State: TIMED_WAITING (sleeping)
+	at java.lang.Thread.sleep0(java.base@21/Native Method)
+	at java.lang.Thread.sleep(java.base@21/Thread.java:558)
+	at java.util.concurrent.TimeUnit.sleep(java.base@21/TimeUnit.java:446)
+	at gc.harness.IoStallsSuspect.sleepMs(IoStallsSuspect.java:157)
+	at gc.harness.IoStallsSuspect.lambda$startHeartbeat$2(IoStallsSuspect.java:147)
+	at gc.harness.IoStallsSuspect$$Lambda/0x0000000800000c18.run(Unknown Source)
+	at java.lang.Thread.runWith(java.base@21/Thread.java:1596)
+	at java.lang.Thread.run(java.base@21/Thread.java:1583)
+
+   Locked ownable synchronizers:
+	- None
+
+"io-stall-client-0" #22 [28931] prio=5 os_prio=31 cpu=1.27ms elapsed=31.38s tid=0x0000000103059400 nid=28931 runnable  [0x00000001701fe000]
+   java.lang.Thread.State: RUNNABLE
+	at sun.nio.ch.SocketDispatcher.read0(java.base@21/Native Method)
+	at sun.nio.ch.SocketDispatcher.read(java.base@21/SocketDispatcher.java:47)
+	at sun.nio.ch.NioSocketImpl.tryRead(java.base@21/NioSocketImpl.java:256)
+	at sun.nio.ch.NioSocketImpl.implRead(java.base@21/NioSocketImpl.java:307)
+	at sun.nio.ch.NioSocketImpl.read(java.base@21/NioSocketImpl.java:346)
+	at sun.nio.ch.NioSocketImpl$1.read(java.base@21/NioSocketImpl.java:796)
+	at java.net.Socket$SocketInputStream.read(java.base@21/Socket.java:1099)
+	at java.io.InputStream.read(java.base@21/InputStream.java:220)
+	at gc.harness.IoStallsSuspect$Client.run(IoStallsSuspect.java:131)
+	at java.lang.Thread.runWith(java.base@21/Thread.java:1596)
+	at java.lang.Thread.run(java.base@21/Thread.java:1583)
+
+   Locked ownable synchronizers:
+	- <0x000000043c83f1b8> (a java.util.concurrent.locks.ReentrantLock$NonfairSync)
+
+"io-stall-client-1" #23 [28419] prio=5 os_prio=31 cpu=1.55ms elapsed=31.38s tid=0x0000000103059c00 nid=28419 runnable  [0x000000017040a000]
+   java.lang.Thread.State: RUNNABLE
+	at sun.nio.ch.SocketDispatcher.read0(java.base@21/Native Method)
+	at sun.nio.ch.SocketDispatcher.read(java.base@21/SocketDispatcher.java:47)
+	at sun.nio.ch.NioSocketImpl.tryRead(java.base@21/NioSocketImpl.java:256)
+	at sun.nio.ch.NioSocketImpl.implRead(java.base@21/NioSocketImpl.java:307)
+	at sun.nio.ch.NioSocketImpl.read(java.base@21/NioSocketImpl.java:346)
+	at sun.nio.ch.NioSocketImpl$1.read(java.base@21/NioSocketImpl.java:796)
+	at java.net.Socket$SocketInputStream.read(java.base@21/Socket.java:1099)
+	at java.io.InputStream.read(java.base@21/InputStream.java:220)
+	at gc.harness.IoStallsSuspect$Client.run(IoStallsSuspect.java:131)
+	at java.lang.Thread.runWith(java.base@21/Thread.java:1596)
+	at java.lang.Thread.run(java.base@21/Thread.java:1583)
+
+   Locked ownable synchronizers:
+	- <0x000000043c80ff48> (a java.util.concurrent.locks.ReentrantLock$NonfairSync)
+
+"io-stall-client-2" #24 [25603] prio=5 os_prio=31 cpu=0.73ms elapsed=31.38s tid=0x00000001030c8800 nid=25603 runnable  [0x0000000170616000]
+   java.lang.Thread.State: RUNNABLE
+	at sun.nio.ch.SocketDispatcher.read0(java.base@21/Native Method)
+	at sun.nio.ch.SocketDispatcher.read(java.base@21/SocketDispatcher.java:47)
+	at sun.nio.ch.NioSocketImpl.tryRead(java.base@21/NioSocketImpl.java:256)
+	at sun.nio.ch.NioSocketImpl.implRead(java.base@21/NioSocketImpl.java:307)
+	at sun.nio.ch.NioSocketImpl.read(java.base@21/NioSocketImpl.java:346)
+	at sun.nio.ch.NioSocketImpl$1.read(java.base@21/NioSocketImpl.java:796)
+	at java.net.Socket$SocketInputStream.read(java.base@21/Socket.java:1099)
+	at java.io.InputStream.read(java.base@21/InputStream.java:220)
+	at gc.harness.IoStallsSuspect$Client.run(IoStallsSuspect.java:131)
+	at java.lang.Thread.runWith(java.base@21/Thread.java:1596)
+	at java.lang.Thread.run(java.base@21/Thread.java:1583)
+
+   Locked ownable synchronizers:
+	- <0x000000043c80fb40> (a java.util.concurrent.locks.ReentrantLock$NonfairSync)
+
+"io-stall-client-3" #25 [27651] prio=5 os_prio=31 cpu=1.78ms elapsed=31.38s tid=0x00000001030c9000 nid=27651 runnable  [0x0000000170822000]
+   java.lang.Thread.State: RUNNABLE
+	at sun.nio.ch.SocketDispatcher.read0(java.base@21/Native Method)
+	at sun.nio.ch.SocketDispatcher.read(java.base@21/SocketDispatcher.java:47)
+	at sun.nio.ch.NioSocketImpl.tryRead(java.base@21/NioSocketImpl.java:256)
+	at sun.nio.ch.NioSocketImpl.implRead(java.base@21/NioSocketImpl.java:307)
+	at sun.nio.ch.NioSocketImpl.read(java.base@21/NioSocketImpl.java:346)
+	at sun.nio.ch.NioSocketImpl$1.read(java.base@21/NioSocketImpl.java:796)
+	at java.net.Socket$SocketInputStream.read(java.base@21/Socket.java:1099)
+	at java.io.InputStream.read(java.base@21/InputStream.java:220)
+	at gc.harness.IoStallsSuspect$Client.run(IoStallsSuspect.java:131)
+	at java.lang.Thread.runWith(java.base@21/Thread.java:1596)
+	at java.lang.Thread.run(java.base@21/Thread.java:1583)
+
+   Locked ownable synchronizers:
+	- <0x000000043c84f360> (a java.util.concurrent.locks.ReentrantLock$NonfairSync)
+
+"io-stall-client-4" #26 [27139] prio=5 os_prio=31 cpu=1.79ms elapsed=31.38s tid=0x000000012c80a400 nid=27139 runnable  [0x0000000170a2e000]
+   java.lang.Thread.State: RUNNABLE
+	at sun.nio.ch.SocketDispatcher.read0(java.base@21/Native Method)
+	at sun.nio.ch.SocketDispatcher.read(java.base@21/SocketDispatcher.java:47)
+	at sun.nio.ch.NioSocketImpl.tryRead(java.base@21/NioSocketImpl.java:256)
+	at sun.nio.ch.NioSocketImpl.implRead(java.base@21/NioSocketImpl.java:307)
+	at sun.nio.ch.NioSocketImpl.read(java.base@21/NioSocketImpl.java:346)
+	at sun.nio.ch.NioSocketImpl$1.read(java.base@21/NioSocketImpl.java:796)
+	at java.net.Socket$SocketInputStream.read(java.base@21/Socket.java:1099)
+	at java.io.InputStream.read(java.base@21/InputStream.java:220)
+	at gc.harness.IoStallsSuspect$Client.run(IoStallsSuspect.java:131)
+	at java.lang.Thread.runWith(java.base@21/Thread.java:1596)
+	at java.lang.Thread.run(java.base@21/Thread.java:1583)
+
+   Locked ownable synchronizers:
+	- <0x000000043c857508> (a java.util.concurrent.locks.ReentrantLock$NonfairSync)
+
+"io-stall-client-5" #27 [26627] prio=5 os_prio=31 cpu=1.95ms elapsed=31.38s tid=0x000000012c808800 nid=26627 runnable  [0x0000000170c3a000]
+   java.lang.Thread.State: RUNNABLE
+	at sun.nio.ch.SocketDispatcher.read0(java.base@21/Native Method)
+	at sun.nio.ch.SocketDispatcher.read(java.base@21/SocketDispatcher.java:47)
+	at sun.nio.ch.NioSocketImpl.tryRead(java.base@21/NioSocketImpl.java:256)
+	at sun.nio.ch.NioSocketImpl.implRead(java.base@21/NioSocketImpl.java:307)
+	at sun.nio.ch.NioSocketImpl.read(java.base@21/NioSocketImpl.java:346)
+	at sun.nio.ch.NioSocketImpl$1.read(java.base@21/NioSocketImpl.java:796)
+	at java.net.Socket$SocketInputStream.read(java.base@21/Socket.java:1099)
+	at java.io.InputStream.read(java.base@21/InputStream.java:220)
+	at gc.harness.IoStallsSuspect$Client.run(IoStallsSuspect.java:131)
+	at java.lang.Thread.runWith(java.base@21/Thread.java:1596)
+	at java.lang.Thread.run(java.base@21/Thread.java:1583)
+
+   Locked ownable synchronizers:
+	- <0x000000043c80f438> (a java.util.concurrent.locks.ReentrantLock$NonfairSync)
+
+"io-stall-client-6" #28 [26371] prio=5 os_prio=31 cpu=1.14ms elapsed=31.38s tid=0x000000011e80ac00 nid=26371 runnable  [0x0000000170e46000]
+   java.lang.Thread.State: RUNNABLE
+	at sun.nio.ch.SocketDispatcher.read0(java.base@21/Native Method)
+	at sun.nio.ch.SocketDispatcher.read(java.base@21/SocketDispatcher.java:47)
+	at sun.nio.ch.NioSocketImpl.tryRead(java.base@21/NioSocketImpl.java:256)
+	at sun.nio.ch.NioSocketImpl.implRead(java.base@21/NioSocketImpl.java:307)
+	at sun.nio.ch.NioSocketImpl.read(java.base@21/NioSocketImpl.java:346)
+	at sun.nio.ch.NioSocketImpl$1.read(java.base@21/NioSocketImpl.java:796)
+	at java.net.Socket$SocketInputStream.read(java.base@21/Socket.java:1099)
+	at java.io.InputStream.read(java.base@21/InputStream.java:220)
+	at gc.harness.IoStallsSuspect$Client.run(IoStallsSuspect.java:131)
+	at java.lang.Thread.runWith(java.base@21/Thread.java:1596)
+	at java.lang.Thread.run(java.base@21/Thread.java:1583)
+
+   Locked ownable synchronizers:
+	- <0x000000043c80f928> (a java.util.concurrent.locks.ReentrantLock$NonfairSync)
+
+"io-stall-client-7" #29 [32771] prio=5 os_prio=31 cpu=0.46ms elapsed=31.38s tid=0x000000012c0b5400 nid=32771 runnable  [0x0000000171052000]
+   java.lang.Thread.State: RUNNABLE
+	at sun.nio.ch.SocketDispatcher.read0(java.base@21/Native Method)
+	at sun.nio.ch.SocketDispatcher.read(java.base@21/SocketDispatcher.java:47)
+	at sun.nio.ch.NioSocketImpl.tryRead(java.base@21/NioSocketImpl.java:256)
+	at sun.nio.ch.NioSocketImpl.implRead(java.base@21/NioSocketImpl.java:307)
+	at sun.nio.ch.NioSocketImpl.read(java.base@21/NioSocketImpl.java:346)
+	at sun.nio.ch.NioSocketImpl$1.read(java.base@21/NioSocketImpl.java:796)
+	at java.net.Socket$SocketInputStream.read(java.base@21/Socket.java:1099)
+	at java.io.InputStream.read(java.base@21/InputStream.java:220)
+	at gc.harness.IoStallsSuspect$Client.run(IoStallsSuspect.java:131)
+	at java.lang.Thread.runWith(java.base@21/Thread.java:1596)
+	at java.lang.Thread.run(java.base@21/Thread.java:1583)
+
+   Locked ownable synchronizers:
+	- <0x000000043c806e28> (a java.util.concurrent.locks.ReentrantLock$NonfairSync)
+
+"io-stall-client-8" #30 [43011] prio=5 os_prio=31 cpu=1.22ms elapsed=31.38s tid=0x000000012c809000 nid=43011 runnable  [0x000000017125e000]
+   java.lang.Thread.State: RUNNABLE
+	at sun.nio.ch.SocketDispatcher.read0(java.base@21/Native Method)
+	at sun.nio.ch.SocketDispatcher.read(java.base@21/SocketDispatcher.java:47)
+	at sun.nio.ch.NioSocketImpl.tryRead(java.base@21/NioSocketImpl.java:256)
+	at sun.nio.ch.NioSocketImpl.implRead(java.base@21/NioSocketImpl.java:307)
+	at sun.nio.ch.NioSocketImpl.read(java.base@21/NioSocketImpl.java:346)
+	at sun.nio.ch.NioSocketImpl$1.read(java.base@21/NioSocketImpl.java:796)
+	at java.net.Socket$SocketInputStream.read(java.base@21/Socket.java:1099)
+	at java.io.InputStream.read(java.base@21/InputStream.java:220)
+	at gc.harness.IoStallsSuspect$Client.run(IoStallsSuspect.java:131)
+	at java.lang.Thread.runWith(java.base@21/Thread.java:1596)
+	at java.lang.Thread.run(java.base@21/Thread.java:1583)
+
+   Locked ownable synchronizers:
+	- <0x000000043c823bc0> (a java.util.concurrent.locks.ReentrantLock$NonfairSync)
+
+"io-stall-client-9" #31 [33027] prio=5 os_prio=31 cpu=1.00ms elapsed=31.38s tid=0x000000012c80f600 nid=33027 runnable  [0x000000017146a000]
+   java.lang.Thread.State: RUNNABLE
+	at sun.nio.ch.SocketDispatcher.read0(java.base@21/Native Method)
+	at sun.nio.ch.SocketDispatcher.read(java.base@21/SocketDispatcher.java:47)
+	at sun.nio.ch.NioSocketImpl.tryRead(java.base@21/NioSocketImpl.java:256)
+	at sun.nio.ch.NioSocketImpl.implRead(java.base@21/NioSocketImpl.java:307)
+	at sun.nio.ch.NioSocketImpl.read(java.base@21/NioSocketImpl.java:346)
+	at sun.nio.ch.NioSocketImpl$1.read(java.base@21/NioSocketImpl.java:796)
+	at java.net.Socket$SocketInputStream.read(java.base@21/Socket.java:1099)
+	at java.io.InputStream.read(java.base@21/InputStream.java:220)
+	at gc.harness.IoStallsSuspect$Client.run(IoStallsSuspect.java:131)
+	at java.lang.Thread.runWith(java.base@21/Thread.java:1596)
+	at java.lang.Thread.run(java.base@21/Thread.java:1583)
+
+   Locked ownable synchronizers:
+	- <0x000000043c83de88> (a java.util.concurrent.locks.ReentrantLock$NonfairSync)
+
+"io-stall-client-10" #32 [42243] prio=5 os_prio=31 cpu=0.48ms elapsed=31.38s tid=0x000000012c80fe00 nid=42243 runnable  [0x0000000171676000]
+   java.lang.Thread.State: RUNNABLE
+	at sun.nio.ch.SocketDispatcher.read0(java.base@21/Native Method)
+	at sun.nio.ch.SocketDispatcher.read(java.base@21/SocketDispatcher.java:47)
+	at sun.nio.ch.NioSocketImpl.tryRead(java.base@21/NioSocketImpl.java:256)
+	at sun.nio.ch.NioSocketImpl.implRead(java.base@21/NioSocketImpl.java:307)
+	at sun.nio.ch.NioSocketImpl.read(java.base@21/NioSocketImpl.java:346)
+	at sun.nio.ch.NioSocketImpl$1.read(java.base@21/NioSocketImpl.java:796)
+	at java.net.Socket$SocketInputStream.read(java.base@21/Socket.java:1099)
+	at java.io.InputStream.read(java.base@21/InputStream.java:220)
+	at gc.harness.IoStallsSuspect$Client.run(IoStallsSuspect.java:131)
+	at java.lang.Thread.runWith(java.base@21/Thread.java:1596)
+	at java.lang.Thread.run(java.base@21/Thread.java:1583)
+
+   Locked ownable synchronizers:
+	- <0x000000043c87e3c0> (a java.util.concurrent.locks.ReentrantLock$NonfairSync)
+
+"io-stall-client-11" #33 [41731] prio=5 os_prio=31 cpu=0.60ms elapsed=31.38s tid=0x000000012c810600 nid=41731 runnable  [0x0000000171882000]
+   java.lang.Thread.State: RUNNABLE
+	at sun.nio.ch.SocketDispatcher.read0(java.base@21/Native Method)
+	at sun.nio.ch.SocketDispatcher.read(java.base@21/SocketDispatcher.java:47)
+	at sun.nio.ch.NioSocketImpl.tryRead(java.base@21/NioSocketImpl.java:256)
+	at sun.nio.ch.NioSocketImpl.implRead(java.base@21/NioSocketImpl.java:307)
+	at sun.nio.ch.NioSocketImpl.read(java.base@21/NioSocketImpl.java:346)
+	at sun.nio.ch.NioSocketImpl$1.read(java.base@21/NioSocketImpl.java:796)
+	at java.net.Socket$SocketInputStream.read(java.base@21/Socket.java:1099)
+	at java.io.InputStream.read(java.base@21/InputStream.java:220)
+	at gc.harness.IoStallsSuspect$Client.run(IoStallsSuspect.java:131)
+	at java.lang.Thread.runWith(java.base@21/Thread.java:1596)
+	at java.lang.Thread.run(java.base@21/Thread.java:1583)
+
+   Locked ownable synchronizers:
+	- <0x000000043c84fab0> (a java.util.concurrent.locks.ReentrantLock$NonfairSync)
+
+"io-stall-client-12" #34 [41219] prio=5 os_prio=31 cpu=0.36ms elapsed=31.38s tid=0x000000012c810e00 nid=41219 runnable  [0x0000000171a8e000]
+   java.lang.Thread.State: RUNNABLE
+	at sun.nio.ch.SocketDispatcher.read0(java.base@21/Native Method)
+	at sun.nio.ch.SocketDispatcher.read(java.base@21/SocketDispatcher.java:47)
+	at sun.nio.ch.NioSocketImpl.tryRead(java.base@21/NioSocketImpl.java:256)
+	at sun.nio.ch.NioSocketImpl.implRead(java.base@21/NioSocketImpl.java:307)
+	at sun.nio.ch.NioSocketImpl.read(java.base@21/NioSocketImpl.java:346)
+	at sun.nio.ch.NioSocketImpl$1.read(java.base@21/NioSocketImpl.java:796)
+	at java.net.Socket$SocketInputStream.read(java.base@21/Socket.java:1099)
+	at java.io.InputStream.read(java.base@21/InputStream.java:220)
+	at gc.harness.IoStallsSuspect$Client.run(IoStallsSuspect.java:131)
+	at java.lang.Thread.runWith(java.base@21/Thread.java:1596)
+	at java.lang.Thread.run(java.base@21/Thread.java:1583)
+
+   Locked ownable synchronizers:
+	- <0x000000043c80e108> (a java.util.concurrent.locks.ReentrantLock$NonfairSync)
+
+"io-stall-client-13" #35 [40707] prio=5 os_prio=31 cpu=0.51ms elapsed=31.38s tid=0x000000012c811600 nid=40707 runnable  [0x0000000171c9a000]
+   java.lang.Thread.State: RUNNABLE
+	at sun.nio.ch.SocketDispatcher.read0(java.base@21/Native Method)
+	at sun.nio.ch.SocketDispatcher.read(java.base@21/SocketDispatcher.java:47)
+	at sun.nio.ch.NioSocketImpl.tryRead(java.base@21/NioSocketImpl.java:256)
+	at sun.nio.ch.NioSocketImpl.implRead(java.base@21/NioSocketImpl.java:307)
+	at sun.nio.ch.NioSocketImpl.read(java.base@21/NioSocketImpl.java:346)
+	at sun.nio.ch.NioSocketImpl$1.read(java.base@21/NioSocketImpl.java:796)
+	at java.net.Socket$SocketInputStream.read(java.base@21/Socket.java:1099)
+	at java.io.InputStream.read(java.base@21/InputStream.java:220)
+	at gc.harness.IoStallsSuspect$Client.run(IoStallsSuspect.java:131)
+	at java.lang.Thread.runWith(java.base@21/Thread.java:1596)
+	at java.lang.Thread.run(java.base@21/Thread.java:1583)
+
+   Locked ownable synchronizers:
+	- <0x000000043c84f040> (a java.util.concurrent.locks.ReentrantLock$NonfairSync)
+
+"io-stall-client-14" #36 [33283] prio=5 os_prio=31 cpu=1.58ms elapsed=31.38s tid=0x000000012c811e00 nid=33283 runnable  [0x0000000171ea6000]
+   java.lang.Thread.State: RUNNABLE
+	at sun.nio.ch.SocketDispatcher.read0(java.base@21/Native Method)
+	at sun.nio.ch.SocketDispatcher.read(java.base@21/SocketDispatcher.java:47)
+	at sun.nio.ch.NioSocketImpl.tryRead(java.base@21/NioSocketImpl.java:256)
+	at sun.nio.ch.NioSocketImpl.implRead(java.base@21/NioSocketImpl.java:307)
+	at sun.nio.ch.NioSocketImpl.read(java.base@21/NioSocketImpl.java:346)
+	at sun.nio.ch.NioSocketImpl$1.read(java.base@21/NioSocketImpl.java:796)
+	at java.net.Socket$SocketInputStream.read(java.base@21/Socket.java:1099)
+	at java.io.InputStream.read(java.base@21/InputStream.java:220)
+	at gc.harness.IoStallsSuspect$Client.run(IoStallsSuspect.java:131)
+	at java.lang.Thread.runWith(java.base@21/Thread.java:1596)
+	at java.lang.Thread.run(java.base@21/Thread.java:1583)
+
+   Locked ownable synchronizers:
+	- <0x000000043c805af8> (a java.util.concurrent.locks.ReentrantLock$NonfairSync)
+
+"io-stall-client-15" #37 [40195] prio=5 os_prio=31 cpu=0.93ms elapsed=31.38s tid=0x000000012c812600 nid=40195 runnable  [0x00000001720b2000]
+   java.lang.Thread.State: RUNNABLE
+	at sun.nio.ch.SocketDispatcher.read0(java.base@21/Native Method)
+	at sun.nio.ch.SocketDispatcher.read(java.base@21/SocketDispatcher.java:47)
+	at sun.nio.ch.NioSocketImpl.tryRead(java.base@21/NioSocketImpl.java:256)
+	at sun.nio.ch.NioSocketImpl.implRead(java.base@21/NioSocketImpl.java:307)
+	at sun.nio.ch.NioSocketImpl.read(java.base@21/NioSocketImpl.java:346)
+	at sun.nio.ch.NioSocketImpl$1.read(java.base@21/NioSocketImpl.java:796)
+	at java.net.Socket$SocketInputStream.read(java.base@21/Socket.java:1099)
+	at java.io.InputStream.read(java.base@21/InputStream.java:220)
+	at gc.harness.IoStallsSuspect$Client.run(IoStallsSuspect.java:131)
+	at java.lang.Thread.runWith(java.base@21/Thread.java:1596)
+	at java.lang.Thread.run(java.base@21/Thread.java:1583)
+
+   Locked ownable synchronizers:
+	- <0x000000043c83cb58> (a java.util.concurrent.locks.ReentrantLock$NonfairSync)
+
+"io-stall-client-16" #38 [34051] prio=5 os_prio=31 cpu=1.36ms elapsed=31.38s tid=0x000000012c812e00 nid=34051 runnable  [0x00000001722be000]
+   java.lang.Thread.State: RUNNABLE
+	at sun.nio.ch.SocketDispatcher.read0(java.base@21/Native Method)
+	at sun.nio.ch.SocketDispatcher.read(java.base@21/SocketDispatcher.java:47)
+	at sun.nio.ch.NioSocketImpl.tryRead(java.base@21/NioSocketImpl.java:256)
+	at sun.nio.ch.NioSocketImpl.implRead(java.base@21/NioSocketImpl.java:307)
+	at sun.nio.ch.NioSocketImpl.read(java.base@21/NioSocketImpl.java:346)
+	at sun.nio.ch.NioSocketImpl$1.read(java.base@21/NioSocketImpl.java:796)
+	at java.net.Socket$SocketInputStream.read(java.base@21/Socket.java:1099)
+	at java.io.InputStream.read(java.base@21/InputStream.java:220)
+	at gc.harness.IoStallsSuspect$Client.run(IoStallsSuspect.java:131)
+	at java.lang.Thread.runWith(java.base@21/Thread.java:1596)
+	at java.lang.Thread.run(java.base@21/Thread.java:1583)
+
+   Locked ownable synchronizers:
+	- <0x000000043c87e730> (a java.util.concurrent.locks.ReentrantLock$NonfairSync)
+
+"io-stall-client-17" #39 [34563] prio=5 os_prio=31 cpu=1.62ms elapsed=31.38s tid=0x000000012c813600 nid=34563 runnable  [0x00000001724ca000]
+   java.lang.Thread.State: RUNNABLE
+	at sun.nio.ch.SocketDispatcher.read0(java.base@21/Native Method)
+	at sun.nio.ch.SocketDispatcher.read(java.base@21/SocketDispatcher.java:47)
+	at sun.nio.ch.NioSocketImpl.tryRead(java.base@21/NioSocketImpl.java:256)
+	at sun.nio.ch.NioSocketImpl.implRead(java.base@21/NioSocketImpl.java:307)
+	at sun.nio.ch.NioSocketImpl.read(java.base@21/NioSocketImpl.java:346)
+	at sun.nio.ch.NioSocketImpl$1.read(java.base@21/NioSocketImpl.java:796)
+	at java.net.Socket$SocketInputStream.read(java.base@21/Socket.java:1099)
+	at java.io.InputStream.read(java.base@21/InputStream.java:220)
+	at gc.harness.IoStallsSuspect$Client.run(IoStallsSuspect.java:131)
+	at java.lang.Thread.runWith(java.base@21/Thread.java:1596)
+	at java.lang.Thread.run(java.base@21/Thread.java:1583)
+
+   Locked ownable synchronizers:
+	- <0x000000043c8561d8> (a java.util.concurrent.locks.ReentrantLock$NonfairSync)
+
+"io-stall-client-18" #40 [39939] prio=5 os_prio=31 cpu=1.43ms elapsed=31.38s tid=0x000000012c900800 nid=39939 runnable  [0x00000001726d6000]
+   java.lang.Thread.State: RUNNABLE
+	at sun.nio.ch.SocketDispatcher.read0(java.base@21/Native Method)
+	at sun.nio.ch.SocketDispatcher.read(java.base@21/SocketDispatcher.java:47)
+	at sun.nio.ch.NioSocketImpl.tryRead(java.base@21/NioSocketImpl.java:256)
+	at sun.nio.ch.NioSocketImpl.implRead(java.base@21/NioSocketImpl.java:307)
+	at sun.nio.ch.NioSocketImpl.read(java.base@21/NioSocketImpl.java:346)
+	at sun.nio.ch.NioSocketImpl$1.read(java.base@21/NioSocketImpl.java:796)
+	at java.net.Socket$SocketInputStream.read(java.base@21/Socket.java:1099)
+	at java.io.InputStream.read(java.base@21/InputStream.java:220)
+	at gc.harness.IoStallsSuspect$Client.run(IoStallsSuspect.java:131)
+	at java.lang.Thread.runWith(java.base@21/Thread.java:1596)
+	at java.lang.Thread.run(java.base@21/Thread.java:1583)
+
+   Locked ownable synchronizers:
+	- <0x000000043c857e78> (a java.util.concurrent.locks.ReentrantLock$NonfairSync)
+
+"io-stall-client-19" #41 [35331] prio=5 os_prio=31 cpu=0.98ms elapsed=31.38s tid=0x000000012c901000 nid=35331 runnable  [0x00000001728e2000]
+   java.lang.Thread.State: RUNNABLE
+	at sun.nio.ch.SocketDispatcher.read0(java.base@21/Native Method)
+	at sun.nio.ch.SocketDispatcher.read(java.base@21/SocketDispatcher.java:47)
+	at sun.nio.ch.NioSocketImpl.tryRead(java.base@21/NioSocketImpl.java:256)
+	at sun.nio.ch.NioSocketImpl.implRead(java.base@21/NioSocketImpl.java:307)
+	at sun.nio.ch.NioSocketImpl.read(java.base@21/NioSocketImpl.java:346)
+	at sun.nio.ch.NioSocketImpl$1.read(java.base@21/NioSocketImpl.java:796)
+	at java.net.Socket$SocketInputStream.read(java.base@21/Socket.java:1099)
+	at java.io.InputStream.read(java.base@21/InputStream.java:220)
+	at gc.harness.IoStallsSuspect$Client.run(IoStallsSuspect.java:131)
+	at java.lang.Thread.runWith(java.base@21/Thread.java:1596)
+	at java.lang.Thread.run(java.base@21/Thread.java:1583)
+
+   Locked ownable synchronizers:
+	- <0x000000043c80c988> (a java.util.concurrent.locks.ReentrantLock$NonfairSync)
+
+"io-stall-client-20" #42 [35587] prio=5 os_prio=31 cpu=1.04ms elapsed=31.38s tid=0x000000012c0b5c00 nid=35587 runnable  [0x0000000172aee000]
+   java.lang.Thread.State: RUNNABLE
+	at sun.nio.ch.SocketDispatcher.read0(java.base@21/Native Method)
+	at sun.nio.ch.SocketDispatcher.read(java.base@21/SocketDispatcher.java:47)
+	at sun.nio.ch.NioSocketImpl.tryRead(java.base@21/NioSocketImpl.java:256)
+	at sun.nio.ch.NioSocketImpl.implRead(java.base@21/NioSocketImpl.java:307)
+	at sun.nio.ch.NioSocketImpl.read(java.base@21/NioSocketImpl.java:346)
+	at sun.nio.ch.NioSocketImpl$1.read(java.base@21/NioSocketImpl.java:796)
+	at java.net.Socket$SocketInputStream.read(java.base@21/Socket.java:1099)
+	at java.io.InputStream.read(java.base@21/InputStream.java:220)
+	at gc.harness.IoStallsSuspect$Client.run(IoStallsSuspect.java:131)
+	at java.lang.Thread.runWith(java.base@21/Thread.java:1596)
+	at java.lang.Thread.run(java.base@21/Thread.java:1583)
+
+   Locked ownable synchronizers:
+	- <0x000000043c84dd10> (a java.util.concurrent.locks.ReentrantLock$NonfairSync)
+
+"io-stall-client-21" #43 [36099] prio=5 os_prio=31 cpu=1.25ms elapsed=31.38s tid=0x000000012c171200 nid=36099 runnable  [0x0000000172cfa000]
+   java.lang.Thread.State: RUNNABLE
+	at sun.nio.ch.SocketDispatcher.read0(java.base@21/Native Method)
+	at sun.nio.ch.SocketDispatcher.read(java.base@21/SocketDispatcher.java:47)
+	at sun.nio.ch.NioSocketImpl.tryRead(java.base@21/NioSocketImpl.java:256)
+	at sun.nio.ch.NioSocketImpl.implRead(java.base@21/NioSocketImpl.java:307)
+	at sun.nio.ch.NioSocketImpl.read(java.base@21/NioSocketImpl.java:346)
+	at sun.nio.ch.NioSocketImpl$1.read(java.base@21/NioSocketImpl.java:796)
+	at java.net.Socket$SocketInputStream.read(java.base@21/Socket.java:1099)
+	at java.io.InputStream.read(java.base@21/InputStream.java:220)
+	at gc.harness.IoStallsSuspect$Client.run(IoStallsSuspect.java:131)
+	at java.lang.Thread.runWith(java.base@21/Thread.java:1596)
+	at java.lang.Thread.run(java.base@21/Thread.java:1583)
+
+   Locked ownable synchronizers:
+	- <0x000000043c8018a8> (a java.util.concurrent.locks.ReentrantLock$NonfairSync)
+
+"io-stall-client-22" #44 [36355] prio=5 os_prio=31 cpu=1.81ms elapsed=31.38s tid=0x000000012c171a00 nid=36355 runnable  [0x0000000172f06000]
+   java.lang.Thread.State: RUNNABLE
+	at sun.nio.ch.SocketDispatcher.read0(java.base@21/Native Method)
+	at sun.nio.ch.SocketDispatcher.read(java.base@21/SocketDispatcher.java:47)
+	at sun.nio.ch.NioSocketImpl.tryRead(java.base@21/NioSocketImpl.java:256)
+	at sun.nio.ch.NioSocketImpl.implRead(java.base@21/NioSocketImpl.java:307)
+	at sun.nio.ch.NioSocketImpl.read(java.base@21/NioSocketImpl.java:346)
+	at sun.nio.ch.NioSocketImpl$1.read(java.base@21/NioSocketImpl.java:796)
+	at java.net.Socket$SocketInputStream.read(java.base@21/Socket.java:1099)
+	at java.io.InputStream.read(java.base@21/InputStream.java:220)
+	at gc.harness.IoStallsSuspect$Client.run(IoStallsSuspect.java:131)
+	at java.lang.Thread.runWith(java.base@21/Thread.java:1596)
+	at java.lang.Thread.run(java.base@21/Thread.java:1583)
+
+   Locked ownable synchronizers:
+	- <0x000000043c83b828> (a java.util.concurrent.locks.ReentrantLock$NonfairSync)
+
+"io-stall-client-23" #45 [39171] prio=5 os_prio=31 cpu=1.26ms elapsed=31.38s tid=0x000000012c172200 nid=39171 runnable  [0x0000000173112000]
+   java.lang.Thread.State: RUNNABLE
+	at sun.nio.ch.SocketDispatcher.read0(java.base@21/Native Method)
+	at sun.nio.ch.SocketDispatcher.read(java.base@21/SocketDispatcher.java:47)
+	at sun.nio.ch.NioSocketImpl.tryRead(java.base@21/NioSocketImpl.java:256)
+	at sun.nio.ch.NioSocketImpl.implRead(java.base@21/NioSocketImpl.java:307)
+	at sun.nio.ch.NioSocketImpl.read(java.base@21/NioSocketImpl.java:346)
+	at sun.nio.ch.NioSocketImpl$1.read(java.base@21/NioSocketImpl.java:796)
+	at java.net.Socket$SocketInputStream.read(java.base@21/Socket.java:1099)
+	at java.io.InputStream.read(java.base@21/InputStream.java:220)
+	at gc.harness.IoStallsSuspect$Client.run(IoStallsSuspect.java:131)
+	at java.lang.Thread.runWith(java.base@21/Thread.java:1596)
+	at java.lang.Thread.run(java.base@21/Thread.java:1583)
+
+   Locked ownable synchronizers:
+	- <0x000000043c846620> (a java.util.concurrent.locks.ReentrantLock$NonfairSync)
+
+"io-stall-client-24" #46 [38659] prio=5 os_prio=31 cpu=0.62ms elapsed=31.38s tid=0x000000012c266800 nid=38659 runnable  [0x000000017331e000]
+   java.lang.Thread.State: RUNNABLE
+	at sun.nio.ch.SocketDispatcher.read0(java.base@21/Native Method)
+	at sun.nio.ch.SocketDispatcher.read(java.base@21/SocketDispatcher.java:47)
+	at sun.nio.ch.NioSocketImpl.tryRead(java.base@21/NioSocketImpl.java:256)
+	at sun.nio.ch.NioSocketImpl.implRead(java.base@21/NioSocketImpl.java:307)
+	at sun.nio.ch.NioSocketImpl.read(java.base@21/NioSocketImpl.java:346)
+	at sun.nio.ch.NioSocketImpl$1.read(java.base@21/NioSocketImpl.java:796)
+	at java.net.Socket$SocketInputStream.read(java.base@21/Socket.java:1099)
+	at java.io.InputStream.read(java.base@21/InputStream.java:220)
+	at gc.harness.IoStallsSuspect$Client.run(IoStallsSuspect.java:131)
+	at java.lang.Thread.runWith(java.base@21/Thread.java:1596)
+	at java.lang.Thread.run(java.base@21/Thread.java:1583)
+
+   Locked ownable synchronizers:
+	- <0x000000043c8b18c0> (a java.util.concurrent.locks.ReentrantLock$NonfairSync)
+
+"io-stall-client-25" #47 [36867] prio=5 os_prio=31 cpu=1.09ms elapsed=31.38s tid=0x000000012c267000 nid=36867 runnable  [0x000000017352a000]
+   java.lang.Thread.State: RUNNABLE
+	at sun.nio.ch.SocketDispatcher.read0(java.base@21/Native Method)
+	at sun.nio.ch.SocketDispatcher.read(java.base@21/SocketDispatcher.java:47)
+	at sun.nio.ch.NioSocketImpl.tryRead(java.base@21/NioSocketImpl.java:256)
+	at sun.nio.ch.NioSocketImpl.implRead(java.base@21/NioSocketImpl.java:307)
+	at sun.nio.ch.NioSocketImpl.read(java.base@21/NioSocketImpl.java:346)
+	at sun.nio.ch.NioSocketImpl$1.read(java.base@21/NioSocketImpl.java:796)
+	at java.net.Socket$SocketInputStream.read(java.base@21/Socket.java:1099)
+	at java.io.InputStream.read(java.base@21/InputStream.java:220)
+	at gc.harness.IoStallsSuspect$Client.run(IoStallsSuspect.java:131)
+	at java.lang.Thread.runWith(java.base@21/Thread.java:1596)
+	at java.lang.Thread.run(java.base@21/Thread.java:1583)
+
+   Locked ownable synchronizers:
+	- <0x000000043c854ea8> (a java.util.concurrent.locks.ReentrantLock$NonfairSync)
+
+"io-stall-client-26" #48 [37123] prio=5 os_prio=31 cpu=1.38ms elapsed=31.38s tid=0x000000012c267800 nid=37123 runnable  [0x0000000173736000]
+   java.lang.Thread.State: RUNNABLE
+	at sun.nio.ch.SocketDispatcher.read0(java.base@21/Native Method)
+	at sun.nio.ch.SocketDispatcher.read(java.base@21/SocketDispatcher.java:47)
+	at sun.nio.ch.NioSocketImpl.tryRead(java.base@21/NioSocketImpl.java:256)
+	at sun.nio.ch.NioSocketImpl.implRead(java.base@21/NioSocketImpl.java:307)
+	at sun.nio.ch.NioSocketImpl.read(java.base@21/NioSocketImpl.java:346)
+	at sun.nio.ch.NioSocketImpl$1.read(java.base@21/NioSocketImpl.java:796)
+	at java.net.Socket$SocketInputStream.read(java.base@21/Socket.java:1099)
+	at java.io.InputStream.read(java.base@21/InputStream.java:220)
+	at gc.harness.IoStallsSuspect$Client.run(IoStallsSuspect.java:131)
+	at java.lang.Thread.runWith(java.base@21/Thread.java:1596)
+	at java.lang.Thread.run(java.base@21/Thread.java:1583)
+
+   Locked ownable synchronizers:
+	- <0x000000043c80b658> (a java.util.concurrent.locks.ReentrantLock$NonfairSync)
+
+"io-stall-client-27" #49 [37379] prio=5 os_prio=31 cpu=0.66ms elapsed=31.38s tid=0x000000012c268000 nid=37379 runnable  [0x0000000173942000]
+   java.lang.Thread.State: RUNNABLE
+	at sun.nio.ch.SocketDispatcher.read0(java.base@21/Native Method)
+	at sun.nio.ch.SocketDispatcher.read(java.base@21/SocketDispatcher.java:47)
+	at sun.nio.ch.NioSocketImpl.tryRead(java.base@21/NioSocketImpl.java:256)
+	at sun.nio.ch.NioSocketImpl.implRead(java.base@21/NioSocketImpl.java:307)
+	at sun.nio.ch.NioSocketImpl.read(java.base@21/NioSocketImpl.java:346)
+	at sun.nio.ch.NioSocketImpl$1.read(java.base@21/NioSocketImpl.java:796)
+	at java.net.Socket$SocketInputStream.read(java.base@21/Socket.java:1099)
+	at java.io.InputStream.read(java.base@21/InputStream.java:220)
+	at gc.harness.IoStallsSuspect$Client.run(IoStallsSuspect.java:131)
+	at java.lang.Thread.runWith(java.base@21/Thread.java:1596)
+	at java.lang.Thread.run(java.base@21/Thread.java:1583)
+
+   Locked ownable synchronizers:
+	- <0x000000043c83fa88> (a java.util.concurrent.locks.ReentrantLock$NonfairSync)
+
+"io-blackhole-handler-1" #50 [43523] daemon prio=5 os_prio=31 cpu=0.49ms elapsed=31.37s tid=0x000000011e80bc00 nid=43523 runnable  [0x0000000173b4e000]
+   java.lang.Thread.State: RUNNABLE
+	at sun.nio.ch.SocketDispatcher.read0(java.base@21/Native Method)
+	at sun.nio.ch.SocketDispatcher.read(java.base@21/SocketDispatcher.java:47)
+	at sun.nio.ch.NioSocketImpl.tryRead(java.base@21/NioSocketImpl.java:256)
+	at sun.nio.ch.NioSocketImpl.implRead(java.base@21/NioSocketImpl.java:307)
+	at sun.nio.ch.NioSocketImpl.read(java.base@21/NioSocketImpl.java:346)
+	at sun.nio.ch.NioSocketImpl$1.read(java.base@21/NioSocketImpl.java:796)
+	at java.net.Socket$SocketInputStream.read(java.base@21/Socket.java:1099)
+	at java.io.InputStream.read(java.base@21/InputStream.java:220)
+	at gc.harness.IoStallsSuspect.blackholeHandler(IoStallsSuspect.java:96)
+	at gc.harness.IoStallsSuspect.lambda$startBlackholeServer$0(IoStallsSuspect.java:71)
+	at gc.harness.IoStallsSuspect$$Lambda/0x00000008000c1218.run(Unknown Source)
+	at java.lang.Thread.runWith(java.base@21/Thread.java:1596)
+	at java.lang.Thread.run(java.base@21/Thread.java:1583)
+
+   Locked ownable synchronizers:
+	- <0x000000043c84bd18> (a java.util.concurrent.locks.ReentrantLock$NonfairSync)
+
+"io-blackhole-handler-2" #51 [65283] daemon prio=5 os_prio=31 cpu=0.21ms elapsed=31.37s tid=0x000000012c268800 nid=65283 runnable  [0x0000000173d5a000]
+   java.lang.Thread.State: RUNNABLE
+	at sun.nio.ch.SocketDispatcher.read0(java.base@21/Native Method)
+	at sun.nio.ch.SocketDispatcher.read(java.base@21/SocketDispatcher.java:47)
+	at sun.nio.ch.NioSocketImpl.tryRead(java.base@21/NioSocketImpl.java:256)
+	at sun.nio.ch.NioSocketImpl.implRead(java.base@21/NioSocketImpl.java:307)
+	at sun.nio.ch.NioSocketImpl.read(java.base@21/NioSocketImpl.java:346)
+	at sun.nio.ch.NioSocketImpl$1.read(java.base@21/NioSocketImpl.java:796)
+	at java.net.Socket$SocketInputStream.read(java.base@21/Socket.java:1099)
+	at java.io.InputStream.read(java.base@21/InputStream.java:220)
+	at gc.harness.IoStallsSuspect.blackholeHandler(IoStallsSuspect.java:96)
+	at gc.harness.IoStallsSuspect.lambda$startBlackholeServer$0(IoStallsSuspect.java:71)
+	at gc.harness.IoStallsSuspect$$Lambda/0x00000008000c1218.run(Unknown Source)
+	at java.lang.Thread.runWith(java.base@21/Thread.java:1596)
+	at java.lang.Thread.run(java.base@21/Thread.java:1583)
+
+   Locked ownable synchronizers:
+	- <0x000000043c83a538> (a java.util.concurrent.locks.ReentrantLock$NonfairSync)
+
+"io-blackhole-handler-3" #52 [64771] daemon prio=5 os_prio=31 cpu=0.08ms elapsed=31.37s tid=0x000000012a00a400 nid=64771 runnable  [0x0000000173f66000]
+   java.lang.Thread.State: RUNNABLE
+	at sun.nio.ch.SocketDispatcher.read0(java.base@21/Native Method)
+	at sun.nio.ch.SocketDispatcher.read(java.base@21/SocketDispatcher.java:47)
+	at sun.nio.ch.NioSocketImpl.tryRead(java.base@21/NioSocketImpl.java:256)
+	at sun.nio.ch.NioSocketImpl.implRead(java.base@21/NioSocketImpl.java:307)
+	at sun.nio.ch.NioSocketImpl.read(java.base@21/NioSocketImpl.java:346)
+	at sun.nio.ch.NioSocketImpl$1.read(java.base@21/NioSocketImpl.java:796)
+	at java.net.Socket$SocketInputStream.read(java.base@21/Socket.java:1099)
+	at java.io.InputStream.read(java.base@21/InputStream.java:220)
+	at gc.harness.IoStallsSuspect.blackholeHandler(IoStallsSuspect.java:96)
+	at gc.harness.IoStallsSuspect.lambda$startBlackholeServer$0(IoStallsSuspect.java:71)
+	at gc.harness.IoStallsSuspect$$Lambda/0x00000008000c1218.run(Unknown Source)
+	at java.lang.Thread.runWith(java.base@21/Thread.java:1596)
+	at java.lang.Thread.run(java.base@21/Thread.java:1583)
+
+   Locked ownable synchronizers:
+	- <0x000000043c845330> (a java.util.concurrent.locks.ReentrantLock$NonfairSync)
+
+"io-blackhole-handler-4" #53 [64259] daemon prio=5 os_prio=31 cpu=0.18ms elapsed=31.37s tid=0x000000012c901800 nid=64259 runnable  [0x0000000174172000]
+   java.lang.Thread.State: RUNNABLE
+	at sun.nio.ch.SocketDispatcher.read0(java.base@21/Native Method)
+	at sun.nio.ch.SocketDispatcher.read(java.base@21/SocketDispatcher.java:47)
+	at sun.nio.ch.NioSocketImpl.tryRead(java.base@21/NioSocketImpl.java:256)
+	at sun.nio.ch.NioSocketImpl.implRead(java.base@21/NioSocketImpl.java:307)
+	at sun.nio.ch.NioSocketImpl.read(java.base@21/NioSocketImpl.java:346)
+	at sun.nio.ch.NioSocketImpl$1.read(java.base@21/NioSocketImpl.java:796)
+	at java.net.Socket$SocketInputStream.read(java.base@21/Socket.java:1099)
+	at java.io.InputStream.read(java.base@21/InputStream.java:220)
+	at gc.harness.IoStallsSuspect.blackholeHandler(IoStallsSuspect.java:96)
+	at gc.harness.IoStallsSuspect.lambda$startBlackholeServer$0(IoStallsSuspect.java:71)
+	at gc.harness.IoStallsSuspect$$Lambda/0x00000008000c1218.run(Unknown Source)
+	at java.lang.Thread.runWith(java.base@21/Thread.java:1596)
+	at java.lang.Thread.run(java.base@21/Thread.java:1583)
+
+   Locked ownable synchronizers:
+	- <0x000000043c8b2b80> (a java.util.concurrent.locks.ReentrantLock$NonfairSync)
+
+"io-blackhole-handler-5" #54 [44291] daemon prio=5 os_prio=31 cpu=0.12ms elapsed=31.37s tid=0x000000012a00ac00 nid=44291 runnable  [0x000000017437e000]
+   java.lang.Thread.State: RUNNABLE
+	at sun.nio.ch.SocketDispatcher.read0(java.base@21/Native Method)
+	at sun.nio.ch.SocketDispatcher.read(java.base@21/SocketDispatcher.java:47)
+	at sun.nio.ch.NioSocketImpl.tryRead(java.base@21/NioSocketImpl.java:256)
+	at sun.nio.ch.NioSocketImpl.implRead(java.base@21/NioSocketImpl.java:307)
+	at sun.nio.ch.NioSocketImpl.read(java.base@21/NioSocketImpl.java:346)
+	at sun.nio.ch.NioSocketImpl$1.read(java.base@21/NioSocketImpl.java:796)
+	at java.net.Socket$SocketInputStream.read(java.base@21/Socket.java:1099)
+	at java.io.InputStream.read(java.base@21/InputStream.java:220)
+	at gc.harness.IoStallsSuspect.blackholeHandler(IoStallsSuspect.java:96)
+	at gc.harness.IoStallsSuspect.lambda$startBlackholeServer$0(IoStallsSuspect.java:71)
+	at gc.harness.IoStallsSuspect$$Lambda/0x00000008000c1218.run(Unknown Source)
+	at java.lang.Thread.runWith(java.base@21/Thread.java:1596)
+	at java.lang.Thread.run(java.base@21/Thread.java:1583)
+
+   Locked ownable synchronizers:
+	- <0x000000043c8873f0> (a java.util.concurrent.locks.ReentrantLock$NonfairSync)
+
+"io-blackhole-handler-6" #55 [64003] daemon prio=5 os_prio=31 cpu=0.06ms elapsed=31.37s tid=0x000000011f00aa00 nid=64003 runnable  [0x000000017458a000]
+   java.lang.Thread.State: RUNNABLE
+	at sun.nio.ch.SocketDispatcher.read0(java.base@21/Native Method)
+	at sun.nio.ch.SocketDispatcher.read(java.base@21/SocketDispatcher.java:47)
+	at sun.nio.ch.NioSocketImpl.tryRead(java.base@21/NioSocketImpl.java:256)
+	at sun.nio.ch.NioSocketImpl.implRead(java.base@21/NioSocketImpl.java:307)
+	at sun.nio.ch.NioSocketImpl.read(java.base@21/NioSocketImpl.java:346)
+	at sun.nio.ch.NioSocketImpl$1.read(java.base@21/NioSocketImpl.java:796)
+	at java.net.Socket$SocketInputStream.read(java.base@21/Socket.java:1099)
+	at java.io.InputStream.read(java.base@21/InputStream.java:220)
+	at gc.harness.IoStallsSuspect.blackholeHandler(IoStallsSuspect.java:96)
+	at gc.harness.IoStallsSuspect.lambda$startBlackholeServer$0(IoStallsSuspect.java:71)
+	at gc.harness.IoStallsSuspect$$Lambda/0x00000008000c1218.run(Unknown Source)
+	at java.lang.Thread.runWith(java.base@21/Thread.java:1596)
+	at java.lang.Thread.run(java.base@21/Thread.java:1583)
+
+   Locked ownable synchronizers:
+	- <0x000000043c853bb8> (a java.util.concurrent.locks.ReentrantLock$NonfairSync)
+
+"io-blackhole-handler-7" #56 [44803] daemon prio=5 os_prio=31 cpu=0.05ms elapsed=31.37s tid=0x000000012c269000 nid=44803 runnable  [0x0000000174796000]
+   java.lang.Thread.State: RUNNABLE
+	at sun.nio.ch.SocketDispatcher.read0(java.base@21/Native Method)
+	at sun.nio.ch.SocketDispatcher.read(java.base@21/SocketDispatcher.java:47)
+	at sun.nio.ch.NioSocketImpl.tryRead(java.base@21/NioSocketImpl.java:256)
+	at sun.nio.ch.NioSocketImpl.implRead(java.base@21/NioSocketImpl.java:307)
+	at sun.nio.ch.NioSocketImpl.read(java.base@21/NioSocketImpl.java:346)
+	at sun.nio.ch.NioSocketImpl$1.read(java.base@21/NioSocketImpl.java:796)
+	at java.net.Socket$SocketInputStream.read(java.base@21/Socket.java:1099)
+	at java.io.InputStream.read(java.base@21/InputStream.java:220)
+	at gc.harness.IoStallsSuspect.blackholeHandler(IoStallsSuspect.java:96)
+	at gc.harness.IoStallsSuspect.lambda$startBlackholeServer$0(IoStallsSuspect.java:71)
+	at gc.harness.IoStallsSuspect$$Lambda/0x00000008000c1218.run(Unknown Source)
+	at java.lang.Thread.runWith(java.base@21/Thread.java:1596)
+	at java.lang.Thread.run(java.base@21/Thread.java:1583)
+
+   Locked ownable synchronizers:
+	- <0x000000043c80a368> (a java.util.concurrent.locks.ReentrantLock$NonfairSync)
+
+"io-blackhole-handler-8" #57 [63491] daemon prio=5 os_prio=31 cpu=0.04ms elapsed=31.37s tid=0x000000012c269800 nid=63491 runnable  [0x00000001749a2000]
+   java.lang.Thread.State: RUNNABLE
+	at sun.nio.ch.SocketDispatcher.read0(java.base@21/Native Method)
+	at sun.nio.ch.SocketDispatcher.read(java.base@21/SocketDispatcher.java:47)
+	at sun.nio.ch.NioSocketImpl.tryRead(java.base@21/NioSocketImpl.java:256)
+	at sun.nio.ch.NioSocketImpl.implRead(java.base@21/NioSocketImpl.java:307)
+	at sun.nio.ch.NioSocketImpl.read(java.base@21/NioSocketImpl.java:346)
+	at sun.nio.ch.NioSocketImpl$1.read(java.base@21/NioSocketImpl.java:796)
+	at java.net.Socket$SocketInputStream.read(java.base@21/Socket.java:1099)
+	at java.io.InputStream.read(java.base@21/InputStream.java:220)
+	at gc.harness.IoStallsSuspect.blackholeHandler(IoStallsSuspect.java:96)
+	at gc.harness.IoStallsSuspect.lambda$startBlackholeServer$0(IoStallsSuspect.java:71)
+	at gc.harness.IoStallsSuspect$$Lambda/0x00000008000c1218.run(Unknown Source)
+	at java.lang.Thread.runWith(java.base@21/Thread.java:1596)
+	at java.lang.Thread.run(java.base@21/Thread.java:1583)
+
+   Locked ownable synchronizers:
+	- <0x000000043c80fa90> (a java.util.concurrent.locks.ReentrantLock$NonfairSync)
+
+"io-blackhole-handler-9" #58 [45315] daemon prio=5 os_prio=31 cpu=0.04ms elapsed=31.37s tid=0x000000012c26a000 nid=45315 runnable  [0x0000000174bae000]
+   java.lang.Thread.State: RUNNABLE
+	at sun.nio.ch.SocketDispatcher.read0(java.base@21/Native Method)
+	at sun.nio.ch.SocketDispatcher.read(java.base@21/SocketDispatcher.java:47)
+	at sun.nio.ch.NioSocketImpl.tryRead(java.base@21/NioSocketImpl.java:256)
+	at sun.nio.ch.NioSocketImpl.implRead(java.base@21/NioSocketImpl.java:307)
+	at sun.nio.ch.NioSocketImpl.read(java.base@21/NioSocketImpl.java:346)
+	at sun.nio.ch.NioSocketImpl$1.read(java.base@21/NioSocketImpl.java:796)
+	at java.net.Socket$SocketInputStream.read(java.base@21/Socket.java:1099)
+	at java.io.InputStream.read(java.base@21/InputStream.java:220)
+	at gc.harness.IoStallsSuspect.blackholeHandler(IoStallsSuspect.java:96)
+	at gc.harness.IoStallsSuspect.lambda$startBlackholeServer$0(IoStallsSuspect.java:71)
+	at gc.harness.IoStallsSuspect$$Lambda/0x00000008000c1218.run(Unknown Source)
+	at java.lang.Thread.runWith(java.base@21/Thread.java:1596)
+	at java.lang.Thread.run(java.base@21/Thread.java:1583)
+
+   Locked ownable synchronizers:
+	- <0x000000043c84a9a8> (a java.util.concurrent.locks.ReentrantLock$NonfairSync)
+
+"io-blackhole-handler-10" #59 [62979] daemon prio=5 os_prio=31 cpu=0.05ms elapsed=31.37s tid=0x000000012c26a800 nid=62979 runnable  [0x0000000174dba000]
+   java.lang.Thread.State: RUNNABLE
+	at sun.nio.ch.SocketDispatcher.read0(java.base@21/Native Method)
+	at sun.nio.ch.SocketDispatcher.read(java.base@21/SocketDispatcher.java:47)
+	at sun.nio.ch.NioSocketImpl.tryRead(java.base@21/NioSocketImpl.java:256)
+	at sun.nio.ch.NioSocketImpl.implRead(java.base@21/NioSocketImpl.java:307)
+	at sun.nio.ch.NioSocketImpl.read(java.base@21/NioSocketImpl.java:346)
+	at sun.nio.ch.NioSocketImpl$1.read(java.base@21/NioSocketImpl.java:796)
+	at java.net.Socket$SocketInputStream.read(java.base@21/Socket.java:1099)
+	at java.io.InputStream.read(java.base@21/InputStream.java:220)
+	at gc.harness.IoStallsSuspect.blackholeHandler(IoStallsSuspect.java:96)
+	at gc.harness.IoStallsSuspect.lambda$startBlackholeServer$0(IoStallsSuspect.java:71)
+	at gc.harness.IoStallsSuspect$$Lambda/0x00000008000c1218.run(Unknown Source)
+	at java.lang.Thread.runWith(java.base@21/Thread.java:1596)
+	at java.lang.Thread.run(java.base@21/Thread.java:1583)
+
+   Locked ownable synchronizers:
+	- <0x000000043c87e880> (a java.util.concurrent.locks.ReentrantLock$NonfairSync)
+
+"io-blackhole-handler-11" #60 [62467] daemon prio=5 os_prio=31 cpu=0.05ms elapsed=31.37s tid=0x000000012c26b000 nid=62467 runnable  [0x0000000174fc6000]
+   java.lang.Thread.State: RUNNABLE
+	at sun.nio.ch.SocketDispatcher.read0(java.base@21/Native Method)
+	at sun.nio.ch.SocketDispatcher.read(java.base@21/SocketDispatcher.java:47)
+	at sun.nio.ch.NioSocketImpl.tryRead(java.base@21/NioSocketImpl.java:256)
+	at sun.nio.ch.NioSocketImpl.implRead(java.base@21/NioSocketImpl.java:307)
+	at sun.nio.ch.NioSocketImpl.read(java.base@21/NioSocketImpl.java:346)
+	at sun.nio.ch.NioSocketImpl$1.read(java.base@21/NioSocketImpl.java:796)
+	at java.net.Socket$SocketInputStream.read(java.base@21/Socket.java:1099)
+	at java.io.InputStream.read(java.base@21/InputStream.java:220)
+	at gc.harness.IoStallsSuspect.blackholeHandler(IoStallsSuspect.java:96)
+	at gc.harness.IoStallsSuspect.lambda$startBlackholeServer$0(IoStallsSuspect.java:71)
+	at gc.harness.IoStallsSuspect$$Lambda/0x00000008000c1218.run(Unknown Source)
+	at java.lang.Thread.runWith(java.base@21/Thread.java:1596)
+	at java.lang.Thread.run(java.base@21/Thread.java:1583)
+
+   Locked ownable synchronizers:
+	- <0x000000043c843e20> (a java.util.concurrent.locks.ReentrantLock$NonfairSync)
+
+"io-blackhole-handler-12" #61 [46083] daemon prio=5 os_prio=31 cpu=0.04ms elapsed=31.37s tid=0x000000012c26b800 nid=46083 runnable  [0x00000001751d2000]
+   java.lang.Thread.State: RUNNABLE
+	at sun.nio.ch.SocketDispatcher.read0(java.base@21/Native Method)
+	at sun.nio.ch.SocketDispatcher.read(java.base@21/SocketDispatcher.java:47)
+	at sun.nio.ch.NioSocketImpl.tryRead(java.base@21/NioSocketImpl.java:256)
+	at sun.nio.ch.NioSocketImpl.implRead(java.base@21/NioSocketImpl.java:307)
+	at sun.nio.ch.NioSocketImpl.read(java.base@21/NioSocketImpl.java:346)
+	at sun.nio.ch.NioSocketImpl$1.read(java.base@21/NioSocketImpl.java:796)
+	at java.net.Socket$SocketInputStream.read(java.base@21/Socket.java:1099)
+	at java.io.InputStream.read(java.base@21/InputStream.java:220)
+	at gc.harness.IoStallsSuspect.blackholeHandler(IoStallsSuspect.java:96)
+	at gc.harness.IoStallsSuspect.lambda$startBlackholeServer$0(IoStallsSuspect.java:71)
+	at gc.harness.IoStallsSuspect$$Lambda/0x00000008000c1218.run(Unknown Source)
+	at java.lang.Thread.runWith(java.base@21/Thread.java:1596)
+	at java.lang.Thread.run(java.base@21/Thread.java:1583)
+
+   Locked ownable synchronizers:
+	- <0x000000043c86cb60> (a java.util.concurrent.locks.ReentrantLock$NonfairSync)
+
+"io-blackhole-handler-13" #62 [62211] daemon prio=5 os_prio=31 cpu=0.04ms elapsed=31.37s tid=0x000000012c26c000 nid=62211 runnable  [0x00000001753de000]
+   java.lang.Thread.State: RUNNABLE
+	at sun.nio.ch.SocketDispatcher.read0(java.base@21/Native Method)
+	at sun.nio.ch.SocketDispatcher.read(java.base@21/SocketDispatcher.java:47)
+	at sun.nio.ch.NioSocketImpl.tryRead(java.base@21/NioSocketImpl.java:256)
+	at sun.nio.ch.NioSocketImpl.implRead(java.base@21/NioSocketImpl.java:307)
+	at sun.nio.ch.NioSocketImpl.read(java.base@21/NioSocketImpl.java:346)
+	at sun.nio.ch.NioSocketImpl$1.read(java.base@21/NioSocketImpl.java:796)
+	at java.net.Socket$SocketInputStream.read(java.base@21/Socket.java:1099)
+	at java.io.InputStream.read(java.base@21/InputStream.java:220)
+	at gc.harness.IoStallsSuspect.blackholeHandler(IoStallsSuspect.java:96)
+	at gc.harness.IoStallsSuspect.lambda$startBlackholeServer$0(IoStallsSuspect.java:71)
+	at gc.harness.IoStallsSuspect$$Lambda/0x00000008000c1218.run(Unknown Source)
+	at java.lang.Thread.runWith(java.base@21/Thread.java:1596)
+	at java.lang.Thread.run(java.base@21/Thread.java:1583)
+
+   Locked ownable synchronizers:
+	- <0x000000043c839288> (a java.util.concurrent.locks.ReentrantLock$NonfairSync)
+
+"io-blackhole-handler-14" #63 [61699] daemon prio=5 os_prio=31 cpu=0.04ms elapsed=31.37s tid=0x000000012c26c800 nid=61699 runnable  [0x00000001755ea000]
+   java.lang.Thread.State: RUNNABLE
+	at sun.nio.ch.SocketDispatcher.read0(java.base@21/Native Method)
+	at sun.nio.ch.SocketDispatcher.read(java.base@21/SocketDispatcher.java:47)
+	at sun.nio.ch.NioSocketImpl.tryRead(java.base@21/NioSocketImpl.java:256)
+	at sun.nio.ch.NioSocketImpl.implRead(java.base@21/NioSocketImpl.java:307)
+	at sun.nio.ch.NioSocketImpl.read(java.base@21/NioSocketImpl.java:346)
+	at sun.nio.ch.NioSocketImpl$1.read(java.base@21/NioSocketImpl.java:796)
+	at java.net.Socket$SocketInputStream.read(java.base@21/Socket.java:1099)
+	at java.io.InputStream.read(java.base@21/InputStream.java:220)
+	at gc.harness.IoStallsSuspect.blackholeHandler(IoStallsSuspect.java:96)
+	at gc.harness.IoStallsSuspect.lambda$startBlackholeServer$0(IoStallsSuspect.java:71)
+	at gc.harness.IoStallsSuspect$$Lambda/0x00000008000c1218.run(Unknown Source)
+	at java.lang.Thread.runWith(java.base@21/Thread.java:1596)
+	at java.lang.Thread.run(java.base@21/Thread.java:1583)
+
+   Locked ownable synchronizers:
+	- <0x000000043c808f38> (a java.util.concurrent.locks.ReentrantLock$NonfairSync)
+
+"io-blackhole-handler-15" #64 [46595] daemon prio=5 os_prio=31 cpu=0.04ms elapsed=31.37s tid=0x000000012c26d000 nid=46595 runnable  [0x00000001757f6000]
+   java.lang.Thread.State: RUNNABLE
+	at sun.nio.ch.SocketDispatcher.read0(java.base@21/Native Method)
+	at sun.nio.ch.SocketDispatcher.read(java.base@21/SocketDispatcher.java:47)
+	at sun.nio.ch.NioSocketImpl.tryRead(java.base@21/NioSocketImpl.java:256)
+	at sun.nio.ch.NioSocketImpl.implRead(java.base@21/NioSocketImpl.java:307)
+	at sun.nio.ch.NioSocketImpl.read(java.base@21/NioSocketImpl.java:346)
+	at sun.nio.ch.NioSocketImpl$1.read(java.base@21/NioSocketImpl.java:796)
+	at java.net.Socket$SocketInputStream.read(java.base@21/Socket.java:1099)
+	at java.io.InputStream.read(java.base@21/InputStream.java:220)
+	at gc.harness.IoStallsSuspect.blackholeHandler(IoStallsSuspect.java:96)
+	at gc.harness.IoStallsSuspect.lambda$startBlackholeServer$0(IoStallsSuspect.java:71)
+	at gc.harness.IoStallsSuspect$$Lambda/0x00000008000c1218.run(Unknown Source)
+	at java.lang.Thread.runWith(java.base@21/Thread.java:1596)
+	at java.lang.Thread.run(java.base@21/Thread.java:1583)
+
+   Locked ownable synchronizers:
+	- <0x000000043c852918> (a java.util.concurrent.locks.ReentrantLock$NonfairSync)
+
+"io-blackhole-handler-16" #65 [61187] daemon prio=5 os_prio=31 cpu=0.04ms elapsed=31.37s tid=0x000000012c26d800 nid=61187 runnable  [0x0000000175a02000]
+   java.lang.Thread.State: RUNNABLE
+	at sun.nio.ch.SocketDispatcher.read0(java.base@21/Native Method)
+	at sun.nio.ch.SocketDispatcher.read(java.base@21/SocketDispatcher.java:47)
+	at sun.nio.ch.NioSocketImpl.tryRead(java.base@21/NioSocketImpl.java:256)
+	at sun.nio.ch.NioSocketImpl.implRead(java.base@21/NioSocketImpl.java:307)
+	at sun.nio.ch.NioSocketImpl.read(java.base@21/NioSocketImpl.java:346)
+	at sun.nio.ch.NioSocketImpl$1.read(java.base@21/NioSocketImpl.java:796)
+	at java.net.Socket$SocketInputStream.read(java.base@21/Socket.java:1099)
+	at java.io.InputStream.read(java.base@21/InputStream.java:220)
+	at gc.harness.IoStallsSuspect.blackholeHandler(IoStallsSuspect.java:96)
+	at gc.harness.IoStallsSuspect.lambda$startBlackholeServer$0(IoStallsSuspect.java:71)
+	at gc.harness.IoStallsSuspect$$Lambda/0x00000008000c1218.run(Unknown Source)
+	at java.lang.Thread.runWith(java.base@21/Thread.java:1596)
+	at java.lang.Thread.run(java.base@21/Thread.java:1583)
+
+   Locked ownable synchronizers:
+	- <0x000000043c849678> (a java.util.concurrent.locks.ReentrantLock$NonfairSync)
+
+"io-blackhole-handler-17" #66 [60931] daemon prio=5 os_prio=31 cpu=0.04ms elapsed=31.37s tid=0x000000012c26e000 nid=60931 runnable  [0x0000000175c0e000]
+   java.lang.Thread.State: RUNNABLE
+	at sun.nio.ch.SocketDispatcher.read0(java.base@21/Native Method)
+	at sun.nio.ch.SocketDispatcher.read(java.base@21/SocketDispatcher.java:47)
+	at sun.nio.ch.NioSocketImpl.tryRead(java.base@21/NioSocketImpl.java:256)
+	at sun.nio.ch.NioSocketImpl.implRead(java.base@21/NioSocketImpl.java:307)
+	at sun.nio.ch.NioSocketImpl.read(java.base@21/NioSocketImpl.java:346)
+	at sun.nio.ch.NioSocketImpl$1.read(java.base@21/NioSocketImpl.java:796)
+	at java.net.Socket$SocketInputStream.read(java.base@21/Socket.java:1099)
+	at java.io.InputStream.read(java.base@21/InputStream.java:220)
+	at gc.harness.IoStallsSuspect.blackholeHandler(IoStallsSuspect.java:96)
+	at gc.harness.IoStallsSuspect.lambda$startBlackholeServer$0(IoStallsSuspect.java:71)
+	at gc.harness.IoStallsSuspect$$Lambda/0x00000008000c1218.run(Unknown Source)
+	at java.lang.Thread.runWith(java.base@21/Thread.java:1596)
+	at java.lang.Thread.run(java.base@21/Thread.java:1583)
+
+   Locked ownable synchronizers:
+	- <0x000000043c842b80> (a java.util.concurrent.locks.ReentrantLock$NonfairSync)
+
+"io-blackhole-handler-18" #67 [47619] daemon prio=5 os_prio=31 cpu=0.04ms elapsed=31.37s tid=0x000000012c26e800 nid=47619 runnable  [0x0000000175e1a000]
+   java.lang.Thread.State: RUNNABLE
+	at sun.nio.ch.SocketDispatcher.read0(java.base@21/Native Method)
+	at sun.nio.ch.SocketDispatcher.read(java.base@21/SocketDispatcher.java:47)
+	at sun.nio.ch.NioSocketImpl.tryRead(java.base@21/NioSocketImpl.java:256)
+	at sun.nio.ch.NioSocketImpl.implRead(java.base@21/NioSocketImpl.java:307)
+	at sun.nio.ch.NioSocketImpl.read(java.base@21/NioSocketImpl.java:346)
+	at sun.nio.ch.NioSocketImpl$1.read(java.base@21/NioSocketImpl.java:796)
+	at java.net.Socket$SocketInputStream.read(java.base@21/Socket.java:1099)
+	at java.io.InputStream.read(java.base@21/InputStream.java:220)
+	at gc.harness.IoStallsSuspect.blackholeHandler(IoStallsSuspect.java:96)
+	at gc.harness.IoStallsSuspect.lambda$startBlackholeServer$0(IoStallsSuspect.java:71)
+	at gc.harness.IoStallsSuspect$$Lambda/0x00000008000c1218.run(Unknown Source)
+	at java.lang.Thread.runWith(java.base@21/Thread.java:1596)
+	at java.lang.Thread.run(java.base@21/Thread.java:1583)
+
+   Locked ownable synchronizers:
+	- <0x000000043c851668> (a java.util.concurrent.locks.ReentrantLock$NonfairSync)
+
+"io-blackhole-handler-19" #68 [47875] daemon prio=5 os_prio=31 cpu=0.04ms elapsed=31.37s tid=0x000000012c26f000 nid=47875 runnable  [0x0000000176026000]
+   java.lang.Thread.State: RUNNABLE
+	at sun.nio.ch.SocketDispatcher.read0(java.base@21/Native Method)
+	at sun.nio.ch.SocketDispatcher.read(java.base@21/SocketDispatcher.java:47)
+	at sun.nio.ch.NioSocketImpl.tryRead(java.base@21/NioSocketImpl.java:256)
+	at sun.nio.ch.NioSocketImpl.implRead(java.base@21/NioSocketImpl.java:307)
+	at sun.nio.ch.NioSocketImpl.read(java.base@21/NioSocketImpl.java:346)
+	at sun.nio.ch.NioSocketImpl$1.read(java.base@21/NioSocketImpl.java:796)
+	at java.net.Socket$SocketInputStream.read(java.base@21/Socket.java:1099)
+	at java.io.InputStream.read(java.base@21/InputStream.java:220)
+	at gc.harness.IoStallsSuspect.blackholeHandler(IoStallsSuspect.java:96)
+	at gc.harness.IoStallsSuspect.lambda$startBlackholeServer$0(IoStallsSuspect.java:71)
+	at gc.harness.IoStallsSuspect$$Lambda/0x00000008000c1218.run(Unknown Source)
+	at java.lang.Thread.runWith(java.base@21/Thread.java:1596)
+	at java.lang.Thread.run(java.base@21/Thread.java:1583)
+
+   Locked ownable synchronizers:
+	- <0x000000043c80fc50> (a java.util.concurrent.locks.ReentrantLock$NonfairSync)
+
+"io-blackhole-handler-20" #69 [60163] daemon prio=5 os_prio=31 cpu=0.06ms elapsed=31.37s tid=0x000000012c26f800 nid=60163 runnable  [0x0000000176232000]
+   java.lang.Thread.State: RUNNABLE
+	at sun.nio.ch.SocketDispatcher.read0(java.base@21/Native Method)
+	at sun.nio.ch.SocketDispatcher.read(java.base@21/SocketDispatcher.java:47)
+	at sun.nio.ch.NioSocketImpl.tryRead(java.base@21/NioSocketImpl.java:256)
+	at sun.nio.ch.NioSocketImpl.implRead(java.base@21/NioSocketImpl.java:307)
+	at sun.nio.ch.NioSocketImpl.read(java.base@21/NioSocketImpl.java:346)
+	at sun.nio.ch.NioSocketImpl$1.read(java.base@21/NioSocketImpl.java:796)
+	at java.net.Socket$SocketInputStream.read(java.base@21/Socket.java:1099)
+	at java.io.InputStream.read(java.base@21/InputStream.java:220)
+	at gc.harness.IoStallsSuspect.blackholeHandler(IoStallsSuspect.java:96)
+	at gc.harness.IoStallsSuspect.lambda$startBlackholeServer$0(IoStallsSuspect.java:71)
+	at gc.harness.IoStallsSuspect$$Lambda/0x00000008000c1218.run(Unknown Source)
+	at java.lang.Thread.runWith(java.base@21/Thread.java:1596)
+	at java.lang.Thread.run(java.base@21/Thread.java:1583)
+
+   Locked ownable synchronizers:
+	- <0x000000043c841880> (a java.util.concurrent.locks.ReentrantLock$NonfairSync)
+
+"io-blackhole-handler-21" #70 [48387] daemon prio=5 os_prio=31 cpu=0.06ms elapsed=31.37s tid=0x000000012c270000 nid=48387 runnable  [0x000000017643e000]
+   java.lang.Thread.State: RUNNABLE
+	at sun.nio.ch.SocketDispatcher.read0(java.base@21/Native Method)
+	at sun.nio.ch.SocketDispatcher.read(java.base@21/SocketDispatcher.java:47)
+	at sun.nio.ch.NioSocketImpl.tryRead(java.base@21/NioSocketImpl.java:256)
+	at sun.nio.ch.NioSocketImpl.implRead(java.base@21/NioSocketImpl.java:307)
+	at sun.nio.ch.NioSocketImpl.read(java.base@21/NioSocketImpl.java:346)
+	at sun.nio.ch.NioSocketImpl$1.read(java.base@21/NioSocketImpl.java:796)
+	at java.net.Socket$SocketInputStream.read(java.base@21/Socket.java:1099)
+	at java.io.InputStream.read(java.base@21/InputStream.java:220)
+	at gc.harness.IoStallsSuspect.blackholeHandler(IoStallsSuspect.java:96)
+	at gc.harness.IoStallsSuspect.lambda$startBlackholeServer$0(IoStallsSuspect.java:71)
+	at gc.harness.IoStallsSuspect$$Lambda/0x00000008000c1218.run(Unknown Source)
+	at java.lang.Thread.runWith(java.base@21/Thread.java:1596)
+	at java.lang.Thread.run(java.base@21/Thread.java:1583)
+
+   Locked ownable synchronizers:
+	- <0x000000043c84f908> (a java.util.concurrent.locks.ReentrantLock$NonfairSync)
+
+"io-blackhole-handler-22" #81 [50947] daemon prio=5 os_prio=31 cpu=0.05ms elapsed=31.37s tid=0x000000012c264600 nid=50947 runnable  [0x0000000177ac2000]
+   java.lang.Thread.State: RUNNABLE
+	at sun.nio.ch.SocketDispatcher.read0(java.base@21/Native Method)
+	at sun.nio.ch.SocketDispatcher.read(java.base@21/SocketDispatcher.java:47)
+	at sun.nio.ch.NioSocketImpl.tryRead(java.base@21/NioSocketImpl.java:256)
+	at sun.nio.ch.NioSocketImpl.implRead(java.base@21/NioSocketImpl.java:307)
+	at sun.nio.ch.NioSocketImpl.read(java.base@21/NioSocketImpl.java:346)
+	at sun.nio.ch.NioSocketImpl$1.read(java.base@21/NioSocketImpl.java:796)
+	at java.net.Socket$SocketInputStream.read(java.base@21/Socket.java:1099)
+	at java.io.InputStream.read(java.base@21/InputStream.java:220)
+	at gc.harness.IoStallsSuspect.blackholeHandler(IoStallsSuspect.java:96)
+	at gc.harness.IoStallsSuspect.lambda$startBlackholeServer$0(IoStallsSuspect.java:71)
+	at gc.harness.IoStallsSuspect$$Lambda/0x00000008000c1218.run(Unknown Source)
+	at java.lang.Thread.runWith(java.base@21/Thread.java:1596)
+	at java.lang.Thread.run(java.base@21/Thread.java:1583)
+
+   Locked ownable synchronizers:
+	- <0x000000043c857e18> (a java.util.concurrent.locks.ReentrantLock$NonfairSync)
+
+"io-blackhole-handler-23" #82 [51459] daemon prio=5 os_prio=31 cpu=0.07ms elapsed=31.37s tid=0x000000012c264e00 nid=51459 runnable  [0x0000000177cce000]
+   java.lang.Thread.State: RUNNABLE
+	at sun.nio.ch.SocketDispatcher.read0(java.base@21/Native Method)
+	at sun.nio.ch.SocketDispatcher.read(java.base@21/SocketDispatcher.java:47)
+	at sun.nio.ch.NioSocketImpl.tryRead(java.base@21/NioSocketImpl.java:256)
+	at sun.nio.ch.NioSocketImpl.implRead(java.base@21/NioSocketImpl.java:307)
+	at sun.nio.ch.NioSocketImpl.read(java.base@21/NioSocketImpl.java:346)
+	at sun.nio.ch.NioSocketImpl$1.read(java.base@21/NioSocketImpl.java:796)
+	at java.net.Socket$SocketInputStream.read(java.base@21/Socket.java:1099)
+	at java.io.InputStream.read(java.base@21/InputStream.java:220)
+	at gc.harness.IoStallsSuspect.blackholeHandler(IoStallsSuspect.java:96)
+	at gc.harness.IoStallsSuspect.lambda$startBlackholeServer$0(IoStallsSuspect.java:71)
+	at gc.harness.IoStallsSuspect$$Lambda/0x00000008000c1218.run(Unknown Source)
+	at java.lang.Thread.runWith(java.base@21/Thread.java:1596)
+	at java.lang.Thread.run(java.base@21/Thread.java:1583)
+
+   Locked ownable synchronizers:
+	- <0x000000043f800ad8> (a java.util.concurrent.locks.ReentrantLock$NonfairSync)
+
+"io-blackhole-handler-24" #83 [56579] daemon prio=5 os_prio=31 cpu=0.05ms elapsed=31.37s tid=0x000000012c265600 nid=56579 runnable  [0x0000000177eda000]
+   java.lang.Thread.State: RUNNABLE
+	at sun.nio.ch.SocketDispatcher.read0(java.base@21/Native Method)
+	at sun.nio.ch.SocketDispatcher.read(java.base@21/SocketDispatcher.java:47)
+	at sun.nio.ch.NioSocketImpl.tryRead(java.base@21/NioSocketImpl.java:256)
+	at sun.nio.ch.NioSocketImpl.implRead(java.base@21/NioSocketImpl.java:307)
+	at sun.nio.ch.NioSocketImpl.read(java.base@21/NioSocketImpl.java:346)
+	at sun.nio.ch.NioSocketImpl$1.read(java.base@21/NioSocketImpl.java:796)
+	at java.net.Socket$SocketInputStream.read(java.base@21/Socket.java:1099)
+	at java.io.InputStream.read(java.base@21/InputStream.java:220)
+	at gc.harness.IoStallsSuspect.blackholeHandler(IoStallsSuspect.java:96)
+	at gc.harness.IoStallsSuspect.lambda$startBlackholeServer$0(IoStallsSuspect.java:71)
+	at gc.harness.IoStallsSuspect$$Lambda/0x00000008000c1218.run(Unknown Source)
+	at java.lang.Thread.runWith(java.base@21/Thread.java:1596)
+	at java.lang.Thread.run(java.base@21/Thread.java:1583)
+
+   Locked ownable synchronizers:
+	- <0x000000043f800e50> (a java.util.concurrent.locks.ReentrantLock$NonfairSync)
+
+"io-blackhole-handler-25" #84 [56323] daemon prio=5 os_prio=31 cpu=0.05ms elapsed=31.37s tid=0x000000012c265e00 nid=56323 runnable  [0x00000001780e6000]
+   java.lang.Thread.State: RUNNABLE
+	at sun.nio.ch.SocketDispatcher.read0(java.base@21/Native Method)
+	at sun.nio.ch.SocketDispatcher.read(java.base@21/SocketDispatcher.java:47)
+	at sun.nio.ch.NioSocketImpl.tryRead(java.base@21/NioSocketImpl.java:256)
+	at sun.nio.ch.NioSocketImpl.implRead(java.base@21/NioSocketImpl.java:307)
+	at sun.nio.ch.NioSocketImpl.read(java.base@21/NioSocketImpl.java:346)
+	at sun.nio.ch.NioSocketImpl$1.read(java.base@21/NioSocketImpl.java:796)
+	at java.net.Socket$SocketInputStream.read(java.base@21/Socket.java:1099)
+	at java.io.InputStream.read(java.base@21/InputStream.java:220)
+	at gc.harness.IoStallsSuspect.blackholeHandler(IoStallsSuspect.java:96)
+	at gc.harness.IoStallsSuspect.lambda$startBlackholeServer$0(IoStallsSuspect.java:71)
+	at gc.harness.IoStallsSuspect$$Lambda/0x00000008000c1218.run(Unknown Source)
+	at java.lang.Thread.runWith(java.base@21/Thread.java:1596)
+	at java.lang.Thread.run(java.base@21/Thread.java:1583)
+
+   Locked ownable synchronizers:
+	- <0x000000043f8011c8> (a java.util.concurrent.locks.ReentrantLock$NonfairSync)
+
+"io-blackhole-handler-26" #85 [51971] daemon prio=5 os_prio=31 cpu=0.06ms elapsed=31.37s tid=0x000000012c272a00 nid=51971 runnable  [0x00000001782f2000]
+   java.lang.Thread.State: RUNNABLE
+	at sun.nio.ch.SocketDispatcher.read0(java.base@21/Native Method)
+	at sun.nio.ch.SocketDispatcher.read(java.base@21/SocketDispatcher.java:47)
+	at sun.nio.ch.NioSocketImpl.tryRead(java.base@21/NioSocketImpl.java:256)
+	at sun.nio.ch.NioSocketImpl.implRead(java.base@21/NioSocketImpl.java:307)
+	at sun.nio.ch.NioSocketImpl.read(java.base@21/NioSocketImpl.java:346)
+	at sun.nio.ch.NioSocketImpl$1.read(java.base@21/NioSocketImpl.java:796)
+	at java.net.Socket$SocketInputStream.read(java.base@21/Socket.java:1099)
+	at java.io.InputStream.read(java.base@21/InputStream.java:220)
+	at gc.harness.IoStallsSuspect.blackholeHandler(IoStallsSuspect.java:96)
+	at gc.harness.IoStallsSuspect.lambda$startBlackholeServer$0(IoStallsSuspect.java:71)
+	at gc.harness.IoStallsSuspect$$Lambda/0x00000008000c1218.run(Unknown Source)
+	at java.lang.Thread.runWith(java.base@21/Thread.java:1596)
+	at java.lang.Thread.run(java.base@21/Thread.java:1583)
+
+   Locked ownable synchronizers:
+	- <0x000000043f801540> (a java.util.concurrent.locks.ReentrantLock$NonfairSync)
+
+"io-blackhole-handler-27" #86 [55555] daemon prio=5 os_prio=31 cpu=0.05ms elapsed=31.37s tid=0x000000012c273200 nid=55555 runnable  [0x00000001784fe000]
+   java.lang.Thread.State: RUNNABLE
+	at sun.nio.ch.SocketDispatcher.read0(java.base@21/Native Method)
+	at sun.nio.ch.SocketDispatcher.read(java.base@21/SocketDispatcher.java:47)
+	at sun.nio.ch.NioSocketImpl.tryRead(java.base@21/NioSocketImpl.java:256)
+	at sun.nio.ch.NioSocketImpl.implRead(java.base@21/NioSocketImpl.java:307)
+	at sun.nio.ch.NioSocketImpl.read(java.base@21/NioSocketImpl.java:346)
+	at sun.nio.ch.NioSocketImpl$1.read(java.base@21/NioSocketImpl.java:796)
+	at java.net.Socket$SocketInputStream.read(java.base@21/Socket.java:1099)
+	at java.io.InputStream.read(java.base@21/InputStream.java:220)
+	at gc.harness.IoStallsSuspect.blackholeHandler(IoStallsSuspect.java:96)
+	at gc.harness.IoStallsSuspect.lambda$startBlackholeServer$0(IoStallsSuspect.java:71)
+	at gc.harness.IoStallsSuspect$$Lambda/0x00000008000c1218.run(Unknown Source)
+	at java.lang.Thread.runWith(java.base@21/Thread.java:1596)
+	at java.lang.Thread.run(java.base@21/Thread.java:1583)
+
+   Locked ownable synchronizers:
+	- <0x000000043f8018b8> (a java.util.concurrent.locks.ReentrantLock$NonfairSync)
+
+"io-blackhole-handler-28" #87 [55299] daemon prio=5 os_prio=31 cpu=0.04ms elapsed=31.37s tid=0x000000012c273a00 nid=55299 runnable  [0x000000017870a000]
+   java.lang.Thread.State: RUNNABLE
+	at sun.nio.ch.SocketDispatcher.read0(java.base@21/Native Method)
+	at sun.nio.ch.SocketDispatcher.read(java.base@21/SocketDispatcher.java:47)
+	at sun.nio.ch.NioSocketImpl.tryRead(java.base@21/NioSocketImpl.java:256)
+	at sun.nio.ch.NioSocketImpl.implRead(java.base@21/NioSocketImpl.java:307)
+	at sun.nio.ch.NioSocketImpl.read(java.base@21/NioSocketImpl.java:346)
+	at sun.nio.ch.NioSocketImpl$1.read(java.base@21/NioSocketImpl.java:796)
+	at java.net.Socket$SocketInputStream.read(java.base@21/Socket.java:1099)
+	at java.io.InputStream.read(java.base@21/InputStream.java:220)
+	at gc.harness.IoStallsSuspect.blackholeHandler(IoStallsSuspect.java:96)
+	at gc.harness.IoStallsSuspect.lambda$startBlackholeServer$0(IoStallsSuspect.java:71)
+	at gc.harness.IoStallsSuspect$$Lambda/0x00000008000c1218.run(Unknown Source)
+	at java.lang.Thread.runWith(java.base@21/Thread.java:1596)
+	at java.lang.Thread.run(java.base@21/Thread.java:1583)
+
+   Locked ownable synchronizers:
+	- <0x000000043f801c30> (a java.util.concurrent.locks.ReentrantLock$NonfairSync)
+
+"Attach Listener" #88 [32527] daemon prio=9 os_prio=31 cpu=0.39ms elapsed=0.11s tid=0x000000012c896600 nid=32527 waiting on condition  [0x0000000000000000]
+   java.lang.Thread.State: RUNNABLE
+
+   Locked ownable synchronizers:
+	- None
+
+"VM Thread" os_prio=31 cpu=2.38ms elapsed=31.53s tid=0x000000012be11d00 nid=18179 runnable  
+
+"GC Thread#0" os_prio=31 cpu=0.71ms elapsed=31.54s tid=0x000000012be0a3b0 nid=12035 runnable  
+
+"GC Thread#1" os_prio=31 cpu=0.64ms elapsed=31.37s tid=0x000000012bf11ac0 nid=48899 runnable  
+
+"GC Thread#2" os_prio=31 cpu=0.81ms elapsed=31.37s tid=0x000000012bf12420 nid=59907 runnable  
+
+"GC Thread#3" os_prio=31 cpu=0.71ms elapsed=31.37s tid=0x000000012be2cae0 nid=59395 runnable  
+
+"GC Thread#4" os_prio=31 cpu=0.72ms elapsed=31.37s tid=0x000000012be2d270 nid=49667 runnable  
+
+"GC Thread#5" os_prio=31 cpu=0.69ms elapsed=31.37s tid=0x000000012be2dbd0 nid=49923 runnable  
+
+"GC Thread#6" os_prio=31 cpu=0.72ms elapsed=31.37s tid=0x000000012be2e530 nid=58627 runnable  
+
+"GC Thread#7" os_prio=31 cpu=0.69ms elapsed=31.37s tid=0x000000012be2ee90 nid=58115 runnable  
+
+"GC Thread#8" os_prio=31 cpu=0.67ms elapsed=31.37s tid=0x000000012be2f7f0 nid=50435 runnable  
+
+"GC Thread#9" os_prio=31 cpu=0.66ms elapsed=31.37s tid=0x000000012bf12d80 nid=57603 runnable  
+
+"GC Thread#10" os_prio=31 cpu=0.65ms elapsed=31.37s tid=0x000000012be30150 nid=50691 runnable  
+
+"G1 Main Marker" os_prio=31 cpu=0.01ms elapsed=31.54s tid=0x000000012be0ab50 nid=13827 runnable  
+
+"G1 Conc#0" os_prio=31 cpu=0.01ms elapsed=31.54s tid=0x000000012be0b4c0 nid=13315 runnable  
+
+"G1 Refine#0" os_prio=31 cpu=0.02ms elapsed=31.54s tid=0x000000012c020e00 nid=16387 runnable  
+
+"G1 Service" os_prio=31 cpu=0.72ms elapsed=31.54s tid=0x000000012be0e220 nid=16899 runnable  
+
+"VM Periodic Task Thread" os_prio=31 cpu=14.80ms elapsed=31.54s tid=0x000000012be0f5c0 nid=20995 waiting on condition  
+
+JNI global refs: 14, weak refs: 0
+

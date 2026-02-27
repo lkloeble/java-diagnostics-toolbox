@@ -8,6 +8,7 @@ from thread_diagnostic.analyzer import (
     detect_thread_pool_saturation,
     detect_stuck_threads,
     detect_cpu_storm,
+    detect_io_stalls,
     compute_thread_state_summary,
     compute_thread_group_inventory,
 )
@@ -184,6 +185,44 @@ def test_compute_thread_state_summary(simple_thread_dump):
     assert "runnable" in stats
     assert "waiting" in stats
     assert "blocked" in stats
+
+
+@pytest.fixture
+def real_io_stalls_dump():
+    """Load real I/O stalls dump from samples."""
+    path = Path(__file__).parents[3] / "samples" / "dump_io_stalls.txt"
+    if not path.exists():
+        pytest.skip(f"Sample not found: {path}")
+    return path.read_text()
+
+
+def test_detect_io_stalls(io_stall_thread_dump):
+    """I/O stalls should be detected when threads are blocked on socket reads."""
+    dump = parse_thread_dump(io_stall_thread_dump)
+    result = detect_io_stalls(dump)
+
+    assert result["detected"] is True
+    assert result["stalled_count"] == 4
+    assert len(result["evidence"]) > 0
+
+
+def test_detect_no_io_stalls(simple_thread_dump):
+    """Healthy dump should not trigger I/O stall detection."""
+    dump = parse_thread_dump(simple_thread_dump)
+    result = detect_io_stalls(dump)
+
+    assert result["detected"] is False
+
+
+def test_real_io_stalls_dump(real_io_stalls_dump):
+    """Real I/O stalls dump should detect 28 threads blocked on socket reads."""
+    dump = parse_thread_dump(real_io_stalls_dump)
+    findings = analyze_thread_dump(dump)
+
+    io_stalls = next(s for s in findings["suspects"] if s["type"] == "io_stalls")
+    assert io_stalls["detected"] is True
+    assert io_stalls["confidence"] == "high"
+    assert io_stalls["stalled_count"] >= 28  # 28 clients + 28 server-side handlers
 
 
 def test_detect_cpu_storm(cpu_storm_thread_dump):

@@ -9,6 +9,7 @@ TYPE_DISPLAY_NAMES = {
     "thread_pool_saturation": "Thread Pool Saturation",
     "stuck_threads": "Stuck Threads",
     "cpu_storm": "CPU Storm",
+    "io_stalls": "I/O Stalls",
 }
 
 # Severity levels and their indicators
@@ -85,6 +86,9 @@ def generate_slack_summary(findings: Dict) -> str:
         elif stype == "cpu_storm":
             pct = s.get("runnable_pct", 0)
             issues.append(f"CPU storm ({pct:.0f}% RUNNABLE)")
+        elif stype == "io_stalls":
+            count = s.get("stalled_count", 0)
+            issues.append(f"I/O stalls ({count} threads)")
 
     return f"{emoji} {status}: {', '.join(issues)} | {threads_suffix}"
 

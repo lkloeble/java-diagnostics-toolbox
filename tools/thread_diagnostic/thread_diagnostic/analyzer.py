@@ -231,6 +231,83 @@ def detect_stuck_threads(dump: ThreadDump, min_same_location: int = 3) -> Dict:
     }
 
 
+_IO_STALL_FRAMES = [
+    "SocketDispatcher.read0",       # NIO socket read (Java 11+)
+    "SocketInputStream.read",       # Classic blocking socket read
+    "SocketInputStream.socketRead0", # Older Java
+    "FileDispatcher.read0",         # NIO file read
+    "FileInputStream.read0",        # Classic file read
+]
+
+_JDK_FRAME_PREFIXES = ("at java.", "at javax.", "at sun.", "at jdk.", "at com.sun.")
+
+
+def _is_io_stall_frame(frame: str) -> bool:
+    return any(p in frame for p in _IO_STALL_FRAMES)
+
+
+def _find_app_frame(stack_trace: List[str]) -> Optional[str]:
+    """Return the first user (non-JDK) frame below the I/O stall frame."""
+    io_found = False
+    for frame in stack_trace:
+        if not io_found:
+            if _is_io_stall_frame(frame):
+                io_found = True
+            continue
+        if frame.startswith("at ") and not any(frame.startswith(p) for p in _JDK_FRAME_PREFIXES):
+            return frame
+    return None
+
+
+def detect_io_stalls(dump: ThreadDump, min_stalled: int = 3) -> Dict:
+    """
+    Detect threads blocked on network or file I/O.
+
+    These threads appear RUNNABLE in the dump (they are in a native blocking
+    call) but are not making progress — they are waiting for data from a
+    socket or file that is not responding.
+    """
+    stalled = []
+    for thread in dump.threads:
+        if thread.state == "RUNNABLE" and thread.stack_trace:
+            if any(_is_io_stall_frame(f) for f in thread.stack_trace):
+                stalled.append(thread)
+
+    detected = len(stalled) >= min_stalled
+
+    # Group by application frame to show where in the code the stall originates
+    app_groups: Dict[str, list] = defaultdict(list)
+    for thread in stalled:
+        app_frame = _find_app_frame(thread.stack_trace) or "unknown"
+        app_groups[app_frame].append(thread.name)
+
+    evidence = []
+    if detected:
+        evidence.append(f"{len(stalled)} threads blocked on network/file I/O")
+        for app_frame, names in sorted(app_groups.items(), key=lambda x: -len(x[1])):
+            evidence.append(f"{len(names)} threads at: {app_frame}")
+
+    confidence = "high" if len(stalled) >= 10 else "medium" if detected else "low"
+
+    return {
+        "type": "io_stalls",
+        "detected": detected,
+        "confidence": confidence,
+        "stalled_count": len(stalled),
+        "evidence": evidence,
+        "business_note": (
+            f"I/O STALL: {len(stalled)} threads blocked waiting for network or file data. "
+            "Likely a slow/unresponsive downstream dependency (DB, external API, filesystem)."
+        ) if detected else "",
+        "next_steps": [
+            "Identify the downstream target from the stack trace (DB host, API endpoint, file path)",
+            "Check latency/availability of that dependency",
+            "Look for connection pool exhaustion or missing read timeout configuration",
+            "Compare multiple dumps to confirm threads are not making progress",
+        ] if detected else [],
+    }
+
+
 def detect_cpu_storm(dump: ThreadDump, runnable_threshold_pct: float = 50.0, min_cluster: int = 3) -> Dict:
     """
     Detect high RUNNABLE ratio combined with thread clustering at the same stack location.
@@ -373,6 +450,7 @@ def analyze_thread_dump(dump: ThreadDump) -> Dict:
         detect_thread_pool_saturation(dump),
         detect_stuck_threads(dump),
         detect_cpu_storm(dump),
+        detect_io_stalls(dump),
     ]
 
     thread_stats = compute_thread_state_summary(dump)
