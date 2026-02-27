@@ -116,6 +116,7 @@ def generate_report(findings: Dict, format: str = "txt") -> str:
         lines.append("")
 
     # Thread statistics
+    thread_groups = findings.get("thread_groups", [])
     if format == "md":
         lines.append("## Thread Statistics")
         lines.append(f"**Total threads:** {thread_stats.get('total_threads', 0)}")
@@ -128,6 +129,16 @@ def generate_report(findings: Dict, format: str = "txt") -> str:
         lines.append(f"| TIMED_WAITING | {thread_stats.get('timed_waiting', 0)} |")
         lines.append(f"| BLOCKED | {thread_stats.get('blocked', 0)} |")
         lines.append("")
+        if thread_groups:
+            lines.append("**By group:**")
+            lines.append("")
+            lines.append("| Group | Total | RUNNABLE | WAITING | TIMED_WAITING | BLOCKED |")
+            lines.append("|-------|-------|----------|---------|---------------|---------|")
+            for g in thread_groups:
+                lines.append(f"| {g['name']} | {g['count']} | {g['runnable']} | {g['waiting']} | {g['timed_waiting']} | {g['blocked']} |")
+            lines.append("")
+            lines.append("> Compare group sizes with your nominal baseline — an unusual count may indicate a thread leak.")
+            lines.append("")
     else:
         lines.append("Thread Statistics")
         lines.append(f"  Total:         {thread_stats.get('total_threads', 0)}")
@@ -136,6 +147,19 @@ def generate_report(findings: Dict, format: str = "txt") -> str:
         lines.append(f"  WAITING:       {thread_stats.get('waiting', 0)}")
         lines.append(f"  TIMED_WAITING: {thread_stats.get('timed_waiting', 0)}")
         lines.append(f"  BLOCKED:       {thread_stats.get('blocked', 0)}")
+        if thread_groups:
+            lines.append("")
+            lines.append("  By group (compare with nominal baseline):")
+            for g in thread_groups:
+                state_parts = []
+                if g['runnable']:     state_parts.append(f"RUNNABLE: {g['runnable']}")
+                if g['waiting']:      state_parts.append(f"WAITING: {g['waiting']}")
+                if g['timed_waiting']:state_parts.append(f"TIMED_WAITING: {g['timed_waiting']}")
+                if g['blocked']:      state_parts.append(f"BLOCKED: {g['blocked']}")
+                thread_word = "thread " if g['count'] == 1 else "threads"
+                states_str = ", ".join(state_parts) if state_parts else "-"
+                lines.append(f"    {g['name']:<32} {g['count']:>3} {thread_word}  {states_str}")
+            lines.append("  Note: Unusual thread counts may indicate a thread leak.")
         lines.append("")
 
     # Suspects

@@ -8,6 +8,7 @@ from thread_diagnostic.analyzer import (
     detect_thread_pool_saturation,
     detect_stuck_threads,
     compute_thread_state_summary,
+    compute_thread_group_inventory,
 )
 
 
@@ -148,6 +149,37 @@ def test_compute_thread_state_summary(simple_thread_dump):
     assert "runnable" in stats
     assert "waiting" in stats
     assert "blocked" in stats
+
+
+def test_thread_group_inventory_groups_by_prefix(contention_thread_dump):
+    """worker-1..4 should be grouped as a single 'worker' group."""
+    dump = parse_thread_dump(contention_thread_dump)
+    groups = compute_thread_group_inventory(dump)
+
+    worker_group = next((g for g in groups if g["name"] == "worker"), None)
+    assert worker_group is not None, "Expected a 'worker' group"
+    assert worker_group["count"] == 4
+    assert worker_group["runnable"] == 1
+    assert worker_group["blocked"] == 3
+
+
+def test_thread_group_inventory_in_findings(simple_thread_dump):
+    """analyze_thread_dump should include thread_groups in findings."""
+    dump = parse_thread_dump(simple_thread_dump)
+    findings = analyze_thread_dump(dump)
+
+    assert "thread_groups" in findings
+    groups = findings["thread_groups"]
+    assert len(groups) > 0
+
+    # http-nio-8080-exec-1..4 should collapse into one group
+    http_group = next((g for g in groups if "http-nio-8080-exec" in g["name"]), None)
+    assert http_group is not None
+    assert http_group["count"] == 4
+
+    # Groups sorted by count descending
+    counts = [g["count"] for g in groups]
+    assert counts == sorted(counts, reverse=True)
 
 
 def test_analyze_deadlock_is_critical(deadlock_thread_dump):

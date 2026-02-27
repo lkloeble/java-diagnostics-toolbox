@@ -1,5 +1,6 @@
 # thread_diagnostic/analyzer.py
 
+import re
 from typing import List, Dict, Optional
 from collections import Counter, defaultdict
 from .parser import ThreadDump, ThreadInfo
@@ -248,6 +249,46 @@ def compute_thread_state_summary(dump: ThreadDump) -> Dict:
     }
 
 
+def _thread_group_key(name: str) -> str:
+    """Strip trailing index to get logical group name."""
+    # Handle -N and #N patterns (e.g. worker-3, GC Thread#0)
+    stripped = re.sub(r'[-#]\d+$', '', name).strip()
+    if stripped and stripped != name:
+        return stripped
+    # Handle trailing digits without separator (e.g. C2 CompilerThread0)
+    stripped = re.sub(r'\d+$', '', name).strip()
+    if stripped and len(stripped) >= 3:
+        return stripped
+    return name
+
+
+def compute_thread_group_inventory(dump: ThreadDump) -> List[Dict]:
+    """
+    Group threads by logical name prefix, sorted by count descending.
+
+    Strips trailing -N / #N indices to identify groups (e.g. worker-1..4 → worker).
+    Useful for spotting unusual thread counts vs. nominal baseline.
+    """
+    groups: Dict[str, list] = defaultdict(list)
+    for thread in dump.threads:
+        key = _thread_group_key(thread.name)
+        groups[key].append(thread)
+
+    result = []
+    for name, threads in groups.items():
+        state_counts = Counter(t.state for t in threads if t.state)
+        result.append({
+            "name": name,
+            "count": len(threads),
+            "runnable": state_counts.get("RUNNABLE", 0),
+            "waiting": state_counts.get("WAITING", 0),
+            "timed_waiting": state_counts.get("TIMED_WAITING", 0),
+            "blocked": state_counts.get("BLOCKED", 0),
+        })
+
+    return sorted(result, key=lambda g: g["count"], reverse=True)
+
+
 def analyze_thread_dump(dump: ThreadDump) -> Dict:
     """
     Main analysis orchestrator - runs all detectors and builds findings.
@@ -260,6 +301,7 @@ def analyze_thread_dump(dump: ThreadDump) -> Dict:
     ]
 
     thread_stats = compute_thread_state_summary(dump)
+    thread_groups = compute_thread_group_inventory(dump)
     detected_count = sum(1 for s in suspects if s["detected"])
     summary = f"{detected_count} issues DETECTED" if detected_count > 0 else "NO STRONG SIGNAL"
 
@@ -267,6 +309,7 @@ def analyze_thread_dump(dump: ThreadDump) -> Dict:
         "summary": summary,
         "suspects": suspects,
         "thread_stats": thread_stats,
+        "thread_groups": thread_groups,
         "jvm_info": dump.jvm_info,
         "timestamp": dump.timestamp,
     }
