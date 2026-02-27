@@ -231,6 +231,80 @@ def detect_stuck_threads(dump: ThreadDump, min_same_location: int = 3) -> Dict:
     }
 
 
+def detect_cpu_storm(dump: ThreadDump, runnable_threshold_pct: float = 50.0, min_cluster: int = 3) -> Dict:
+    """
+    Detect high RUNNABLE ratio combined with thread clustering at the same stack location.
+
+    A high RUNNABLE % alone is normal for CPU-bound apps. The signal is
+    RUNNABLE threads piling up at the same frame — hot loop or spinlock.
+    """
+    threads_with_state = [t for t in dump.threads if t.state]
+    if not threads_with_state:
+        return {
+            "type": "cpu_storm",
+            "detected": False,
+            "confidence": "low",
+            "runnable_pct": 0.0,
+            "hot_locations": [],
+            "evidence": [],
+            "business_note": "",
+            "next_steps": [],
+        }
+
+    runnable_threads = [t for t in threads_with_state if t.state == "RUNNABLE" and t.stack_trace]
+    runnable_count = sum(1 for t in threads_with_state if t.state == "RUNNABLE")
+    runnable_pct = (runnable_count / len(threads_with_state)) * 100
+
+    # Group RUNNABLE threads by top stack frame
+    location_groups: Dict[str, list] = defaultdict(list)
+    for thread in runnable_threads:
+        location_groups[thread.stack_trace[0]].append(thread)
+
+    hot_locations = sorted(
+        [
+            {
+                "location": loc,
+                "count": len(threads),
+                "thread_names": [t.name for t in threads[:5]],
+            }
+            for loc, threads in location_groups.items()
+            if len(threads) >= min_cluster
+        ],
+        key=lambda x: x["count"],
+        reverse=True,
+    )
+
+    detected = runnable_pct >= runnable_threshold_pct and len(hot_locations) > 0
+    confidence = "high" if runnable_pct >= 70 and hot_locations else "medium" if detected else "low"
+
+    evidence = []
+    if detected:
+        evidence.append(
+            f"{runnable_pct:.0f}% of threads RUNNABLE ({runnable_count}/{len(threads_with_state)})"
+        )
+    for loc in hot_locations:
+        evidence.append(f"{loc['count']} RUNNABLE threads at: {loc['location']}")
+
+    return {
+        "type": "cpu_storm",
+        "detected": detected,
+        "confidence": confidence,
+        "runnable_pct": round(runnable_pct, 1),
+        "hot_locations": hot_locations,
+        "evidence": evidence,
+        "business_note": (
+            f"CPU STORM: {runnable_pct:.0f}% of threads are RUNNABLE and clustering at the same location. "
+            "Likely a hot loop, spinlock, or runaway computation exhausting CPU."
+        ) if detected else "",
+        "next_steps": [
+            "Take a CPU profile (async-profiler, JFR) to confirm the hot method",
+            "Check if the clustering frame is a tight loop or busy-wait",
+            "Compare CPU% in top/jstat — high CPU confirms active spinning",
+            "Take multiple dumps 5s apart to confirm threads are not making progress",
+        ] if detected else [],
+    }
+
+
 def compute_thread_state_summary(dump: ThreadDump) -> Dict:
     """
     Compute summary statistics on thread states.
@@ -298,6 +372,7 @@ def analyze_thread_dump(dump: ThreadDump) -> Dict:
         detect_lock_contention(dump),
         detect_thread_pool_saturation(dump),
         detect_stuck_threads(dump),
+        detect_cpu_storm(dump),
     ]
 
     thread_stats = compute_thread_state_summary(dump)

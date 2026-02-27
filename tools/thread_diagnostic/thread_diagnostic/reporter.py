@@ -3,6 +3,14 @@
 from typing import Dict
 
 
+TYPE_DISPLAY_NAMES = {
+    "deadlock": "Deadlock",
+    "lock_contention": "Lock Contention",
+    "thread_pool_saturation": "Thread Pool Saturation",
+    "stuck_threads": "Stuck Threads",
+    "cpu_storm": "CPU Storm",
+}
+
 # Severity levels and their indicators
 SEVERITY_CRITICAL = "critical"
 SEVERITY_WARNING = "warning"
@@ -74,6 +82,9 @@ def generate_slack_summary(findings: Dict) -> str:
         elif stype == "stuck_threads":
             locs = s.get("locations", [])
             issues.append(f"Stuck threads ({len(locs)} locations)")
+        elif stype == "cpu_storm":
+            pct = s.get("runnable_pct", 0)
+            issues.append(f"CPU storm ({pct:.0f}% RUNNABLE)")
 
     return f"{emoji} {status}: {', '.join(issues)} | {threads_suffix}"
 
@@ -92,7 +103,7 @@ def generate_report(findings: Dict, format: str = "txt") -> str:
     else:
         severities = [compute_suspect_severity(s) for s in detected]
         max_sev = SEVERITY_CRITICAL if SEVERITY_CRITICAL in severities else SEVERITY_WARNING
-        names = ", ".join(s["type"].replace("_", " ").title() for s in detected)
+        names = ", ".join(TYPE_DISPLAY_NAMES.get(s["type"], s["type"].replace("_", " ").title()) for s in detected)
         summary_line = f"{SEVERITY_EMOJI[max_sev]} {detected_count} issues DETECTED → {names}"
 
     # Header
@@ -122,9 +133,12 @@ def generate_report(findings: Dict, format: str = "txt") -> str:
         lines.append(f"**Total threads:** {thread_stats.get('total_threads', 0)}")
         lines.append(f"**Daemon threads:** {thread_stats.get('daemon_threads', 0)}")
         lines.append("")
+        accounted = (thread_stats.get('runnable', 0) + thread_stats.get('waiting', 0)
+                     + thread_stats.get('timed_waiting', 0) + thread_stats.get('blocked', 0))
+        runnable_pct = (thread_stats.get('runnable', 0) / accounted * 100) if accounted else 0
         lines.append("| State | Count |")
         lines.append("|-------|-------|")
-        lines.append(f"| RUNNABLE | {thread_stats.get('runnable', 0)} |")
+        lines.append(f"| RUNNABLE | {thread_stats.get('runnable', 0)} ({runnable_pct:.0f}%) |")
         lines.append(f"| WAITING | {thread_stats.get('waiting', 0)} |")
         lines.append(f"| TIMED_WAITING | {thread_stats.get('timed_waiting', 0)} |")
         lines.append(f"| BLOCKED | {thread_stats.get('blocked', 0)} |")
@@ -143,7 +157,10 @@ def generate_report(findings: Dict, format: str = "txt") -> str:
         lines.append("Thread Statistics")
         lines.append(f"  Total:         {thread_stats.get('total_threads', 0)}")
         lines.append(f"  Daemon:        {thread_stats.get('daemon_threads', 0)}")
-        lines.append(f"  RUNNABLE:      {thread_stats.get('runnable', 0)}")
+        accounted = (thread_stats.get('runnable', 0) + thread_stats.get('waiting', 0)
+                     + thread_stats.get('timed_waiting', 0) + thread_stats.get('blocked', 0))
+        runnable_pct = (thread_stats.get('runnable', 0) / accounted * 100) if accounted else 0
+        lines.append(f"  RUNNABLE:      {thread_stats.get('runnable', 0)} ({runnable_pct:.0f}%)")
         lines.append(f"  WAITING:       {thread_stats.get('waiting', 0)}")
         lines.append(f"  TIMED_WAITING: {thread_stats.get('timed_waiting', 0)}")
         lines.append(f"  BLOCKED:       {thread_stats.get('blocked', 0)}")
@@ -164,7 +181,7 @@ def generate_report(findings: Dict, format: str = "txt") -> str:
 
     # Suspects
     for suspect in suspects:
-        type_title = suspect["type"].replace("_", " ").title()
+        type_title = TYPE_DISPLAY_NAMES.get(suspect["type"], suspect["type"].replace("_", " ").title())
         status = "DETECTED" if suspect["detected"] else "NOT DETECTED"
         severity = compute_suspect_severity(suspect)
         emoji = SEVERITY_EMOJI[severity]

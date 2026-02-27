@@ -55,6 +55,50 @@ Found 1 deadlock.
 
 
 @pytest.fixture
+def cpu_storm_thread_dump():
+    """Thread dump with CPU storm - many RUNNABLE threads clustering at the same hot location."""
+    return '''2024-01-15 10:30:45
+Full thread dump OpenJDK 64-Bit Server VM (17.0.1+12 mixed mode):
+
+"main" #1 prio=5 os_prio=0 tid=0x00007f1234567890 nid=0x1 runnable
+   java.lang.Thread.State: RUNNABLE
+	at com.example.Main.main(Main.java:5)
+
+"worker-1" #10 prio=5 os_prio=0 tid=0x00007f1234567891 nid=0xa runnable
+   java.lang.Thread.State: RUNNABLE
+	at com.example.HotLoop.spin(HotLoop.java:15)
+
+"worker-2" #11 prio=5 os_prio=0 tid=0x00007f1234567892 nid=0xb runnable
+   java.lang.Thread.State: RUNNABLE
+	at com.example.HotLoop.spin(HotLoop.java:15)
+
+"worker-3" #12 prio=5 os_prio=0 tid=0x00007f1234567893 nid=0xc runnable
+   java.lang.Thread.State: RUNNABLE
+	at com.example.HotLoop.spin(HotLoop.java:15)
+
+"worker-4" #13 prio=5 os_prio=0 tid=0x00007f1234567894 nid=0xd runnable
+   java.lang.Thread.State: RUNNABLE
+	at com.example.HotLoop.spin(HotLoop.java:15)
+
+"worker-5" #14 prio=5 os_prio=0 tid=0x00007f1234567895 nid=0xe runnable
+   java.lang.Thread.State: RUNNABLE
+	at com.example.HotLoop.spin(HotLoop.java:15)
+
+"worker-6" #15 prio=5 os_prio=0 tid=0x00007f1234567896 nid=0xf runnable
+   java.lang.Thread.State: RUNNABLE
+	at com.example.HotLoop.spin(HotLoop.java:15)
+
+"worker-7" #16 prio=5 os_prio=0 tid=0x00007f1234567897 nid=0x10 runnable
+   java.lang.Thread.State: RUNNABLE
+	at com.example.HotLoop.spin(HotLoop.java:15)
+
+"worker-8" #17 prio=5 os_prio=0 tid=0x00007f1234567898 nid=0x11 runnable
+   java.lang.Thread.State: RUNNABLE
+	at com.example.HotLoop.spin(HotLoop.java:15)
+'''
+
+
+@pytest.fixture
 def contention_thread_dump():
     """Thread dump with lock contention - multiple threads blocked on same lock."""
     return '''2024-01-15 10:30:45

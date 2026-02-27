@@ -7,6 +7,7 @@ from thread_diagnostic.analyzer import (
     detect_lock_contention,
     detect_thread_pool_saturation,
     detect_stuck_threads,
+    detect_cpu_storm,
     compute_thread_state_summary,
     compute_thread_group_inventory,
 )
@@ -161,6 +162,26 @@ def test_compute_thread_state_summary(simple_thread_dump):
     assert "runnable" in stats
     assert "waiting" in stats
     assert "blocked" in stats
+
+
+def test_detect_cpu_storm(cpu_storm_thread_dump):
+    """CPU storm should be detected when many RUNNABLE threads cluster at the same location."""
+    dump = parse_thread_dump(cpu_storm_thread_dump)
+    result = detect_cpu_storm(dump)
+
+    assert result["detected"] is True
+    assert result["confidence"] == "high"
+    assert result["runnable_pct"] >= 50.0
+    assert len(result["hot_locations"]) > 0
+    assert result["hot_locations"][0]["count"] >= 3
+
+
+def test_detect_no_cpu_storm(simple_thread_dump):
+    """Healthy dump with no dominant RUNNABLE cluster should not trigger cpu_storm."""
+    dump = parse_thread_dump(simple_thread_dump)
+    result = detect_cpu_storm(dump)
+
+    assert result["detected"] is False
 
 
 def test_thread_group_inventory_groups_by_prefix(contention_thread_dump):
