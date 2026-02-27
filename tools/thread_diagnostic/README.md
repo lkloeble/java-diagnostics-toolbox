@@ -72,6 +72,7 @@ The tool runs **5 detectors** on every dump:
 | **Thread pool saturation** | 80%+ of a pool's threads in WAITING / TIMED_WAITING / BLOCKED | medium / high |
 | **Stuck threads** | 3+ threads with identical top-2 stack frames | medium / high (scales with count) |
 | **CPU storm** | RUNNABLE ratio > 50% **and** 3+ RUNNABLE threads clustering at the same frame | medium / high |
+| **I/O stalls** | 3+ RUNNABLE threads blocked on socket or file reads (`SocketDispatcher`, `SocketInputStream`, `FileDispatcher`) | medium / high |
 
 ### Always shown (informational)
 
