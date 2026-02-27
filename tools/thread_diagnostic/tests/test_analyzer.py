@@ -96,6 +96,18 @@ def test_real_pool_saturated_dump(real_pool_saturated_dump):
     assert len(saturation["saturated_pools"]) > 0
 
 
+def test_real_pool_saturated_dump_group_inventory(real_pool_saturated_dump):
+    """pool-sat-worker threads should form a single group of 28."""
+    dump = parse_thread_dump(real_pool_saturated_dump)
+    findings = analyze_thread_dump(dump)
+
+    groups = findings["thread_groups"]
+    worker_group = next((g for g in groups if g["name"] == "pool-sat-worker"), None)
+    assert worker_group is not None, "Expected a 'pool-sat-worker' group"
+    assert worker_group["count"] == 28
+    assert worker_group["waiting"] == 28
+
+
 def test_analyze_healthy_dump(simple_thread_dump):
     """Healthy dump should return no strong signal."""
     dump = parse_thread_dump(simple_thread_dump)
