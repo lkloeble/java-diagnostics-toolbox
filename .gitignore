@@ -205,3 +205,17 @@ cython_debug/
 marimo/_static/
 marimo/_lsp/
 __marimo__/
+
+# macOS
+.DS_Store
+
+# Generated diagnostic report outputs (written to cwd when running the tools)
+thread-diagnostic.md
+thread-diagnostic.txt
+gc-diagnostic.md
+gc-diagnostic.txt
+async-profiler-diagnostic.md
+async-profiler-diagnostic.txt
+
+# Maven build output (fake-apps)
+fake-apps/**/target/

@@ -1,0 +1,32 @@
+# async-profiler CPU sample — Spring Boot + Hibernate application
+# Generated with: asprof -d 30 -e cpu -o collapsed -f cpu.collapsed <pid>
+# App prefix: com/example/myapp
+# Total samples: 147
+
+# HTTP threads doing DB queries — leaf in JDBC driver
+thread_start;_pthread_start;thread_native_entry;Thread::call_run;JavaThread::thread_main_inner;java/lang/Thread.run;org/springframework/web/servlet/DispatcherServlet.doDispatch;com/example/myapp/controller/UserController.getUser;com/example/myapp/service/UserService.findById;org/hibernate/query/internal/AbstractProducedQuery.list;com/mysql/cj/jdbc/ClientPreparedStatement.executeQuery;com/mysql/cj/NativeSession.execSQL 40
+
+# Business logic filtering — leaf in app domain model
+thread_start;_pthread_start;thread_native_entry;Thread::call_run;JavaThread::thread_main_inner;java/lang/Thread.run;org/springframework/web/servlet/DispatcherServlet.doDispatch;com/example/myapp/controller/OrderController.listOrders;com/example/myapp/service/OrderService.filterByStatus;com/example/myapp/domain/Order.isEligible 30
+
+# CSV export / string building — leaf in JDK StringBuilder
+thread_start;_pthread_start;thread_native_entry;Thread::call_run;JavaThread::thread_main_inner;java/lang/Thread.run;com/example/myapp/controller/ReportController.exportCsv;com/example/myapp/service/ReportService.buildCsv;java/lang/StringBuilder.append 25
+
+# Batch computation — short app-only stack
+com/example/myapp/batch/ReportGenerator.computeMetrics;com/example/myapp/util/Statistics.mean 20
+
+# Hibernate entity load — leaf in Hibernate event listener
+thread_start;_pthread_start;thread_native_entry;Thread::call_run;JavaThread::thread_main_inner;java/lang/Thread.run;org/springframework/aop/framework/ReflectiveMethodInvocation.proceed;org/springframework/transaction/interceptor/TransactionInterceptor.invoke;com/example/myapp/service/PaymentService.processPayment;org/hibernate/loader/Loader.loadEntityBatch;org/hibernate/event/internal/DefaultLoadEventListener.proxyOrLoad 15
+
+# GC thread active — JVM/Native leaf
+thread_start;_pthread_start;thread_native_entry;Thread::call_run;VMThread::run;VM_GenCollectFull::doit 8
+
+# Spring validation AOP — leaf in Spring interceptor
+thread_start;_pthread_start;thread_native_entry;Thread::call_run;JavaThread::thread_main_inner;java/lang/Thread.run;com/example/myapp/controller/UserController.createUser;org/springframework/aop/framework/ReflectiveMethodInvocation.proceed;org/springframework/validation/beanvalidation/MethodValidationInterceptor.invoke 5
+
+# JVM WatcherThread sleeping — JVM/Native leaf
+thread_start;_pthread_start;thread_native_entry;Thread::call_run;WatcherThread::run;WatcherThread::sleep;Monitor::wait_without_safepoint_check;PlatformMonitor::wait;__psynch_cvwait 2
+
+# Real frames from gc/harness profiling run (asprof 4.3, macOS)
+gc/harness/MemoryBehaviorApp.main 1
+gc/harness/MemoryBehaviorApp.main;gc/harness/MemoryBehaviorApp.retainUpTo;gc/harness/MemoryBehaviorApp.retainedBytes 1
